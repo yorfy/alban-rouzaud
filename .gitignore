@@ -2,9 +2,8 @@
 **/images/
 **/images_small/
 
-# Fichiers binaires générés (PDF et DOCX — trop lourds pour GitHub)
+# PDF trop volumineux pour GitHub (hébergés sur Google Drive)
 *.pdf
-*.docx
 
 # Environnement virtuel Python
 venv/
