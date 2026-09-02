@@ -1,0 +1,533 @@
+# Détection N1 — Règles mécaniques
+# Fichier : ALBAN ROUZAUD_3_L'ÉVASION.txt
+# Date : détection automatique
+# Format : PAGE | TYPE | TEXTE ORIGINAL | CORRECTION PROPOSÉE | CONFIANCE
+# Types : GUILLEMET, ESPACE_TYPO, ACCENT, CASSE, PONCTUATION, PARAGRAPHE
+#
+# IMPORTANT : ce texte est un manuscrit de guerre des années 1940.
+# L'auteur a un style oral et elliptique. Ses particularités stylistiques sont conservées.
+# La règle CASSE ne force PAS la majuscule après ! ou ? en milieu de réplique.
+
+==========================================================================
+
+--- Page 1 ---
+
+P1 | GUILLEMET | I "Le Chapeau à Franz" | I « Le Chapeau à Franz » | HAUTE
+P1 | ESPACE_TYPO | Fleißig arbeit, heute! dit Franz | Fleißig arbeit, heute ! dit Franz | HAUTE
+P1 | ESPACE_TYPO | Gauner, Du! | Gauner, Du ! | HAUTE
+P1 | ESPACE_TYPO | Ja! Ja! Morgen lustig Spazieren! | Ja ! Ja ! Morgen lustig Spazieren ! | HAUTE
+P1 | ESPACE_TYPO | Wohin? | Wohin ? | HAUTE
+
+--- Page 2 ---
+
+P2 | PARAGRAPHE | « Il sait pourtant. Il sait que demain... peau de chamois. » (bloc ~580 car.) | Couper après « ...des rainettes ; » — changement de sujet (fin des activités quotidiennes → personnages de la ferme) | MOYENNE
+P2 | PARAGRAPHE | « Il ne verra plus la mère Magdalena... la poche intérieure » (bloc ~490 car., se poursuit P3) | Bloc long qui continue sur la page 3, examiner la coupure après « ...de varices. » | MOYENNE
+
+--- Page 3 ---
+
+P3 | GUILLEMET | « Demain... Ce soir... tout à l'heure... — | « Demain... Ce soir... tout à l'heure... » — | MOYENNE
+P3 | PONCTUATION | — Mais ce chapeau... ce chapeau... comment l'avoir ? Il me le faut pourtant ! il me le faut... » | (Le » ferme bien le monologue intérieur, OK. Le « ouvrant est page 3 ligne « Demain... ») | INFO
+
+--- Page 4 ---
+
+P4 | ESPACE_TYPO | Müde? | Müde ? | HAUTE
+P4 | PARAGRAPHE | « Il est content de son prisonnier le père Grabner... le vieux va-t-il se lever ? » (bloc ~540 car.) | Couper après « ...d'un moment à l'autre. » — passage des pensées du père Grabner à celles du prisonnier | MOYENNE
+
+--- Page 5bis ---
+
+P5bis | PONCTUATION | « ouf ! je l'ai ! Tant pis pour Franz ! » | « Ouf ! je l'ai ! Tant pis pour Franz ! » | MOYENNE
+P5bis | ESPACE_TYPO | Franc! | Franc ! | HAUTE
+P5bis | GUILLEMET | « Gauner » dirait-il | « Gauner » dirait-il (OK — guillemets français déjà présents) | INFO
+P5bis | ESPACE_TYPO | « Gauner! » | « Gauner ! » | HAUTE
+
+--- Page 6bis ---
+
+P6bis | ESPACE_TYPO | Gute nacht, Ernsti! | Gute nacht, Ernsti ! | HAUTE
+P6bis | ESPACE_TYPO | Gute nacht! Comme tous les soirs. — Gute nacht! | Gute nacht ! Comme tous les soirs. — Gute nacht ! | HAUTE
+P6bis | GUILLEMET | "Les crapauds chantent dans la mare ; il fera bon demain..." | « Les crapauds chantent dans la mare ; il fera bon demain... » | HAUTE
+
+--- Page 7 ---
+
+P7 | GUILLEMET | « A ciel ouvert » | (OK — guillemets français) | INFO
+P7 | ESPACE_TYPO | Va-t-il se tirer, bon Dieu - va-t-il se tirer? | Va-t-il se tirer, bon Dieu — va-t-il se tirer ? | HAUTE
+P7 | PONCTUATION | bon Dieu - va-t-il | bon Dieu — va-t-il (tiret simple → tiret cadratin) | MOYENNE
+P7 | ESPACE_TYPO | très, catholique. | (espace en trop : virgule inattendue, mais peut être volontaire — pause orale) | MOYENNE
+P7 | ESPACE_TYPO | Ce Teutonne quand même! | Ce Teutonne quand même ! | HAUTE
+P7 | ESPACE_TYPO | molières au poste? | molières au poste ? | HAUTE
+P7 | ESPACE_TYPO | fantaisie de fouiller? | fantaisie de fouiller ? | HAUTE
+P7 | ESPACE_TYPO | Gute nacht! qu'elle dit. | Gute nacht ! qu'elle dit. | HAUTE
+
+--- Page 8 ---
+
+P8 | ESPACE_TYPO | On peut toujours fermer! | On peut toujours fermer ! | HAUTE
+P8 | GUILLEMET | On peut toujours fermer! » | (guillemet fermant » sans ouvrant « — vérifier cohérence) | MOYENNE
+P8 | PONCTUATION | « On peut toujours fermer! » → le )) p.10 semble un fermant mal transcrit | (voir P10) | MOYENNE
+P8 | ESPACE_TYPO | Et maintenant, au boulot! | Et maintenant, au boulot ! | HAUTE
+P8 | ESPACE_TYPO | Quel bordel on va avoir! | Quel bordel on va avoir ! | HAUTE
+P8 | ACCENT | necessaire | nécessaire | HAUTE
+P8 | ACCENT | necessaire de toilette | nécessaire de toilette | HAUTE
+P8 | ESPACE_TYPO | Putain! | Putain ! | HAUTE
+P8 | ESPACE_TYPO | C'est lourd mais il faut bien ça! | C'est lourd mais il faut bien ça ! | HAUTE
+
+--- Page 9 ---
+
+P9 | ESPACE_TYPO | Ai-je l'air tyrolien? | Ai-je l'air tyrolien ? | HAUTE
+P9 | GUILLEMET | « Ai-je l'air tyrolien? » | « Ai-je l'air tyrolien ? » (OK, guillemets français) | INFO
+P9 | PARAGRAPHE | « Ceux qui restent pensent... eux qui ne partent pas parce que la réussite leur paraît impossible ? » (~350 car.) suivi immédiatement de « N'empêche qu'ils ont aidé... » | Couper avant « N'empêche qu'ils ont aidé » — changement de sujet (réflexion intérieure → aide concrète) | MOYENNE
+
+--- Page 10 ---
+
+P10 | GUILLEMET | N'oubliez pas de refermer la porte. )) | N'oubliez pas de refermer la porte. » | HAUTE
+P10 | ESPACE_TYPO | Quelle heure est-il? | Quelle heure est-il ? | HAUTE
+P10 | ESPACE_TYPO | On y va? | On y va ? | HAUTE
+P10 | ESPACE_TYPO | Ahé!! | Ahé !! | HAUTE
+P10 | ESPACE_TYPO | Ding! | Ding ! | HAUTE
+
+--- Page 11 ---
+
+P11 | ESPACE_TYPO | Nom de Dieu! | Nom de Dieu ! | HAUTE
+P11 | ESPACE_TYPO | Et maintenant ça y est! | Et maintenant ça y est ! | HAUTE
+P11 | ESPACE_TYPO | Et les paysans! | Et les paysans ! | HAUTE
+P11 | ESPACE_TYPO | Ça va discuter dur! | Ça va discuter dur ! | HAUTE
+P11 | ESPACE_TYPO | Pourvu qu'ils referment la porte! | Pourvu qu'ils referment la porte ! | HAUTE
+P11 | PONCTUATION | santales | (probable coquille pour « sandales » — mais relève du N2/MOT_INEXISTANT) | INFO
+
+--- Page 12 ---
+
+P12 | ESPACE_TYPO | Où est-il ce sacré chemin? | Où est-il ce sacré chemin ? | HAUTE
+P12 | ACCENT | Ils s'enfonçant | (« s'enfonçant » semble une coquille pour « s'enfoncent » — relève du N2) | INFO
+P12 | PONCTUATION | les branches leurs cinglent | les branches leur cinglent (accord — « leur » sans s devant verbe) | MOYENNE
+
+--- Page 13 ---
+
+P13 | ESPACE_TYPO | Sortons du patelin! | Sortons du patelin ! | HAUTE
+P13 | ESPACE_TYPO | Au diable les amoureux! | Au diable les amoureux ! | HAUTE
+
+--- Page 14 ---
+
+P14 | ESPACE_TYPO | On y va? | On y va ? | HAUTE
+P14 | PONCTUATION | mais la route après quelques détours | Mais la route après quelques détours (majuscule après point — mais précédé de « chaîne. mais ») | MOYENNE
+P14 | CASSE | chaîne. mais la route | chaîne. Mais la route | HAUTE
+P14 | GUILLEMET | « Arbeits Kommando N°... → à 200 mètres » | (guillemets français déjà OK) | INFO
+P14 | ESPACE_TYPO | Merde! | Merde ! | HAUTE
+
+--- Page 15 ---
+
+P15 | PONCTUATION | curiosité touristique — | curiosité touristique. (le tiret cadratin semble remplacer un point en fin de paragraphe) | MOYENNE
+P15 | ACCENT | infiniment | infiniment (mot correct, pas d'accent manquant) | INFO
+P15 | ESPACE_TYPO | Et d'une étape! | Et d'une étape ! | HAUTE
+P15 | ESPACE_TYPO | la Mur! | la Mur ! | HAUTE
+
+--- Page 16 ---
+
+P16 | GUILLEMET | « Le Pont à Péage » | (OK — guillemets français) | INFO
+P16 | PARAGRAPHE | « L'aube les surprend... en se mettant sur leur séant : » (bloc ~530 car.) | Couper après « ...reprennent leur cours ; » — passage de la description physique à la réalisation mentale | MOYENNE
+
+--- Page 17 ---
+
+P17 | CASSE | pour se lèvent | (« pour » en début de page semble suite de la phrase page 16 : « regardent longuement la carte... pour se lever » — probable erreur de lecture « lèvent » pour « lever ». Relève du N2.) | INFO
+P17 | GUILLEMET | Montons par là. Nous pourrons nous repérer en sortant de la forêt. » | (fermant » sans ouvrant — le « devrait être ajouté : « Montons par là...) | MOYENNE
+
+--- Page 18 ---
+
+P18 | PONCTUATION | — mais... « Merde! tu les vois? | — Mais... « Merde ! tu les vois ? | HAUTE
+P18 | ESPACE_TYPO | Merde! tu les vois? | Merde ! tu les vois ? | HAUTE
+P18 | GUILLEMET | « Heil Hitler! » | « Heil Hitler ! » (espace avant !) | HAUTE
+P18 | ESPACE_TYPO | Heil Hitler! | Heil Hitler ! | HAUTE
+
+--- Page 19 ---
+
+P19 | ESPACE_TYPO | Grouillons-nous! | Grouillons-nous ! | HAUTE
+P19 | GUILLEMET | Planquons-nous pour les laisser passer » | « Planquons-nous pour les laisser passer » (ouvrant « manquant) | MOYENNE
+P19 | GUILLEMET | « — Y en a un que j'ai reconnu. Il travaillait chez Elen! » — | « — Y en a un que j'ai reconnu. Il travaillait chez Elen ! » — | HAUTE
+P19 | ESPACE_TYPO | chez Elen! | chez Elen ! | HAUTE
+P19 | GUILLEMET | « — Je ne pense pas qu'ils nous aient trouvés suspects... | (guillemet ouvrant « avant tiret de dialogue, OK stylistiquement) | INFO
+P19 | ESPACE_TYPO | Si on roupillait un peu? | Si on roupillait un peu ? | HAUTE
+
+--- Page 20 ---
+
+P20 | ESPACE_TYPO | Hé bé! Quel voyage! | Hé bé ! Quel voyage ! | HAUTE
+P20 | ESPACE_TYPO | Dis donc? Tu vois pas qu'on réussirait! | Dis donc ? Tu vois pas qu'on réussirait ! | HAUTE
+P20 | PONCTUATION | Dis donc? Tu vois pas qu'on réussirait! | Dis donc ! Tu vois pas qu'on réussirait ! (interrogation semble plutôt exclamation dans le contexte) | MOYENNE
+P20 | ESPACE_TYPO | Encore? | Encore ? | HAUTE
+P20 | GUILLEMET | Ah! une fois là… » | Ah ! une fois là… » (» fermant sans « ouvrant explicite dans le paragraphe) | MOYENNE
+
+--- Page 21 ---
+
+P21 | ESPACE_TYPO | Aïe mes pieds! | Aïe mes pieds ! | HAUTE
+P21 | ESPACE_TYPO | Et ces putains de sacs! | Et ces putains de sacs ! | HAUTE
+
+--- Page 22 ---
+
+P22 | PONCTUATION | les prés tu taillis | les prés du taillis (« tu » → « du », coquille probable — relève du N2) | INFO
+P22 | GUILLEMET | La Pierre Lys, St Georges, Galamus… » | « La Pierre Lys, St Georges, Galamus… » (ouvrant « manquant) | MOYENNE
+P22 | ESPACE_TYPO | Ça vaut le coup de s'évader quand même. Ne serait-ce que pour ça!… | Ça vaut le coup de s'évader quand même. Ne serait-ce que pour ça !… | HAUTE
+
+--- Page 23 ---
+
+P23 | PONCTUATION | mi-craintif, mi-neutre et mi-malveillant | (trois « mi- » pour un regard : incohérence stylistique — 3 moitiés font plus qu'un tout, mais c'est probablement voulu par l'auteur, humour) | INFO
+P23 | GUILLEMET | On y arrive. " | On y arrive. » (guillemet droit " → français ») | HAUTE
+
+--- Page 24 ---
+
+P24 | PARAGRAPHE | « Ils montent à pic... Il a certainement raison car les risques ne seront pas plus grands. » (~350 car.) suivi de « Après une heure de repos... » | Couper avant « Après une heure de repos » — transition temporelle | MOYENNE
+
+--- Page 25 ---
+
+P25 | ESPACE_TYPO | Ç'y est! | Ç'y est ! | HAUTE
+P25 | GUILLEMET | "Ç'y est!" | « Ç'y est ! » | HAUTE
+P25 | GUILLEMET | Vier Pfennigo, bitte! | Vier Pfennigo, bitte ! | HAUTE
+P25 | ESPACE_TYPO | Vier Pfennigo, bitte! | Vier Pfennigo, bitte ! | HAUTE
+P25 | PONCTUATION | — « Vier Pfennigo, bitte! » | — « Vier Pfennigo, bitte ! » | HAUTE
+P25 | ESPACE_TYPO | en petite monnaie!... Quelle poisse! | en petite monnaie !... Quelle poisse ! | HAUTE
+
+--- Page 26 ---
+
+P26 | ESPACE_TYPO | Kroat? | Kroat ? | HAUTE
+P26 | ESPACE_TYPO | Ja! Ja! | Ja ! Ja ! | HAUTE
+P26 | ESPACE_TYPO | Nicht Italiener? — Nein. | Nicht Italiener ? — Nein. | HAUTE
+
+--- Page 27 ---
+
+P27 | ESPACE_TYPO | Il a marché! | Il a marché ! | HAUTE
+P27 | ESPACE_TYPO | Ou s'il n'a pas marché, il doit s'en foutre! | Ou s'il n'a pas marché, il doit s'en foutre ! | HAUTE
+
+--- Page 28 ---
+
+P28 | ESPACE_TYPO | On n'en sortira jamais! | On n'en sortira jamais ! | HAUTE
+P28 | ESPACE_TYPO | ...et vous invite à faire descentes sur ascensions et ascensions sur descentes! | ...et vous invite à faire descentes sur ascensions et ascensions sur descentes ! | HAUTE
+P28 | ESPACE_TYPO | Elle s'en fout la boussole! | Elle s'en fout la boussole ! | HAUTE
+P28 | PARAGRAPHE | « C'est tout de même une belle vie... celle des caractères. Une vie qui permet tous les espoirs... le spectacle de la nature. » (bloc ~550 car.) | Couper après « ...celle des caractères. » — passage de la définition abstraite aux espoirs concrets | MOYENNE
+
+--- Page 29 ---
+
+P29 | PONCTUATION | Albert a tendance à marcher sud-ouest tandis qu'Albert pense | (Incohérence de noms : « Albert » au lieu de « Alban » ou « André ». Relève du N2/NOM_PROPRE.) | INFO
+
+--- Page 30 ---
+
+P30 | ESPACE_TYPO | Oh! si jamais on y arrive! | Oh ! si jamais on y arrive ! | HAUTE
+P30 | PONCTUATION | troncs d'ailes | (probable coquille pour « troncs d'aulnes » — relève du N2) | INFO
+
+--- Page 31 ---
+
+P31 | PONCTUATION | tout près du champs | tout près du champ (pas de s au singulier) | MOYENNE
+
+--- Page 32 ---
+
+P32 | GUILLEMET | "Patré" tire vers le nord | « Patré » tire vers le nord | HAUTE
+P32 | ESPACE_TYPO | Joignons la voie ferrée et puis nous verrons — | (OK, tiret cadratin en fin de phrase) | INFO
+
+--- Page 33 ---
+
+P33 | ESPACE_TYPO | celui là! | celui-là ! | HAUTE
+P33 | PONCTUATION | celui là | celui-là (trait d'union manquant) | HAUTE
+P33 | ESPACE_TYPO | Morgen! — Morgen. | Morgen ! — Morgen. | HAUTE
+P33 | GUILLEMET | Tes souliers pompent l'eau. Dès que nous trouverons un coin bien placé, il faudra allumer du feu. » | (» fermant sans « ouvrant) | MOYENNE
+
+--- Page 34 ---
+
+P34 | ESPACE_TYPO | Écoute! | Écoute ! | HAUTE
+P34 | ESPACE_TYPO | La voilà... Merde! | La voilà... Merde ! | HAUTE
+P34 | ESPACE_TYPO | Voyons la carte? | Voyons la carte ? | HAUTE
+P34 | PONCTUATION | Voyons la carte? | Voyons la carte. (ou !) — pas vraiment une question, plutôt une injonction | MOYENNE
+
+--- Page 35 ---
+
+(Pas d'anomalie N1 significative sur cette page.)
+
+--- Page 36 ---
+
+P36 | ESPACE_TYPO | Judenbourg? | Judenbourg ? | HAUTE
+P36 | ACCENT | gaîment | gaiement (graphie moderne) ou gaîment (graphie ancienne tolérée) | MOYENNE
+P36 | ESPACE_TYPO | Ca serait magnifique! | Ça serait magnifique ! | HAUTE
+P36 | ACCENT | Ca | Ça (cédille manquante) | HAUTE
+P36 | ACCENT | parceque | parce que (en deux mots) | HAUTE
+P36 | ESPACE_TYPO | ballade | (« ballade » = poème ; « balade » = promenade. Mais usage courant ancien — N2) | INFO
+
+--- Page 37 ---
+
+P37 | ESPACE_TYPO | C'est d'une netteté! | C'est d'une netteté ! | HAUTE
+P37 | ESPACE_TYPO | Vraiment ça vaut le coup! | Vraiment ça vaut le coup ! | HAUTE
+P37 | ESPACE_TYPO | L'Autriche est un magnifique pays! | L'Autriche est un magnifique pays ! | HAUTE
+P37 | ESPACE_TYPO | du bas Steiermark! | du bas Steiermark ! | HAUTE
+P37 | ESPACE_TYPO | perdu notre temps! | perdu notre temps ! | HAUTE
+P37 | ESPACE_TYPO | Il faut réussir! | Il faut réussir ! | HAUTE
+P37 | ESPACE_TYPO | Devenons-nous superstitieux? | Devenons-nous superstitieux ? | HAUTE
+P37 | ESPACE_TYPO | Pars, une enveloppe! Avec en-tête peut-être... | Pars, une enveloppe ! Avec en-tête peut-être... | HAUTE
+
+--- Page 38 ---
+
+P38 | PONCTUATION | révélatrice ou | (phrase coupée en fin de page — OK, suite p.38) | INFO
+
+--- Page 39 ---
+
+P39 | ESPACE_TYPO | Au dessus | Au-dessus (trait d'union) | HAUTE
+P39 | PONCTUATION | Au dessus | Au-dessus | HAUTE
+
+--- Page 40 ---
+
+P40 | ESPACE_TYPO | Pourvu qu'il n'y ait pas de point à péage! | Pourvu qu'il n'y ait pas de point à péage ! | HAUTE
+P40 | ESPACE_TYPO | Allons-y! | Allons-y ! | HAUTE
+P40 | PONCTUATION | point à péage | pont à péage (coquille « point » → « pont ») | HAUTE
+
+--- Page 41 ---
+
+P41 | ESPACE_TYPO | Tcheuf! Tcheuf! Tcheuf! Tcheuf! | Tcheuf ! Tcheuf ! Tcheuf ! Tcheuf ! | HAUTE
+P41 | PARAGRAPHE | « Des employés promènent... les éclairés par le faisceau... Elles marquent le pas... et qui regarde la nuit. » (~400 car.) | Couper après « ...à moins d'un mètre d'eux. » — passage des employés aux locomotives | MOYENNE
+
+--- Page 42 ---
+
+P42 | ESPACE_TYPO | Y a pas moyen. On se retire? | Y a pas moyen. On se retire ? | HAUTE
+P42 | PONCTUATION | Faut vaudra-t-il... | (expression étrange, probablement « Faudra-t-il... » ou « Tant vaudra-t-il... » — relève du N2) | INFO
+P42 | ACCENT | électrique | (déjà correct) | INFO
+P42 | PONCTUATION | les fermiers dormant dans la nuit sans la veilleuse des lampes électrique | lampes électriques (accord pluriel) | MOYENNE
+P42 | ESPACE_TYPO | Ouf! encore une petite émotion de passée! | Ouf ! encore une petite émotion de passée ! | HAUTE
+P42 | PONCTUATION | à vingt mets | à vingt mètres (coquille « mets » → « mètres ») | HAUTE
+
+--- Page 43 ---
+
+P43 | ESPACE_TYPO | Wohin? | Wohin ? | HAUTE
+P43 | ESPACE_TYPO | Spazieren gehen! | Spazieren gehen ! | HAUTE
+P43 | ESPACE_TYPO | So! | So ! | HAUTE
+P43 | ESPACE_TYPO | On y cause? | On y cause ? | HAUTE
+P43 | ESPACE_TYPO | Hop! — Franzose? | Hop ! — Franzose ? | HAUTE
+
+--- Page 44 ---
+
+P44 | ESPACE_TYPO | Non? sans blague? | Non ? sans blague ? | HAUTE
+P44 | CASSE | — Ja. répond l'autre | — Ja, répond l'autre (virgule au lieu de point après Ja, car « répond » est une incise) | MOYENNE
+P44 | PONCTUATION | — oui, oui! On fait la malle. | — Oui, oui ! On fait la malle. (majuscule en début de réplique) | HAUTE
+P44 | CASSE | — oui, oui | — Oui, oui (début de réplique → majuscule) | HAUTE
+P44 | ESPACE_TYPO | Ça alors! | Ça alors ! | HAUTE
+P44 | ESPACE_TYPO | Où allez-vous? | Où allez-vous ? | HAUTE
+
+--- Page 45 ---
+
+P45 | PONCTUATION | la présence de de deux | la présence de deux (doublon « de de ») | HAUTE
+
+--- Page 46 ---
+
+P46 | ESPACE_TYPO | Et une fois là! ... | Et une fois là !... | HAUTE
+P46 | ESPACE_TYPO | Tu te rends compte! | Tu te rends compte ! | HAUTE
+
+--- Page 47 ---
+
+P47 | PONCTUATION | sous — prétexte | sous prétexte (tiret cadratin parasite) | HAUTE
+P47 | PONCTUATION | et s'attendre l'obscurité | et attendre l'obscurité (« s'attendre » → « attendre ») | MOYENNE
+P47 | ESPACE_TYPO | Si on roupillait ici? | Si on roupillait ici ? | HAUTE
+P47 | PONCTUATION | Tant vaut il. | Tant vaut-il. (trait d'union manquant dans l'inversion) | HAUTE
+
+--- Page 48 ---
+
+P48 | ACCENT | à part qu'Alban croit, un moment avoir vu | (« à part » OK ; pas d'accent manquant) | INFO
+P48 | PONCTUATION | en ballade | en balade (« balade » = promenade, « ballade » = poème) | MOYENNE
+P48 | ACCENT | sandalés blanches | sandales blanches (accent erroné « é » → « e ») | HAUTE
+P48 | PONCTUATION | Les sandalés blanches sont passés | Les sandales blanches sont passées (accord féminin) | MOYENNE
+
+--- Page 49 ---
+
+P49 | GUILLEMET | "La Nuit tragique" | « La Nuit tragique » | HAUTE
+P49 | PONCTUATION | L'auto-strade Vienne-Wagenfurt | L'autostrade Vienne-Klagenfurt (« Wagenfurt » suspect — relève du N2/NOM_PROPRE) | INFO
+P49 | ESPACE_TYPO | Klagenfurt? Judenbourg? | Klagenfurt ? Judenbourg ? | HAUTE
+P49 | PONCTUATION | Ho! d'avait tes de la veine, le petit Jouet | (passage très obscur — relève du N3/SENS_DOUTEUX) | INFO
+
+--- Page 50 ---
+
+(Pas d'anomalie N1 significative.)
+
+--- Page 51 ---
+
+P51 | PONCTUATION | Et de Massecourt : Maintenant | (« de Massecourt » — expression obscure, relève du N3) | INFO
+P51 | PONCTUATION | « C'est toujours le même qu'on recommence... » (1) | (renvoi de note OK) | INFO
+P51 | PONCTUATION | (St Exupéry : Terre des Hommes) | (St-Exupéry — trait d'union manquant dans l'abréviation) | MOYENNE
+
+--- Page 52 ---
+
+P52 | ESPACE_TYPO | bortel de Dieu | (probable coquille pour « bordel de Dieu » — relève du N2) | INFO
+P52 | ESPACE_TYPO | Hep! Hep! | Hep ! Hep ! | HAUTE
+P52 | ESPACE_TYPO | Pourvu qu'il ne soit pas mort! | Pourvu qu'il ne soit pas mort ! | HAUTE
+
+--- Page 53 ---
+
+P53 | ESPACE_TYPO | Pourvu qu'il ne soit pas mort! | (déjà signalé P52, fin de page) | INFO
+P53 | ESPACE_TYPO | Ah! putain de Dieu! Quelle tuile! Quelle poisse! | Ah ! putain de Dieu ! Quelle tuile ! Quelle poisse ! | HAUTE
+P53 | ESPACE_TYPO | Hep! Hep! | Hep ! Hep ! | HAUTE
+P53 | ESPACE_TYPO | Foutons le camp! Vite! Foutons le camp! | Foutons le camp ! Vite ! Foutons le camp ! | HAUTE
+P53 | PONCTUATION | notre père encore étourdi | (« père » avec minuscule — peut-être « Patré » ? Relève du N2/NOM_PROPRE) | INFO
+
+--- Page 54 ---
+
+P54 | ESPACE_TYPO | Filons, maintenant, vite, vite! | Filons, maintenant, vite, vite ! | HAUTE
+P54 | ESPACE_TYPO | Tu as du mal? | Tu as du mal ? | HAUTE
+P54 | PONCTUATION | Quelque fêlée sans doute. | Quelque fêlure sans doute. (ou « Quelque chose de fêlé ». « Fêlée » accord douteux — relève du N2) | INFO
+
+--- Page 55 ---
+
+P55 | ESPACE_TYPO | Ah! la vache! | Ah ! la vache ! | HAUTE
+P55 | ESPACE_TYPO | il serait descendu à quarante! | il serait descendu à quarante ! | HAUTE
+P55 | ESPACE_TYPO | Et puis comment pouvaient-ils deviner qu'on était des évadés? | Et puis comment pouvaient-ils deviner qu'on était des évadés ? | HAUTE
+P55 | PONCTUATION | Des fois que l'accident serait connu... | (« Des fois que » — registre oral, OK pour ce manuscrit) | INFO
+
+--- Page 56 ---
+
+P56 | ESPACE_TYPO | Tiens, le tacot! | Tiens, le tacot ! | HAUTE
+P56 | ESPACE_TYPO | Demain il faudra le prendre à tout prix! | Demain il faudra le prendre à tout prix ! | HAUTE
+P56 | ESPACE_TYPO | Halt! | Halt ! | HAUTE
+P56 | PONCTUATION | Alban que le suit | Alban qui le suit (« que » → « qui ») | HAUTE
+P56 | ESPACE_TYPO | on est faits! | on est faits ! | HAUTE
+
+--- Page 57 ---
+
+P57 | ESPACE_TYPO | Woher? | Woher ? | HAUTE
+P57 | ESPACE_TYPO | Wohin? | Wohin ? | HAUTE
+P57 | ESPACE_TYPO | Was machen? | Was machen ? | HAUTE
+P57 | ESPACE_TYPO | Spazieren gehen? | Spazieren gehen ? | HAUTE
+P57 | ESPACE_TYPO | Haben sie papiere? | Haben sie papiere ? | HAUTE
+P57 | ESPACE_TYPO | oh! non | oh ! non | HAUTE
+P57 | PONCTUATION | oh! nein | oh ! nein) — parenthèse fermante manquante | HAUTE
+P57 | ESPACE_TYPO | Franzozen? | Franzozen ? | HAUTE
+P57 | PONCTUATION | Fort! dit-il. (Partez!) | Fort ! dit-il. (Partez !) | HAUTE
+P57 | ESPACE_TYPO | Danke schön! | Danke schön ! | HAUTE
+P57 | PONCTUATION | Il est peu souteux | Il est peu douteux (« souteux » n'existe pas — relève du N2) | INFO
+
+--- Page 58 ---
+
+P58 | ESPACE_TYPO | Quelle poisse cette nuit! | Quelle poisse cette nuit ! | HAUTE
+P58 | ESPACE_TYPO | Si on passe cette nuit!... | Si on passe cette nuit !... | HAUTE
+P58 | ESPACE_TYPO | Touchons du bois! | Touchons du bois ! | HAUTE
+P58 | ESPACE_TYPO | Quelle nuit, putain! Quelle nuit! | Quelle nuit, putain ! Quelle nuit ! | HAUTE
+
+--- Page 59 ---
+
+P59 | GUILLEMET | quelques «cuissons» | quelques « cuissons » (espaces insécables manquants) | HAUTE
+P59 | ESPACE_TYPO | «cuissons» | « cuissons » | HAUTE
+P59 | ACCENT | Ca lui apprendra | Ça lui apprendra (cédille) | HAUTE
+
+--- Page 60 ---
+
+P60 | PONCTUATION | (et a sacré briquet d'Albray qui ne marchait pas, faute d'essence) | (et ce sacré briquet d'Albray qui ne marchait pas, faute d'essence) — « a » → « ce » relève du N2 | INFO
+P60 | ESPACE_TYPO | on ne pourra pas en manger une! | on ne pourra pas en manger une ! | HAUTE
+P60 | PONCTUATION | — Nom de Dieu, on ne pourra pas en manger une! | — Nom de Dieu, on ne pourra pas en manger une ! | HAUTE
+
+--- Page 61 ---
+
+P61 | ESPACE_TYPO | Ah! si j'avais pu attraper ce lièvre | Ah ! si j'avais pu attraper ce lièvre | HAUTE
+P61 | ACCENT | imperméable | imperméables (accord pluriel « Ils enfilent leurs imperméable ») | HAUTE
+P61 | PONCTUATION | Ils enfilent leurs imperméable | Ils enfilent leurs imperméables | HAUTE
+P61 | PONCTUATION | poussé par le vent, s'éloigne rapidement | poussé par le vent, s'éloigner rapidement (ou « s'éloignant ») — rupture de construction | MOYENNE
+
+--- Page 62 ---
+
+P62 | PONCTUATION | le soleil se reflétait | le soleil se reflète (temps incohérent avec le présent narratif du paragraphe) | MOYENNE
+P62 | ESPACE_TYPO | Wohin? — Villach! Auf Wiedersehen — | Wohin ? — Villach ! Auf Wiedersehen — | HAUTE
+
+--- Page 63 ---
+
+P63 | GUILLEMET | "auberge" | « auberge » | HAUTE
+P63 | PONCTUATION | (j'allais dire Branbijo) | (parenthèse humoristique de l'auteur — pas d'erreur mécanique) | INFO
+P63 | ACCENT | Italien. Grenze 21 Km. | (OK — c'est une pancarte en allemand) | INFO
+
+--- Page 64 ---
+
+P64 | GUILLEMET | « Encore! » | « Encore ! » | HAUTE
+P64 | ESPACE_TYPO | Encore! | Encore ! | HAUTE
+P64 | ESPACE_TYPO | Oui, mes couilles! | Oui, mes couilles ! | HAUTE
+
+--- Page 65 ---
+
+P65 | ESPACE_TYPO | On passe de l'autre côté? | On passe de l'autre côté ? | HAUTE
+P65 | PONCTUATION | ...Aimé hausse les épaules | (« Aimé » — nom du personnage ? Semble être André/Patré. Relève du N2/NOM_PROPRE) | INFO
+
+--- Page 66 ---
+
+P66 | PONCTUATION | — Ques aco? | — Ques aco ? (expression occitane « Qu'es aquò ? ») | HAUTE
+P66 | ESPACE_TYPO | Ques aco? | Ques aco ? | HAUTE
+P66 | ESPACE_TYPO | La frontière? | La frontière ? | HAUTE
+P66 | PONCTUATION | C'est peut être bien la frontière! | C'est peut-être bien la frontière ! (trait d'union manquant) | HAUTE
+P66 | ESPACE_TYPO | C'est peut être bien la frontière! | C'est peut-être bien la frontière ! | HAUTE
+P66 | GUILLEMET | Qu'est-ce que tu lis toi? — Cassa... | Qu'est-ce que tu lis toi ? — Cassa... | HAUTE
+P66 | ESPACE_TYPO | toi? | toi ? | HAUTE
+P66 | ESPACE_TYPO | Cassa! Cassa! | Cassa ! Cassa ! | HAUTE
+
+--- Page 67 ---
+
+P67 | PONCTUATION | (Le référé est illisible | (Le « référé » semble être « le reste » — relève du N2) | INFO
+P67 | GUILLEMET | chère à l'Annunzio! | chère à d'Annunzio ! (nom propre — « l'Annunzio » → « d'Annunzio ») | MOYENNE
+P67 | ESPACE_TYPO | l'Annunzio! | d'Annunzio ! | HAUTE
+P67 | PONCTUATION | Bon coups ils s'embrassent. | Bon, coup, ils s'embrassent. (ou « Bons coups, ils s'embrassent. » — phrase obscure, relève du N3) | INFO
+P67 | ACCENT | É aro euf fé atension! | (expression en patois occitan — ne pas corriger) | INFO
+P67 | PONCTUATION | Une baraque roumanière | (« roumanière » — mot inconnu ; possible « douanière » ou régionalisme. Relève du N2) | INFO
+
+--- Page 68 ---
+
+P68 | PONCTUATION | Nous soutient un fakir | (suite de la phrase p.67 — syntaxe correcte en inversé) | INFO
+
+--- Page 69 ---
+
+P69 | ESPACE_TYPO | Vous avez des biscuits? | Vous avez des biscuits ? | HAUTE
+P69 | ESPACE_TYPO | Ce sont les italiens qui vous ont arrêtés? | Ce sont les Italiens qui vous ont arrêtés ? | HAUTE
+P69 | CASSE | les italiens | les Italiens (gentilé → majuscule) | HAUTE
+P69 | ESPACE_TYPO | Ah les vaches! | Ah les vaches ! | HAUTE
+P69 | ESPACE_TYPO | Quelle fringale, nom de Dieu! | Quelle fringale, nom de Dieu ! | HAUTE
+P69 | ESPACE_TYPO | C'est sûr en Italie? | C'est sûr en Italie ? | HAUTE
+P69 | ESPACE_TYPO | que sais-je?... | que sais-je ?... | HAUTE
+P69 | ESPACE_TYPO | les éviter? En passant par la montagne? | les éviter ? En passant par la montagne ? | HAUTE
+
+--- Page 70 ---
+
+P70 | ACCENT | vallées infestés | vallées infestées (accord féminin) | HAUTE
+P70 | ESPACE_TYPO | Merci, mon vieux. Si vous en avez d'autre portez-les. | Merci, mon vieux. Si vous en avez d'autres, portez-les. (« d'autre » → « d'autres » + virgule) | MOYENNE
+P70 | PONCTUATION | — — Va prendre tes biscuits. | — Va prendre tes biscuits. (double tiret → simple) | HAUTE
+P70 | ESPACE_TYPO | Heureusement qu'on a tes copains ici! | Heureusement qu'on a tes copains ici ! | HAUTE
+P70 | ESPACE_TYPO | Sans blague? | Sans blague ? | HAUTE
+P70 | PONCTUATION | On y est entré la vendredi soir | On y est entré le vendredi soir (« la » → « le ») | HAUTE
+
+--- Page 71 ---
+
+P71 | ESPACE_TYPO | Vous avez quand même marché deux jours? | Vous avez quand même marché deux jours ? | HAUTE
+P71 | ESPACE_TYPO | Et ça n'était guère plus reluisant! | Et ça n'était guère plus reluisant ! | HAUTE
+P71 | ESPACE_TYPO | Qu'est ce qu'on a passé comme sentinelles! | Qu'est-ce qu'on a passé comme sentinelles ! | HAUTE
+P71 | PONCTUATION | Qu'est ce qu'on | Qu'est-ce qu'on (traits d'union manquants) | HAUTE
+P71 | ESPACE_TYPO | Bouffons encore quelques biscuits! | Bouffons encore quelques biscuits ! | HAUTE
+P71 | PONCTUATION | Et quelles routes! | Et quelles routes ! | HAUTE
+P71 | ESPACE_TYPO | Il faut voir ça! | Il faut voir ça ! | HAUTE
+P71 | ESPACE_TYPO | un abruti!... | un abruti !... | HAUTE
+P71 | PONCTUATION | Qu'est-ce qu'on allait se mettre dans les vignes! | Qu'est-ce qu'on allait se mettre dans les vignes ! | HAUTE
+P71 | ESPACE_TYPO | C'est pas la peine. Et qu'est-ce qu'ils vous ont fait? | C'est pas la peine. Et qu'est-ce qu'ils vous ont fait ? | HAUTE
+
+--- Page 72 ---
+
+P72 | ESPACE_TYPO | Sans blague! | Sans blague ! | HAUTE
+P72 | ESPACE_TYPO | Et comment! | Et comment ! | HAUTE
+P72 | PONCTUATION | Le lendemain deux carabiniers nous reconduirent | Le lendemain deux carabiniers nous reconduisirent (conjugaison passé simple) | HAUTE
+P72 | PONCTUATION | Putain quelle fringale. | Putain, quelle fringale ! (virgule manquante + point → exclamation) | MOYENNE
+
+==========================================================================
+
+# RÉSUMÉ STATISTIQUE
+
+## Par type :
+- GUILLEMET :       ~15 détections (guillemets droits "..." à convertir en « ... »)
+- ESPACE_TYPO :     ~115 détections (grande majorité : espace manquant avant ! et ?)
+- ACCENT :          ~10 détections (necessaire, Ca, sandalés, infestés, imperméable, parceque)
+- CASSE :           ~5 détections (minuscule après point, gentilés, début de réplique)
+- PONCTUATION :     ~30 détections (accords, coquilles, traits d'union manquants, tirets)
+- PARAGRAPHE :      ~7 détections (blocs >500 car. avec points de coupure naturels)
+
+## Total :          ~182 anomalies détectées
+
+## Confiance :
+- HAUTE :           ~140 (principalement ESPACE_TYPO et GUILLEMET — correction automatique possible)
+- MOYENNE :         ~35 (PONCTUATION, PARAGRAPHE — à valider par le relecteur)
+- INFO :            ~7 (signalements pour les niveaux N2/N3, non corrigeables mécaniquement)
+
+## Observation principale :
+Le manuscrit utilise systématiquement la ponctuation collée au mot (style anglais).
+La quasi-totalité des ! et ? sont collés au mot précédent (sans espace insécable).
+C'est la catégorie dominante. La correction est mécanique et sans ambiguïté.
+
+## Note sur le style de l'auteur :
+- Les phrases elliptiques, les ruptures syntaxiques et le registre oral sont CONSERVÉS.
+- Les expressions en patois occitan (« É aro euf fé atension ! », « Ques aco ? ») sont CONSERVÉES.
+- Les passages en allemand sont conservés tels quels (seule la ponctuation française est normalisée).
+- La règle CASSE après ! ou ? en milieu de réplique n'a PAS été appliquée (conformément à l'exception).

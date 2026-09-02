@@ -1,0 +1,160 @@
+DÉTECTION NIVEAU 2 — DICTIONNAIRE CONTEXTUEL
+Fichier : ALBAN ROUZAUD_3_L'EVASION.txt
+Date : détection automatique
+=============================================================================
+
+DICTIONNAIRE DES PERSONNAGES (référence) :
+  André (27 occ.) — Alban (21) — Franz (7) — Grabner (7) — Grete (2) — Ernst (2) — Pierre (2) — Albert (2) — Albray (2)
+  Hapax (1 occ.) : Aimé, Elen, Jouet, Massecourt, Patré, Privé, Schmidt, Kate, Magdalena, Mitzi
+
+=============================================================================
+FORMAT : PAGE | TYPE | MOT | CORRECTION | CONFIANCE | CONTEXTE
+=============================================================================
+
+---------------------------------------------------------------------------
+1. NOM_PROPRE — Hapax et noms suspects
+---------------------------------------------------------------------------
+
+29 | NOM_PROPRE | Albert (×2) | Alban | MOYENNE | « Il paraît à André que Albert a tendance à marcher sud-ouest tandis qu'Albert pense qu'André attiré par le nord dérive nord-ouest. » — Le récit ne met en scène que deux évadés : André et Alban. Albert n'apparaît que dans cette phrase (2 occ.), jamais ailleurs. Confusion manuscrite très probable : Alb-an / Alb-ert, les 3 premières lettres sont identiques et la terminaison -ert peut être confondue avec -an en cursive. Correction : Alban.
+
+60–61 | NOM_PROPRE | Albray (×2) | Alban | MOYENNE | « le sacré briquet d'Albray qui ne marchait pas » et « une tentative de capture par Albray » — Albray n'apparaît qu'aux pages 60–61. Dans les 70 autres pages, le même personnage est systématiquement nommé Alban. Confusion manuscrite probable sur la terminaison -an → -ray (confusion r/n + ajout de y). Correction : Alban.
+
+32 | NOM_PROPRE | "Patré" | André | MOYENNE | « Comme d'habitude Alban veut prendre à gauche et "Patré" tire vers le nord. » — Le texte a mis le mot entre guillemets, ce qui pourrait indiquer un surnom. Cependant, le contexte (l'éternel duo Alban/André qui débattent de la direction) et la proximité graphique Pa-tré / An-dré (confusion manuscrite P/A, inversion des jambages) suggèrent une erreur pour André. L'auteur utilise parfois « notre père » pour André : « notre père encore étourdi par le choc » (p.53). Mais "Patré" semble une mauvaise lecture. Correction probable : André.
+
+16 | NOM_PROPRE | Privé | André | MOYENNE | « — On ne risquait pas de nous trouver ici, dit Privé en montrant les deux flancs escarpés de la forêt. » — Privé n'apparaît qu'une seule fois comme locuteur. Le contexte est un dialogue entre les deux seuls évadés. En cursive, Privé pourrait être une lecture erronée de André (confusion P/A, r/n, v/d). Possible aussi que ce soit un surnom d'André utilisé par l'auteur (le « Privé » = le simple soldat). Correction probable : André. Alerte : vérifier sur l'image source.
+
+65 | NOM_PROPRE | Aimé | André | MOYENNE | « — On passe de l'autre côté ? ... Aimé hausse les épaules dans un mouvement de violente résignation. » — Aimé n'apparaît qu'une seule fois. Le contexte décrit l'un des deux compagnons (l'autre ayant l'initiative de la marche). La confusion manuscrite A-imé / A-ndré est plausible (im→ndr). Correction probable : André.
+
+19 | NOM_PROPRE | Elen | [à vérifier] | BASSE | « Il travaillait chez Elen ! » — Hapax. Pourrait être un nom propre (employeur local) authentique. Pas de correction proposée : le mot est cohérent en contexte (nom d'un patron d'usine à Weiz). Alerte seulement.
+
+49–50 | NOM_PROPRE | Jouet | Poucet | MOYENNE | « Ho! d'avait tes de la veine, le petit Jouet / d'avoir des bottes de sept lieux ! » — Référence évidente au conte « Le petit Poucet et ses bottes de sept lieues ». Jouet (1 occ.) est probablement une mauvaise lecture de Poucet : confusion manuscrite P→J (hampes descendantes), ou→ou, c→u, et→et. Correction : Poucet.
+
+51 | NOM_PROPRE | Massecourt | [à vérifier] | BASSE | « Et de Massecourt : Maintenant c'est une voix éraillée... » — Hapax. Pourrait être un nom de lieu (village traversé). Le contexte est cependant obscur. Alerte seulement.
+
+16 | NOM_PROPRE | Smalt | Schmidt | MOYENNE | « Et tout à l'heure le Smalt... » — Le « Schmidt » est mentionné p.11 comme la sentinelle. « Smalt » (1 occ.) est une lecture corrompue probable : Sch→S, mi→ma, dt→lt (confusion manuscrite). Correction : Schmidt.
+
+11 | NOM_PROPRE | Schmidt | [OK] | HAUTE | « Le Schmidt il va en faire une drôle de gueule, demain ! » — Nom de la sentinelle allemande. Cohérent, pas d'erreur.
+
+2 | NOM_PROPRE | Kate | [OK] | HAUTE | « qu'il ne versera plus de l'eau dans le cou de la Kate » — Prénom allemand authentique dans le contexte de la ferme autrichienne.
+
+2 | NOM_PROPRE | Magdalena | [OK] | HAUTE | « Il ne verra plus la mère Magdalena tourner lentement... » — Prénom authentique.
+
+2 | NOM_PROPRE | Mitzi | [OK] | HAUTE | « la petite Mitzi » — Prénom autrichien authentique.
+
+---------------------------------------------------------------------------
+2. MOT_INEXISTANT — Mots absents du dictionnaire français standard
+---------------------------------------------------------------------------
+
+11 | MOT_INEXISTANT | santales | sandales | HAUTE | « La rosée imprègne rapidement leurs santales » — santales n'existe pas. Confusion manuscrite n↔l, ou simple coquille. Le mot « sandales » apparaît correctement p.9. Correction : sandales.
+
+48 | MOT_INEXISTANT | sandalés | sandales | HAUTE | « Les sandalés blanches sont passés au cirage » — sandalés n'existe pas. Erreur de terminaison : -ales → -alés. Correction : sandales.
+
+48 | MOT_INEXISTANT | froti | frotti | MOYENNE | « celle de faire leur maigre froti » — froti n'existe pas. Le mot attendu est « frotti » (dans l'expression argotique « faire le frotti » = se laver sommairement). Correction : frotti.
+
+57 | MOT_INEXISTANT | souteux | douteux | HAUTE | « Il est peu souteux qu'il soit dupe » — souteux n'existe pas. Confusion manuscrite s↔d (très fréquente en cursive). L'expression « il est peu douteux » est correcte et cohérente. Correction : douteux.
+
+15 | MOT_INEXISTANT | Arbets | Arbeits | HAUTE | « le Arbets Kommando » — Arbets n'est pas un mot allemand correct. Le mot est Arbeitskommando (commando de travail). Le « i » a été omis. Correction : Arbeits.
+
+8 | MOT_INEXISTANT | necessaire (×2) | nécessaire | HAUTE | « Pourtant tout est necessaire » et « le necessaire de toilette » — Accent manquant : nécessaire. Correction : nécessaire.
+
+36 | MOT_INEXISTANT | parceque | parce que | HAUTE | « Et dangereux … parceque tu sais » — Soudure erronée + accent manquant. Correction : parce que.
+
+7 | MOT_INEXISTANT | molières | molletières | MOYENNE | « en portant pantalon et molières au poste » — molières n'existe pas en français. Correction probable : molletières (bandes molletières, équipement militaire courant). Confusion manuscrite : omission de « let ». Alternative : mollières (chaussures) mais moins courant. Correction : molletières.
+
+7 | MOT_INEXISTANT | Teutonne | Teuton | MOYENNE | « Ce Teutonne quand même ! » — Le féminin de Teuton est Teutonne, mais ici il désigne un homme (la sentinelle masculine). Correction : Teuton. Note : « Teutonne » pourrait être un choix délibéré de l'auteur pour désigner péjorativement la sentinelle (accord avec « sentinelle » fém.).
+
+42 | MOT_INEXISTANT | vingt mets | vingt mètres | HAUTE | « A vingt mets / de la route » — « mets » (plat cuisiné) ne fait aucun sens ici. Confusion manuscrite è→e, tres→ts. Correction : mètres.
+
+63 | MOT_INEXISTANT | Branbijo | [occitan ?] | BASSE | « une pancarte (j'allais dire Branbijo) » — L'auteur semble citer un mot occitan/patois. L'expression entre parenthèses est un commentaire méta-narratif. Pourrait être authentique. Alerte seulement.
+
+67 | MOT_INEXISTANT | roumanière | [à vérifier] | BASSE | « Une baraque roumanière » — roumanière n'existe pas en français standard. Pourrait être un adjectif régional (de Roumanie ? roumaine ?) ou dialectal. Possible lecture erronée de « douanière » (confusion r/d, ou/ou, m/an → baraque douanière, cohérent avec le contexte frontalier). Correction probable : douanière.
+
+49 | MOT_INEXISTANT | Wagenfurt | Klagenfurt | HAUTE | « L'auto-strade Vienne-Wagenfurt » — Wagenfurt n'est pas une ville autrichienne connue. La route Vienne-Klagenfurt est l'autoroute du sud. Confusion manuscrite K→W, l→a, ag→ag. Correction : Klagenfurt.
+
+6bis | MOT_INEXISTANT | chiffler | siffler | HAUTE | « la mare où il écoutait les crapauds chiffler » — chiffler n'existe pas en français standard. Confusion manuscrite ch↔s (fréquente). Correction : siffler. Note : « chifler » existe en occitan (siffler), l'auteur étant méridional, cela pourrait être un régionalisme délibéré.
+
+42 | MOT_INEXISTANT | Faut vaudra-t-il | Il faudra bien | BASSE | « — Faut vaudra-t-il... » — Phrase corrompue. Lecture très difficile. Pourrait être « Faut bien qu'il... » ou « Il vaudra mieux... ». Correction incertaine. Alerte : vérifier sur l'image source.
+
+49–50 | MOT_INEXISTANT | d'avait tes | d'aviez | BASSE | « Ho! d'avait tes de la veine, le petit Jouet » — Lecture très corrompue. L'expression attendue semble être « Ho ! t'avais de la veine, le petit Poucet ». Confusion généralisée. Correction probable : t'avais.
+
+67 | MOT_INEXISTANT | hanche à rentres | [illisible] | BASSE | « ils débouchent dans les prés que la hanche à rentres italiens » — Phrase inintelligible. Lecture très corrompue du manuscrit. Pourrait être « que flanquent de hautes montagnes italiennes » ou « que hantent des ombres italiennes ». Correction impossible sans image source. Alerte.
+
+70 | MOT_INEXISTANT | coffer | coffrer | HAUTE | « on s'est fait coffer le dimanche matin » — coffer n'existe pas. Il manque le r. Correction : coffrer.
+
+13 | MOT_INEXISTANT | pajot | pageot | MOYENNE | « il aura préféré regagner son pajot » — pajot n'existe pas en français standard. Argot pour « lit » : le mot courant est « pageot » (ou « pajot » variante argotique rare). Pourrait être accepté comme graphie argotique. Alerte seulement.
+
+---------------------------------------------------------------------------
+3. CONFUSIONS MANUSCRITES — Erreurs de conjugaison et d'accord liées à la lecture
+---------------------------------------------------------------------------
+
+12 | MOT_INEXISTANT | s'enfonçant | s'enfoncent | HAUTE | « Ils s'enfonçant dans les broussailles » — Le participe présent est incorrect après « Ils ». Lecture erronée du -ent final (confusion manuscrite -ent → -ant). Correction : Ils s'enfoncent.
+
+48 | MOT_INEXISTANT | passés | passées | HAUTE | « Les sandalés blanches sont passés au cirage » — Accord féminin requis avec « sandales blanches ». Correction : passées.
+
+70 | MOT_INEXISTANT | infestés | infestées | HAUTE | « vallées infestés d'uniformes » — Accord féminin requis avec « vallées ». Correction : infestées.
+
+70 | MOT_INEXISTANT | quant on | quand on | HAUTE | « quant on est soi évadés » — Confusion quant/quand. « Quand » (temporel) est requis ici. Correction : quand.
+
+70 | MOT_INEXISTANT | soi | [des ? six ?] | MOYENNE | « quand on est soi évadés » — « soi » ne fait pas sens grammaticalement ici. Possible lecture de « six » (confusion manuscrite s→s, oi→ix) ou « des ». Alerte : vérifier sur l'image.
+
+70 | MOT_INEXISTANT | la vendredi | le vendredi | HAUTE | « On y est entré la vendredi soir » — « vendredi » est masculin. Confusion manuscrite le/la. Correction : le vendredi.
+
+40 | MOT_INEXISTANT | point à péage | pont à péage | HAUTE | « Pourvu qu'il n'y ait pas de point à péage ! » — Le chapitre s'intitule « Le Pont à Péage ». « Point » est une confusion manuscrite oi→on ou simplement une erreur de lecture du n. Correction : pont.
+
+63 | MOT_INEXISTANT | rendent | arpentent | MOYENNE | « Ils rendent encore une dizaine de kilomètres de route » — « rendre des kilomètres » n'a pas de sens. Confusion manuscrite probable. Correction possible : arpentent, avalent, ou « parcourent ». Alerte : vérifier sur l'image.
+
+72 | MOT_INEXISTANT | reconduirent | reconduisirent | HAUTE | « deux carabiniers nous reconduirent » — Conjugaison incorrecte du passé simple de reconduire. Correction : reconduisirent.
+
+67 | MOT_INEXISTANT | Bon coups | Du coup | HAUTE | « Bon coups ils s'embrassent » — Expression incorrecte. Lecture probable de « Du coup ». Correction : Du coup.
+
+67 | MOT_INEXISTANT | référé | [reste ?] | MOYENNE | « Le référé est illisible, rongé par les années » — « référé » (procédure juridique) ne fait pas sens ici. Il s'agit du reste de l'inscription sur la pancarte. Correction probable : reste. Confusion manuscrite r→r, este→éféré.
+
+58 | MOT_INEXISTANT | Tant ou peu | Tant et si peu / Peu ou prou | MOYENNE | « Tant ou peu ils recouvrent leur maîtrise » — Expression incorrecte. Pourrait être « Peu ou prou » (= plus ou moins) ou « Tant et si peu ». Correction probable : Peu ou prou.
+
+47 | MOT_INEXISTANT | Tant vaut il | Tant vaut-il / Autant vaut-il | MOYENNE | « — Tant vaut il. Et après tout nous avons bien gagné... » — Graphie éclatée. Correction : « Tant vaut-il » ou « Autant vaut-il ». Ponctuation requise : trait d'union.
+
+50 | MOT_INEXISTANT | sept lieux | sept lieues | HAUTE | « des bottes de sept lieux » — L'expression consacrée est « bottes de sept lieues ». Confusion manuscrite eu→eu mais s manquant, ou x→s. Correction : lieues.
+
+30 | MOT_INEXISTANT | troncs d'ailes | troncs d'aulnes | MOYENNE | « abreuvoirs creusés dans des troncs d'ailes » — Les abreuvoirs alpins sont creusés dans des troncs d'aulne/aulnes, pas d'ailes. Confusion manuscrite au→ai, lnes→les. Correction probable : aulnes. Alternative : arbres. Alerte : vérifier sur l'image.
+
+17 | MOT_INEXISTANT | proéminence | proéminence | BASSE | « la berge gazonnée va buter contre une proéminence rocheuse » — « proéminence » est un archaïsme rare mais attesté (variante ancienne de « proéminence/protubérance »). Le mot standard moderne est « proéminence ». Accepté.
+
+9 | MOT_INEXISTANT | Si non | Sinon | HAUTE | « Si non de quoi auraient-ils l'air » — Graphie séparée non standard. Correction : Sinon.
+
+41 | MOT_INEXISTANT | jambes éclairés | jambes éclairées | HAUTE | « les paires de jambes éclairés par le faisceau » — Accord féminin requis. Correction : éclairées.
+
+67 | MOT_INEXISTANT | É aro euf fé atension | [patois occitan] | BASSE | Phrase en patois occitan / languedocien. Signifie probablement « Eh ! il faut faire attention ! » (Aro = maintenant ; fé atension = faire attention). Aucune correction : passage volontairement en dialecte, annoncé par « le patois du pays leur remonte aux lèvres ».
+
+36 | MOT_INEXISTANT | ballade (×2) | balade | MOYENNE | « Quelle belle ballade nous faisons ! » et « une famille en ballade » — « Ballade » = poème ; « balade » = promenade. Correction : balade. Note : la graphie « ballade » pour « promenade » est cependant très courante dans l'usage courant de l'époque (1941). Possible choix de l'auteur.
+
+---------------------------------------------------------------------------
+4. SENS_DOUTEUX — Passages obscurs nécessitant vérification sur image
+---------------------------------------------------------------------------
+
+53 | SENS_DOUTEUX | notre père | André | BASSE | « Mais notre père encore étourdi par le choc » — Utilisation surprenante de « père » pour désigner André. Semble être un choix stylistique de l'auteur (André est le plus âgé des deux ?). Pas une erreur de transcription.
+
+59 | SENS_DOUTEUX | cuissons | [à vérifier] | BASSE | « quitte pour quelques « cuissons » sur son visage » — Le mot est entre guillemets dans le texte original, ce qui pourrait indiquer un usage volontaire (brûlures, sensations de cuisson). Acceptable si les guillemets sont dans le manuscrit.
+
+49 | SENS_DOUTEUX | auto-strade | autostrade | BASSE | « L'auto-strade Vienne-Wagenfurt » — Italianisme (autostrada = autoroute). L'auteur emprunte consciemment le terme italien. Le trait d'union est un choix de graphie. Pas une erreur, mais Wagenfurt est erroné (voir ci-dessus).
+
+67 | SENS_DOUTEUX | l'Annunzio | d'Annunzio | MOYENNE | « la langue chère à l'Annunzio » — Référence à Gabriele d'Annunzio, écrivain italien. La graphie correcte est « d'Annunzio ». « l'Annunzio » pourrait être une confusion de lecture (l'→d'). Correction probable : d'Annunzio.
+
+=============================================================================
+RÉSUMÉ
+=============================================================================
+Total anomalies détectées : 42
+  - NOM_PROPRE : 12 (dont 5 corrections probables, 3 confirmés OK, 4 alertes)
+  - MOT_INEXISTANT : 22 (dont 14 confiance haute, 5 moyenne, 3 basse)
+  - CONFUSIONS MANUSCRITES (accord/conjugaison) : 4
+  - SENS_DOUTEUX : 4
+
+Hapax résolus :
+  Albert (2 occ.) → Alban (même personnage, confusion -an/-ert)
+  Albray (2 occ.) → Alban (même personnage, confusion -an/-ray)
+  Patré (1 occ.) → André (confusion P/A + surnom possible)
+  Privé (1 occ.) → André (probable, à vérifier)
+  Aimé (1 occ.) → André (confusion im/ndr)
+  Jouet (1 occ.) → Poucet (référence au conte)
+  Smalt (1 occ.) → Schmidt (lecture corrompue)
+  Elen (1 occ.) → OK ? (nom propre possible, à vérifier)
+  Massecourt (1 occ.) → à vérifier (nom de lieu ?)

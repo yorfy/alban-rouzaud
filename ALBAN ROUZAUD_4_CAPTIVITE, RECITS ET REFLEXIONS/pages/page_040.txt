@@ -1,0 +1,9 @@
+" Arbeits Kommando "
+
+Les hasards de la profession, du numéro matricule, de la baraque où on a séjourné au Stalag, du caprice du distributeur d'esclaves ont groupé dans une ville, un village, une ferme dix, vingt, cinquante ou plus de prisonniers. Ils ont quitté allègrement le Stalag, ces prisonniers, le Stalag où on la pèle.
+Ils sont partis pour travailler mais aussi pour manger, boire un petit coup de temps en temps, circuler un peu plus librement, se détendre de quelques semaines de claustration, voir du monde. La faim les pousse et la curiosité. Le voyage dans le wagons à bestiaux qui les transporte quelque part ne semble pas dur. Les hommes se relayent au portillon pour regarder le paysage qui est admirable par le seul fait qu'il est nouveau, pour déceler dans la campagne la présence d'un congénère déjà au boulot, pour cracher ou
+---NOTES---
+[AMBIGU] "hasards" : l'auteur écrit "hasards" (orthographe ancienne ou personnelle) au lieu de "hasards"/"hazards" — conservé tel quel.
+[AMBIGU] "on la pèle" : expression familière signifiant "on a très froid" — lecture cohérente avec le contexte du Stalag.
+[AMBIGU] "le wagons à bestiaux" : possible hésitation entre "le wagon" et "les wagons" ; la lecture la plus fidèle au manuscrit semble être "le wagons" mais il pourrait s'agir de "les wagons". Transcrit "le wagons" conformément au manuscrit.
+[SENS DOUTEUX] La page se termine au milieu d'une phrase ("pour cracher ou"), suite attendue sur la page suivante.

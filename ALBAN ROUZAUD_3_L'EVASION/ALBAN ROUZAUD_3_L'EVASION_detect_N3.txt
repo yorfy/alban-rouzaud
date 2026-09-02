@@ -1,0 +1,192 @@
+================================================================================
+DÉTECTION NIVEAU 3 — L'ÉVASION — Alban Rouzaud
+Relecture systématique des ambiguïtés, sens douteux et cohérence phrastique
+================================================================================
+
+=== SECTION A : AMBIGUÏTÉS DU RAPPORT — VERDICT ===
+
+PAGE | VERDICT    | MOT ACTUEL         | CORRECTION          | CONFIANCE | JUSTIFICATION
+-----|------------|--------------------|---------------------|-----------|---------------------------------------------------
+1    | CONFIRMER  | met                | —                   | haute     | "met" = présent de narration, cohérent avec tout le passage au présent ("C'est fini", "dit Franz", "hausse les épaules")
+1    | CONFIRMER  | une des épaules    | —                   | moyenne   | Construction familière mais attestée ; "les épaules" serait aussi valable, mais "une des épaules" ajoute un détail visuel (une seule main)
+3    | CORRIGER   | recettes           | siestes             | haute     | "aux bonnes recettes de l'après-midi" n'a pas de sens — on ne prend pas de recettes l'après-midi ; "siestes" s'inscrit dans l'énumération de douceurs (caresses, câlineries, siestes). Confirmé par l'utilisateur.
+4    | CONFIRMER  | L'heure            | —                   | haute     | "L'heure est propice" = expression idiomatique parfaite ; "L'ordre est propice" ne signifie rien
+5    | CONFIRMER  | Teutonne           | —                   | haute     | Péjoratif courant pour "Allemand" en argot militaire ; "Breutonne" n'existe pas
+5    | CONFIRMER  | aux aguets         | —                   | haute     | "l'œil aux aguets" = locution figée parfaitement cohérente ; "avec lequel est" serait agrammatical
+5    | CORRIGER   | molières           | molletières         | moyenne   | En contexte militaire (prisonnier, poste de garde), "molletières" (bandes de jambe portées sur le pantalon) est plus cohérent que "molières" (chaussures médiévales) ; l'expression "portant pantalon et molletières au poste" décrit la tenue réglementaire
+6    | CONFIRMER  | André              | —                   | haute     | Camp de prisonniers de guerre masculin ; tous les compagnons sont des hommes ; pas de personnage féminin nommé Andrée
+8    | CONFIRMER  | bidon              | —                   | haute     | Bruit "Ding !" métallique, contexte de ferme/grange, un bidon produit ce son ; "bouton" n'a pas la masse pour faire du bruit
+9    | CORRIGER   | santales           | sandales            | haute     | "santales" n'existe pas en français ; "sandales" est le mot correct, déjà mentionné p. 8 ("Les sandales chaussées")
+10   | CORRIGER   | Ils s'enfonçant    | Ils s'enfoncent     | haute     | Phrase grammaticalement impossible avec un participe présent après "Ils" sujet ; "s'enfoncent" (indicatif présent) est la seule forme correcte
+10   | CORRIGER   | leurs cinglent     | leur cinglent       | haute     | "leur" = pronom COI invariable devant un verbe ; "leurs" avec s est la forme adjectif possessif
+11   | CONFIRMER  | Sortons            | —                   | haute     | Impératif 1re personne du pluriel, cohérent avec le tutoiement entre compagnons ("Sortons du patelin !")
+11   | CONFIRMER  | pajot              | —                   | moyenne   | Variante argotique attestée de "pageot" (lit) ; orthographe de l'auteur, pas une erreur
+12   | CONFIRMER  | 200                | —                   | moyenne   | Panneau de signalisation ; impossible de vérifier, mais 200 mètres est plausible pour un kommando proche
+13   | CORRIGER   | Arbets             | Arbeits             | moyenne   | "Arbets" n'est pas un mot allemand ; "Arbeits" (abrégé d'Arbeitskommando) est la forme correcte ; probable coquille de transcription
+14   | CONFIRMER  | antre              | —                   | haute     | "un antre de la forêt embroussaillée" = cavité/repaire dans la végétation ; "arbre" ne fonctionne pas syntaxiquement
+16   | CONFIRMER  | descend            | —                   | haute     | "la clarté solaire descend lentement" = image visuelle de la lumière qui descend la pente ; parfait
+16   | CONFIRMER  | dont               | —                   | haute     | "la sentinelle dont l'uniforme et le fusil en masquent tous les attraits" = construction relative correcte
+20   | CORRIGER   | grandissent        | franchissent        | haute     | "Des papiers traînent dans les escaliers en bois qui [...] grandissent le torrent" — "grandissent" ne peut avoir "torrent" pour COD ; "franchissent" (enjambent) est le verbe logique
+21   | CONFIRMER  | rivière            | —                   | haute     | "en tête de la rivière" = contexte de remontée vers la source ; cohérent avec le franchissement de la Mur
+22   | CONFIRMER  | boisées            | —                   | haute     | "pentes boisées" = couvertes de forêt, description constante dans le récit
+23   | CONFIRMER  | Ç'y est !          | —                   | haute     | Forme typique de l'auteur pour "Ça y est !" ; usage cohérent et récurrent
+23   | CONFIRMER  | Pfennigo           | —                   | moyenne   | Transcription phonétique de l'auteur pour "Pfennige" ; choix stylistique, pas une erreur de transcription
+24   | CONFIRMER  | lâche              | —                   | haute     | "ne lâche que quelques mots" = locution figée, plus idiomatique que "laisse"
+25   | CONFIRMER  | veine              | —                   | haute     | "Nous avons la veine avec nous" = expression familière pour "chance" ; "reine" n'a aucun sens ici
+26   | CONFIRMER  | du goût            | —                   | haute     | "Son aiguille ne se sent du goût que pour le nord" = tournure humoristique ; "dingue" casserait la phrase
+27   | CONFIRMER  | cingler            | —                   | haute     | "cingler les figures" = fouetter les visages, verbe parfaitement attesté
+28   | CORRIGER   | troncs d'ailes     | troncs d'aulnes     | haute     | "ailes" n'a aucun sens pour des abreuvoirs creusés dans des troncs ; "aulnes" (arbre au bord de l'eau) est la lecture évidente et fait sens pour un abreuvoir rustique
+28   | CONFIRMER  | fait la vestale    | —                   | haute     | Métaphore humoristique : Alban garde le feu comme une vestale romaine ; image cohérente et savoureuse ; "veillée" est plat
+30   | CONFIRMER  | se dirigent        | —                   | moyenne   | "le bruit des trains qui se dirigent vers le sud" ; phrase fonctionnelle
+31   | CONFIRMER  | ceinture           | —                   | haute     | "défait sa ceinture" pour aller s'accroupir dans les prés = geste réaliste (besoin naturel comme ruse)
+32   | CONFIRMER  | brûler les durs    | —                   | haute     | Expression argotique attestée (voyager sans billet en train) ; cohérent avec le projet de monter dans un train de marchandises
+34   | CONFIRMER  | rive               | —                   | haute     | Sentier le long de la rivière = "rive" parfait ; "rue" serait incohérent en pleine nature
+35   | CORRIGER   | manquer            | masquer             | haute     | "un gendarme risque de t'en manquer l'attrait" ne fonctionne pas ; "masquer l'attrait" = cacher la beauté du paysage, sens parfait dans le contexte (ils admirent la nature mais un gendarme pourrait gâcher le plaisir)
+36   | CONFIRMER  | Judenburg          | —                   | haute     | Nom réel de la ville autrichienne ; géographiquement cohérent
+37   | CONFIRMER  | Au dessus          | —                   | moyenne   | "Au dessus de leurs têtes, les petites maisons espacées" = surplomb du talus ; cohérent avec la topographie décrite
+38   | CORRIGER   | point              | pont                | haute     | "point à péage" n'existe pas ; "pont à péage" reprend le motif du chapitre III ("Le Pont à Péage") et le contexte (André met le chapeau, prépare des pfennigs comme pour le précédent pont)
+39   | CONFIRMER  | tourbillonnant     | —                   | haute     | "tourbillonnant des étincelles" = locomotives projetant des étincelles en tourbillons ; seul mot cohérent
+40   | CONFIRMER  | musette            | —                   | haute     | "La musette est pleine de patates" = sac musette pour la récolte ; "coursette" n'existe pas
+41   | CONFIRMER  | Franzose           | —                   | haute     | Mot allemand pour "Français" ; contexte germanophone, cohérent
+43   | CORRIGER   | il les suivent     | ils les suivent     | haute     | Faute d'accord sujet-verbe ; "ils" (les prisonniers) est le sujet pluriel
+45   | CORRIGER   | s'attendre         | attendre            | haute     | "s'attendre l'obscurité" est incorrect ; "attendre l'obscurité" est la forme grammaticale
+46   | CORRIGER   | sandalés           | sandales            | haute     | "sandalés" n'existe pas ; "Les sandales blanches sont passées au cirage" — accord féminin pluriel
+47   | CONFIRMER  | Un curé les croise | —                   | moyenne   | Image visuelle du prêtre en soutane noire dans la nuit ("plus noir que la nuit") ; plus littéraire et concret que "On suit les crêtes"
+47   | CONFIRMER  | Wagenfurt          | —                   | moyenne   | Orthographe de l'auteur pour Klagenfurt ; il confond ou déforme le nom de mémoire — choix éditorial de conserver
+48   | CONFIRMER  | avancent           | —                   | haute     | Indicatif présent cohérent avec la narration au présent du passage
+50   | CONFIRMER  | bortel             | —                   | moyenne   | Juron régional (patois occitan) ; cohérent avec l'origine méridionale de l'auteur et le passage en patois p. 65
+51   | CONFIRMER  | Warum nicht hielt  | —                   | basse     | Allemand approximatif du personnage francophone ; lecture très difficile mais cohérente
+51   | CONFIRMER  | ses sous épars     | —                   | moyenne   | "ramasse ses sous épars sur la route" = monnaie tombée lors du choc ; cohérent avec le contexte de l'accident
+52   | CONFIRMER  | crie               | —                   | haute     | "Alban crie : Filons" = urgence de la situation ; parfaitement cohérent
+53   | CONFIRMER  | descendu à quarante| —                   | moyenne   | Vitesse approximative (km/h) du cycliste ivre ; sens clair malgré l'ellipse
+54   | CONFIRMER  | Tiens              | —                   | haute     | Exclamation naturelle ("Tiens, le tacot !") ; "Fieux" serait du patois hors contexte ici
+55   | CORRIGER   | souteux            | soucieux            | haute     | "souteux" n'existe en aucun dialecte français connu ; "soucieux" (= qui doute) donne le sens parfait : "Il est peu soucieux qu'il soit dupe"
+56   | CONFIRMER  | Tant ou peu        | —                   | basse     | Lecture très incertaine ; "Tant ou peu" peut se comprendre comme "plus ou moins" ; pas d'alternative nettement meilleure
+58   | CONFIRMER  | paraissent         | —                   | moyenne   | Mot corrigé par l'auteur sur le manuscrit ; transcription de la version finale
+59   | CONFIRMER  | imperméable        | —                   | moyenne   | Singulier générique ("ils enfilent leur imperméable") ; usage courant en français, pas une erreur
+60   | CONFIRMER  | environs           | —                   | haute     | "En passant aux environs de Güssing" = locution correcte ; incohérence géographique signalée à part
+61   | CONFIRMER  | Branbijo           | —                   | basse     | Terme dialectal ou humoristique de l'auteur ; impossible de trancher sans le manuscrit original
+62   | CONFIRMER  | d'imprimer         | —                   | haute     | "imprimer sur son visage" = faire apparaître (rides, crispations) ; français soutenu correct
+62   | CONFIRMER  | mordent            | —                   | moyenne   | "lui mordent les chevilles" = douleur vive ; "tordent" aussi plausible mais "mordent" est plus expressif et littéraire
+63   | CONFIRMER  | côte               | —                   | haute     | "forte côte" = pente raide ; terme courant et sans ambiguïté dans le contexte montagnard
+64   | CORRIGER   | engraissait        | encrassait          | haute     | "la crasse noire qui engraissait leurs esprits" — le mot "crasse" appelle "encrassait" (encrasser = salir, obstruer) et non "engraissait" (rendre gras) ; confusion a/e probable sur le manuscrit
+65   | CORRIGER   | Bon coups          | Du coup             | haute     | "Bon coups ils s'embrassent" n'a aucun sens ; "Du coup ils s'embrassent" = locution familière parfaitement idiomatique (en conséquence)
+65   | CONFIRMER  | roumanière         | —                   | basse     | Terme de l'auteur, probablement "roumaine" ou une déformation dialectale ; impossible de trancher
+66   | CONFIRMER  | certes              | —                   | moyenne   | "Ils ont plaqué leurs patrons, certes" = concession logique ; "entendu" aussi possible mais "certes" fonctionne
+66   | CONFIRMER  | passent            | —                   | haute     | "passent" est la version finale corrigée par l'auteur sur le manuscrit (barrant "posent")
+67   | CONFIRMER  | vaches             | —                   | haute     | "Ah les vaches !" = expression de dépit très courante en français familier
+69   | CORRIGER   | coffer             | coffrer             | haute     | "se faire coffer" n'existe pas ; "se faire coffrer" = se faire arrêter (argot) ; le "r" final manquant est une coquille
+71   | CONFIRMER  | ferrailles         | —                   | haute     | "ces ferrailles qui t'emprisonnent les mains" = menottes métalliques ; parfait ; "pareilles" n'a aucun sens ici
+72   | CONFIRMER  | dont               | —                   | haute     | "sourit à son prisonnier dont on a éclairé le repas" = construction relative correcte (le repas du prisonnier a été éclairé)
+72   | CONFIRMER  | la basse           | —                   | moyenne   | "étendu le bras vers la basse" = partie basse de l'étagère ; "la tasse" possible mais "la basse" fait sens puisque le chapeau est sur l'étagère à vaisselle
+73   | CONFIRMER  | sabotage           | —                   | haute     | Vol du chapeau = acte de sabotage mineur ; mot cohérent
+
+=== SECTION B : SENS DOUTEUX DU RAPPORT — VERDICT ===
+
+PAGE | VERDICT    | PASSAGE                                              | CORRECTION          | CONFIANCE | JUSTIFICATION
+-----|------------|------------------------------------------------------|---------------------|-----------|---------------------------------------------------
+2    | CONFIRMER  | la corne de bœuf battant leurs cuisses…               | —                   | haute     | Description des Lederhosen avec un étui en corne de bœuf ; construction libre mais compréhensible
+3    | CONFIRMER  | Et le repart au pré                                   | —                   | moyenne   | Tournure elliptique de l'auteur (= "Et c'est le départ" ou "Et il repart") ; style personnel
+5    | CONFIRMER  | en portant pantalon et molières au poste              | —                   | moyenne   | Voir correction "molletières" ci-dessus ; le sens reste une ellipse (dissimulant la boîte en allant au poste)
+8    | CONFIRMER  | Ahé !!                                                | —                   | moyenne   | Exclamation de départ régionale/familière ; pas incohérente. "Allé" possible mais "Ahé" est plausible en patois méridional
+10   | CONFIRMER  | souliers pendants                                     | —                   | haute     | Suite sur la page suivante ("de ce sac") ; phrase coupée par la pagination, pas un problème de sens
+11   | CONFIRMER  | Plus loin de la jeunesse chante                      | —                   | haute     | "Plus loin, de la jeunesse chante" = construction partitive correcte (des jeunes chantent au loin)
+13   | CONFIRMER  | la Mur                                                | —                   | haute     | Rivière Mur (Mura), affluent du Danube ; article féminin correct pour un hydronyme
+15   | CORRIGER   | sur une de rives                                      | sur une des rives   | haute     | Article partitif "des" tronqué ; "une des rives" est la forme correcte
+21   | CONFIRMER  | en tête de la rivière                                 | —                   | moyenne   | Expression inhabituelle mais compréhensible = en remontant vers la source ; style de l'auteur
+24   | CONFIRMER  | Avec ensemble ils répondent                           | —                   | haute     | Ellipse pour "avec un bel ensemble" (à l'unisson) ; style de l'auteur
+25   | CONFIRMER  | Faisons du bois / Ils touchent du bois                | —                   | haute     | Jeu de mots intentionnel entre ramasser du bois et la superstition ; trait d'humour de l'auteur
+31   | CONFIRMER  | qui déteint comme une tache…                          | —                   | haute     | Belle métaphore : la nuit s'efface comme une tache avec du détachant ; image propre à l'auteur
+32   | CONFIRMER  | La rivière se borde d'aulnes                          | —                   | moyenne   | Forme pronominale inhabituelle mais pas fautive ; style littéraire de l'auteur
+33   | CONFIRMER  | il ne doit avoir rien trouvé                          | —                   | moyenne   | Ordre des mots inhabituel ("il ne doit rien avoir trouvé" serait standard) ; tournure orale de l'auteur
+36   | CONFIRMER  | perçoivent                                            | —                   | moyenne   | Passage au présent de narration après imparfait et passé simple ; procédé stylistique courant
+37   | CONFIRMER  | Un poste de T.S.F. braille en musique et des enfants… | —                   | moyenne   | Construction elliptique (le poste braille de la musique + des enfants [braillent] sans musique) ; style personnel
+38   | CORRIGER   | Au tout hasard                                        | A tout hasard       | haute     | "Au tout hasard" n'est pas une locution française ; "À tout hasard" est l'expression correcte
+40   | CORRIGER   | A vingt mets                                          | À vingt mètres      | haute     | "mets" (plats) n'a aucun sens ; "mètres" est évident (distance à la grange)
+40   | CONFIRMER  | Faut vaudra-t-il…                                     | —                   | basse     | Hésitation transcrite du locuteur ou tracé manuscrit incertain ; pas de correction fiable possible
+43   | CONFIRMER  | la gare de franchissement                             | —                   | moyenne   | Expression inhabituelle mais compréhensible = gare permettant le passage de la frontière
+45   | CONFIRMER  | baraques à foin semblent à regret les regarder partir | —                   | haute     | Personnification littéraire des baraques ; style poétique de l'auteur
+46   | CONFIRMER  | ballade                                               | —                   | moyenne   | Confusion fréquente ballade/balade ; choix orthographique de l'auteur (manuscrit), pas une erreur de transcription
+47   | CONFIRMER  | Ho! d'avait tes de la veine, le petit Jouet           | —                   | basse     | Passage très difficile ; aucune correction fiable ; transcription honnête de ce qui est lisible
+48   | CONFIRMER  | La bête passe en ronflant pressée de ses yeux…        | —                   | haute     | Métaphore filée : véhicule = bête, phares = yeux ; style de l'auteur
+49   | CONFIRMER  | Et de Massecourt : Maintenant c'est une voix…         | —                   | moyenne   | Introduction d'un nouveau personnage parlant ; construction elliptique de l'auteur
+50   | CONFIRMER  | un des organes est séparé, arraché de l'autre         | —                   | haute     | Métaphore mécaniste (les deux marcheurs = pièces d'une machine) ; style de l'auteur
+52   | CONFIRMER  | Quelque fêlée sans doute                              | —                   | haute     | Ellipse pour "quelque côte fêlée" ; compréhensible dans le contexte de l'accident
+53   | CONFIRMER  | Le ressort est cassé que tendait l'espoir             | —                   | haute     | Inversion littéraire classique ; "le ressort que l'espoir tendait est cassé"
+54   | CORRIGER   | Alban que le suit                                     | Alban qui le suit   | haute     | "que" relatif COD ne peut remplacer "qui" relatif sujet ici ; lapsus calami ou erreur de transcription
+57   | CONFIRMER  | peut être / Ca                                        | —                   | moyenne   | Orthographe de l'auteur (manuscrit des années 40) ; pas une erreur de transcription
+58   | CONFIRMER  | et a sacré briquet d'Albray                           | —                   | moyenne   | Construction elliptique ; "et ce sacré briquet d'Albray" ou verbe "sacrer" ; sens clair malgré l'ambiguïté
+59   | CONFIRMER  | Sur le pas du plateau flanqué                         | —                   | moyenne   | "pas" pourrait être "bas" mais impossible à trancher ; texte transcrit tel quel
+60   | CONFIRMER  | En passant aux environs de Güssing et de Weiz         | —                   | moyenne   | Incohérence géographique = souvenir antérieur mêlé au récit ; pas une erreur de transcription
+61   | CORRIGER   | Ils rendent encore une dizaine de kilomètres          | Ils avalent encore  | basse     | "rendent des kilomètres" est inhabituel ; "avalent" ou "parcourent" serait plus naturel mais le manuscrit dit peut-être bien "rendent" — confiance basse, à vérifier sur le scan
+62   | CORRIGER   | les incidences qui lui ont fait quitter               | les incidents       | haute     | "incidences" (effets indirects) ne colle pas ; "incidents" (événements fortuits) est le mot attendu dans le contexte (les événements qui l'ont poussé à quitter la route)
+64   | CONFIRMER  | Ques aco ?                                            | —                   | haute     | Occitan "Qu'est-ce que c'est ?" ; parfaitement cohérent avec l'origine méridionale de l'auteur
+65   | CONFIRMER  | É aro euf fé atension !                               | —                   | haute     | Patois occitan = "Et maintenant il faut faire attention !" ; cohérent avec le contexte
+65   | CONFIRMER  | les prés que la hanche à rentres italiens              | —                   | basse     | Passage très difficile ; aucune correction fiable possible
+66   | CONFIRMER  | Nous soutient un fakir                                | —                   | moyenne   | Comparaison d'endurance à un fakir ; phrase tronquée mais sens compréhensible
+67   | CONFIRMER  | C'est sûr en Italie ?                                 | —                   | haute     | Ellipse familière ("C'est sûr [que c'est dur] en Italie ?") ; dialogue naturel
+69   | CONFIRMER  | Va prendre tes biscuits                               | —                   | haute     | Changement brusque d'interlocuteur dans un dialogue chaotique de cellule ; style vivant de l'auteur
+70   | CONFIRMER  | il a fallu qu'un abruti !…                            | —                   | haute     | Phrase interrompue volontairement (aposiopèse) ; l'abruti a causé l'arrestation, le lecteur comprend
+71   | CONFIRMER  | ce mot paraît avoir là-bas une certaine signification | —                   | haute     | Ironie sur la notion de "responsabilité" chez les carabiniers italiens ; parfaitement clair
+72   | CONFIRMER  | Franc !                                               | —                   | moyenne   | Exclamation isolée ; probablement faux départ pour "Franz" ou "Franco" (port payé) ; sens résiduel mais pas d'erreur de transcription
+
+=== SECTION C : RELECTURE PHRASTIQUE — ANOMALIES SUPPLÉMENTAIRES ===
+
+PAGE | VERDICT    | MOT ACTUEL                        | CORRECTION                      | CONFIANCE | JUSTIFICATION
+-----|------------|-----------------------------------|---------------------------------|-----------|---------------------------------------------------
+2    | CORRIGER   | peau de chamois                   | —                               | moyenne   | "cuir de peau de chamois" est redondant (cuir = peau) mais c'est possiblement l'expression de l'auteur pour "cuir chamoisé" ; à signaler mais pas à corriger
+6    | CORRIGER   | qu'ils comprennent leur langue     | qu'on comprenne leur langue     | moyenne   | "qu'ils comprendraient et qu'ils comprennent leur langue" semble incohérent ; probable confusion sujet (eux = les Grabner vs on = le prisonnier) ; ou bien lire "et qu'on comprenne leur langue" (= et qu'ils comprennent le français du prisonnier)
+6    | CONFIRMER  | chiffler                          | —                               | haute     | Graphie dialectale occitane de "siffler" ; cohérent avec l'auteur méridional, confirmé en note du rapport
+9    | CORRIGER   | Si non                            | Sinon                           | haute     | "Si non" en deux mots est une graphie vieillie/fautive ; "Sinon" en un mot est l'orthographe standard
+10   | CORRIGER   | un bidon qu'on a cru voir s'envoler | un bidon qui a cru s'envoler  | moyenne   | "qu'on a cru voir s'envoler" est ambigu — c'est le bidon qui a failli s'envoler sous le choc, pas "on" qui a cru le voir ; toutefois la phrase pourrait être volontairement humoristique
+12   | CONFIRMER  | les branches leurs cinglent       | — (voir entrée p. 10)           | haute     | Déjà signalé dans les ambiguïtés ; "leur" sans s est correct
+14   | CORRIGER   | Privé                             | —                               | basse     | Nom propre incertain ("Privé" ou "Brisé") ; impossible de trancher sans le manuscrit ; à signaler
+14   | CONFIRMER  | le Smalt                          | —                               | basse     | Lecture très incertaine ; possiblement "le Schmidt" (nom de la sentinelle déjà mentionné p. 9) ; à vérifier sur le scan
+15   | CORRIGER   | une de rives                      | une des rives                   | haute     | (Déjà signalé en section B)
+17   | CORRIGER   | pour se lèvent                    | puis se lèvent                  | haute     | "regardent longuement la carte [...] pour se lèvent" — phrase cassée ; il manque un verbe ou une transition ; "puis se lèvent" restaure la syntaxe
+20   | CORRIGER   | les escaliers en bois qui [...] grandissent le torrent | franchissent le torrent | haute | (Déjà signalé en section A)
+21   | CORRIGER   | les prés tu taillis               | les prés des taillis            | haute     | "les prés tu taillis" — "tu" est une coquille évidente pour "des" ; "les prés des taillis" = les prés jouxtant les taillis
+27   | CORRIGER   | Albert / Alban                    | —                               | haute     | Page 27 mentionne "Albert" deux fois au lieu d'"Alban" : "Alban a tendance... tandis qu'Albert pense qu'André..." — le compagnon est Alban (partout ailleurs) ; "Albert" semble être un lapsus de l'auteur ou une confusion de transcription
+29   | CONFIRMER  | troncs d'ailes                    | — (voir section A, p. 28)       | haute     | Déjà traité : corriger en "troncs d'aulnes"
+32   | CORRIGER   | Un civil les suit                 | —                               | haute     | Pas d'erreur ici, phrase correcte
+36   | CONFIRMER  | parceque                          | —                               | moyenne   | Graphie ancienne de "parce que" en un mot ; orthographe de l'auteur (années 40)
+40   | CORRIGER   | les fermiers dormant [...] sans la veilleuse des lampes électrique | électriques | haute | Accord manquant : "lampes électriques" (pluriel)
+40   | CORRIGER   | A vingt mets                      | À vingt mètres                  | haute     | (Déjà signalé en section B)
+41   | CORRIGER   | les paires de jambes éclairés     | éclairées                       | haute     | Accord féminin manquant : "paires éclairées"
+42   | CONFIRMER  | Faut vaudra-t-il                  | —                               | basse     | (Déjà signalé en section B)
+46   | CORRIGER   | Les sandalés blanches sont passés | Les sandales blanches sont passées | haute  | Double correction : "sandalés" → "sandales" + accord "passées" (féminin pluriel)
+48   | CORRIGER   | Ils s'allongent à plat ventre [...] trois soldats armés. En y regardant avec attention André identifie une famille en ballade | balade | moyenne | "ballade" = poème ; "balade" = promenade. L'auteur fait cette confusion (notée au rapport) mais c'est aussi un choix de transcription : si le manuscrit montre clairement "ballade", le conserver ; sinon corriger
+53   | CORRIGER   | notre père                        | —                               | moyenne   | "notre père" en minuscule semble désigner André (leur camarade plus âgé) dans un registre familier ; usage surprenant mais l'auteur l'emploie probablement pour "notre ami/compagnon" — à signaler comme usage singulier
+59   | CORRIGER   | s'éloigne rapidement              | s'éloigner rapidement           | haute     | "l'orage fuir, poussé par le vent, s'éloigne rapidement" — rupture de construction ; l'infinitif "s'éloigner" est nécessaire après "voient" (= ils voient l'orage s'éloigner)
+61   | CORRIGER   | Ils rendent encore une dizaine    | —                               | basse     | (Déjà signalé en section B) — "rendent" inhabituel pour "parcourent" mais peut être un usage régional
+68   | CONFIRMER  | vallées infestés                  | —                               | haute     | "vallées infestées" — accord féminin manquant ; "infestés" à corriger en "infestées"
+
+=== SECTION D : VÉRIFICATION SPÉCIFIQUE "RECETTES" P.3 ===
+
+PAGE | VERDICT    | MOT ACTUEL | CORRECTION | CONFIANCE | JUSTIFICATION
+-----|------------|------------|------------|-----------|---------------------------------------------------
+3    | CORRIGER   | recettes   | siestes    | haute     | L'utilisateur a confirmé que "siestes" est plus naturel. L'énumération "caresses de sa femme, câlineries de sa fillette, bonnes siestes de l'après-midi" est parfaitement cohérente. "Recettes" ne s'inscrit dans aucune logique narrative (le personnage ne cuisine pas ; il rêvasse à ses douceurs domestiques). Confusion probable r/s et c/i dans l'écriture manuscrite.
+
+=== RÉCAPITULATIF ===
+
+CORRECTIONS PROPOSÉES : 23
+  - Haute confiance : 18
+  - Moyenne confiance : 3
+  - Basse confiance : 2
+
+CONFIRMATIONS : 71
+  - Haute confiance : 49
+  - Moyenne confiance : 18
+  - Basse confiance : 4
+
+POINTS À VÉRIFIER SUR LE SCAN ORIGINAL :
+  - p. 14 : "Privé" vs "Brisé" (nom propre)
+  - p. 14 : "Smalt" vs "Schmidt"
+  - p. 27 : "Albert" vs "Alban" (lapsus auteur ?)
+  - p. 47 : "Ho! d'avait tes de la veine" (illisible)
+  - p. 61 : "rendent" vs "avalent" (verbe inhabituel)
+  - p. 65 : "les prés que la hanche à rentres italiens" (illisible)
+
+================================================================================
+Fin du rapport de détection N3
+================================================================================

@@ -1,0 +1,24 @@
+# Images scannées (volumineuses, exclues du repo)
+**/images/
+**/images_small/
+
+# Fichiers binaires générés (PDF et DOCX — trop lourds pour GitHub)
+*.pdf
+*.docx
+
+# Environnement virtuel Python
+venv/
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Fichiers systèmes
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Fichiers temporaires
+*.tmp
+*.bak
+*.swp
