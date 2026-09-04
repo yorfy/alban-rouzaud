@@ -89,6 +89,11 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 #cpa-lb-cap .lt{font-size:.95em;font-weight:600;color:#c8a96e;margin-bottom:3px;}
 #cpa-lb-cap .ld{font-size:.82em;color:#a0b4c8;line-height:1.45;}
 #cpa-lb-cap .lc{font-size:.72em;color:#556677;margin-top:4px;}
+.cpa-lb-arrow{position:fixed;top:50%;transform:translateY(-50%);background:rgba(15,52,96,.75);border:1px solid #1a4a7a;color:#c8a96e;font-size:1.8em;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10001;transition:background .2s;user-select:none;padding:0;line-height:1;appearance:none;-webkit-appearance:none;}
+.cpa-lb-arrow:hover{background:rgba(26,90,154,.9);}
+#cpa-lb-prev{left:16px;}
+#cpa-lb-next{right:16px;}
+.cpa-lb-arrow.hidden{display:none;}
 </style>
 </head>
 <body>
@@ -142,7 +147,9 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 </div>
 <!-- LIGHTBOX CPA -->
 <div id="cpa-lb" onclick="if(event.target===this)this.classList.remove('open')">
+  <button class="cpa-lb-arrow hidden" id="cpa-lb-prev" onclick="event.stopPropagation();_cpaLbIdx=Math.max(0,_cpaLbIdx-1);_cpaLbRender()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15,6 9,12 15,18"/></svg></button>
   <img id="cpa-lb-img" src="" alt="">
+  <button class="cpa-lb-arrow hidden" id="cpa-lb-next" onclick="event.stopPropagation();_cpaLbIdx=Math.min(_cpaLbList.length-1,_cpaLbIdx+1);_cpaLbRender()"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="9,6 15,12 9,18"/></svg></button>
   <div id="cpa-lb-cap">
     <div class="lt" id="cpa-lb-title"></div>
     <div class="ld" id="cpa-lb-desc"></div>
@@ -989,19 +996,21 @@ document.getElementById('sbtoggle').addEventListener('click', function(){
 // CARTES POSTALES
 // =====================================================================
 var CPA_STOPS = [
-  { lat:47.218, lng:15.617, loc:'Weiz (Styrie)', cpa:[
+  { lat:47.21731, lng:15.62247, loc:'Weiz (Styrie)', cpa:[
     { img:'cartes_postales/weiz_hauptplatz_1898.jpg',       title:'Weiz — Place principale, ~1898',             desc:'Weiz, ville du district du Kommando de Hohenilz. Alban et André s\'évadent dans la nuit du 20 septembre.' },
     { img:'cartes_postales/weiz_cpa_autriche_hongrie.jpg',  title:'Weiz — Carte postale Empire austro-hongrois', desc:'Document de la poste impériale de Weiz.' },
     { img:'cartes_postales/weiz_sichelwerk_1898.jpg',       title:'Weiz — Scierie Mooshammer, ~1898',            desc:'Les prisonniers travaillaient dans des fermes et installations locales.' }
   ]},
-  { lat:47.227, lng:15.635, loc:'Weiz — Weizklamm (Styrie)', cpa:[
+  { lat:47.24914, lng:15.59556, loc:'Weiz — Weizklamm (Styrie)', cpa:[
     { img:'cartes_postales/akon_weiz_weizklamm.jpg', title:'Weiz — Ruine Sturmberg dans la Weizklamm', desc:'Le paysage boisé aux portes de Weiz — la gorge que traversent Alban et André dans la nuit du départ.' },
     { img:'cartes_postales/akon_weiz_1.jpg',         title:'Weiz — Ruine Sturmberg, forêt et rivière', desc:'C\'est de ce paysage qu\'ils s\'enfuient dans la nuit du 20 septembre 1941.' }
   ]},
-  { lat:47.225, lng:15.440, loc:'Kesselfallklamm / Semriach (Styrie)', cpa:[
+  { lat:47.19880, lng:15.46776, loc:'Kesselfallklamm / Semriach (Styrie)', cpa:[
     { img:'cartes_postales/akon_schoeckl_1.jpg',    title:'Der Schöckl vom Rosenberg aus, ~1900',        desc:'Le vallon boisé du Schöckl. « Ça vaut le coup de s\'évader quand même ! »' },
-    { img:'cartes_postales/akon_schoeckl_2.jpg',    title:'Der Schöckl vom Rosenberg (variante), ~1900', desc:'La Kesselfallklamm — gorge aménagée dès 1873.' },
     { img:'cartes_postales/akon_schoeckelhaus.jpg', title:'Schöcklhaus — Le refuge alpin',               desc:'Le sommet du Schöckl (1445 m) d\'où descend le Rötschbach.' }
+  ]},
+  { lat:47.20499, lng:15.39888, loc:'Kesselfallklamm — La cascade (Styrie)', cpa:[
+    { img:'cartes_postales/kasselfalls_vintage.png', title:'Kesselfallklamm — La cascade et les passerelles', desc:'« Ça vaut le coup de s\'évader quand même. Ne serait-ce que pour ça ! »' }
   ]},
   { lat:47.269, lng:15.325, loc:'Frohnleiten — Pont sur la Mur (Styrie)', cpa:[
     { img:'cartes_postales/frohnleiten_lithographie_1830.jpg', title:'Frohnleiten — Lithographie J.F. Kaiser, 1830', desc:'« Vier Pfennigo, bitte ! » Un vieux gardien. Ils se font passer pour des Croates.' },
@@ -1016,8 +1025,11 @@ var CPA_STOPS = [
   { lat:47.413, lng:15.287, loc:'Bruck an der Mur (Styrie)', cpa:[
     { img:'cartes_postales/bruck_mur_1910.png', title:'Bruck an der Mur — La Mürz et le Schlossberg, 1910', desc:'La confluence de la Mürz et la Mur. Phases 4–5.' }
   ]},
-  { lat:47.195, lng:14.445, loc:'Unzmarkt / Vallée de la Mur (Styrie)', cpa:[
-    { img:'cartes_postales/murtalbahn_mur_1900.jpg', title:'Murtalbahn — Train sur le pont de la Mur, ~1900', desc:'« La voilà… Merde ! Ça ne peut être que la Mur ! »' }
+  { lat:47.6181, lng:15.1422, loc:'Hochschwab — Alpes de Styrie (Styrie)', cpa:[
+    { img:'cartes_postales/Thomas_Leitner_-_Hochschwab_im_Winter_(1921).jpg', title:'Hochschwab im Winter — Thomas Leitner, 1921', desc:'« Une belle vie, une vraie vie qui éprouve les muscles en lutte constante contre l\'espace et la pesanteur. » Trois jours dans les montagnes entre Mur et Mürz.' }
+  ]},
+  { lat:47.19190, lng:14.43702, loc:'Unzmarkt / Vallée de la Mur (Styrie)', cpa:[
+    { img:'cartes_postales/murtalbahn_mur_1900.jpg', title:'Murtalbahn — Train sur le pont de la Mur, ~1900', desc:'« Le petit train à voie étroite qui monte vers Murau en poussant des sifflements aigus. » La Murtalbahn part d\'Unzmarkt — c\'est là qu\'ils décident de tenter d\'escalader un wagon.' }
   ]},
   { lat:47.213, lng:14.827, loc:'Knittelfeld — Vallée de la Mur (Styrie)', cpa:[
     { img:'cartes_postales/akon_knittelfeld_1.jpg', title:'Knittelfeld — Vue depuis le Dremmelberg',    desc:'« Knittelfeld ? Judenbourg ? — Peu importe. Il n\'y a qu\'à suivre la Mur. »' },
@@ -1035,6 +1047,13 @@ var CPA_STOPS = [
   ]},
   { lat:46.670, lng:13.980, loc:'Lac d\'Ossiach (Carinthie)', cpa:[
     { img:'cartes_postales/ossiach_gierymski_1886.jpg', title:'Lac d\'Ossiach — Gierymski, 1886', desc:'« Le lac d\'Ossiach ! » — bord marécageux. « Wohin ? — Villach ! »' }
+  ]},
+  { lat:46.440, lng:13.310, loc:'Alpes juliennes — Arrestation (Italie)', cpa:[
+    { img:'cartes_postales/Gabinio.Carabinieri_In_Servizio_Al_Confine_Alpino._Valli_Di_Lanzo,_Pian_Della_Mussa,_Due_Carabinieri_In_Pattuglia_2A79.jpg', title:'Deux carabiniers en patrouille à la frontière alpine, ~1902', desc:'Photo de Mario Gabinio (~1902). « À la sortie d\'un village qu\'on ne pouvait contourner à cause de la montagne à pic, deux sentinelles relevées de la garde d\'un tunnel leur demandent les papiers. Un vieux montait avec une corbeille de raisins — la plaine était toute proche. »' }
+  ]},
+  { lat:46.53371, lng:13.64296, loc:'Pontafel / Pontebba — Frontière austro-italienne', cpa:[
+    { img:'cartes_postales/Pontebba1900.JPG', title:'Pontafel/Pontebba — Vue du village, ~1900', desc:'Pontafel (côté autrichien) / Pontebba (côté italien), village frontalier du Kanaltal. En 1941, la frontière a été déplacée plus au nord à Thörl-Maglern — c\'est par là qu\'Alban et André franchissent la frontière le 3 octobre à 15h30.' },
+    { img:'cartes_postales/Pontebba_(UD)_-_vecchia_stazione_ferroviaria_-_cartolina.jpg', title:'Gare de Pontebba — Ancienne station frontière, CPA', desc:'L\'ancienne gare de Pontebba, station frontière vers l\'Autriche jusqu\'à la Première Guerre mondiale. « Elles font une drôle d\'impression, ces ferrailles qui t\'emprisonnent les mains. » Alban et André seront escortés jusqu\'à Tarvisio puis Udine.' }
   ]},
   { lat:46.610, lng:13.852, loc:'Villach (Carinthie)', cpa:[
     { img:'cartes_postales/villach_1898.jpg',        title:'Villach — Vue de la ville, 1898',       desc:'« Le lendemain Villach est traversée sans encombre. »' },
@@ -1152,6 +1171,15 @@ function _cpaLbRender() {
   document.getElementById('cpa-lb-desc').innerHTML = it.desc;
   document.getElementById('cpa-lb-count').textContent =
     _cpaLbList.length > 1 ? (_cpaLbIdx+1) + ' / ' + _cpaLbList.length : '';
+  var prev = document.getElementById('cpa-lb-prev');
+  var next = document.getElementById('cpa-lb-next');
+  if (_cpaLbList.length > 1) {
+    prev.classList.toggle('hidden', _cpaLbIdx === 0);
+    next.classList.toggle('hidden', _cpaLbIdx === _cpaLbList.length - 1);
+  } else {
+    prev.classList.add('hidden');
+    next.classList.add('hidden');
+  }
 }
 document.addEventListener('keydown', function(e) {
   var lb = document.getElementById('cpa-lb');
