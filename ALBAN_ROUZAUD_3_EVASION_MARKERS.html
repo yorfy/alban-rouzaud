@@ -46,13 +46,13 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 /* Marqueurs HTML */
 .mlk-pin { display: block; }
 /* Popup MapLibre */
-.maplibregl-popup-content{background:#16213e!important;color:#e0e0e0;border-radius:8px;border:1px solid #0f3460;padding:12px 16px;max-width:520px;font-family:'Segoe UI',Tahoma,sans-serif;font-size:1.3em}
+.maplibregl-popup-content{background:#16213e!important;color:#e0e0e0;border-radius:8px;border:1px solid #0f3460;padding:12px 16px;max-width:520px;font-family:'Segoe UI',Tahoma,sans-serif;font-size:1.1em}
 .maplibregl-popup-tip{border-top-color:#0f3460!important;border-bottom-color:#0f3460!important}
 .maplibregl-popup-close-button{color:#a0b4c8!important;font-size:1.2em}
-.pt{font-weight:700;font-size:1.5em;margin-bottom:6px}
-.pp{font-size:1.15em;color:#a0b4c8;margin-bottom:7px}
-.px{font-size:1.22em;color:#a0b4c8;line-height:1.6}
-.pq{font-style:italic;border-left:3px solid #e94560;padding-left:8px;margin-top:6px;font-size:1.12em;color:#8899aa}
+.pt{font-weight:700;font-size:1.25em;margin-bottom:6px}
+.pp{font-size:1em;color:#a0b4c8;margin-bottom:7px}
+.px{font-size:1.05em;color:#a0b4c8;line-height:1.6}
+.pq{font-style:italic;border-left:3px solid #e94560;padding-left:8px;margin-top:6px;font-size:1em;color:#8899aa}
 /* Profil altitude */
 #elevpanel{height:220px;background:#0f1628;border-top:2px solid #0f3460;flex-shrink:0;box-shadow:0 -4px 16px rgba(0,0,0,.5);display:flex;flex-direction:column;}
 #elevpanel.hidden{display:none}
@@ -831,7 +831,8 @@ function addMarkers() {
       el.addEventListener('click', function(e) {
         e.stopPropagation();
         var h = '<div class="pt">'+stop.n+'</div>'
-          +'<div class="pp">'+(stop.date||'')+' &mdash; '+(PN[stop.p]||'')+'</div>'
+          +'<div class="pp" style="color:'+(PC[stop.p]||'#888')+';">'+(PN[stop.p]||'')+'</div>'
+          +(stop.date ? '<div class="pp" style="color:#e94560;font-size:.9em;">\uD83D\uDCC5 '+stop.date+'</div>' : '')
           +'<div class="px">'+(stop.d||'')+'</div>'
           +(stop.q ? '<div class="pq">&laquo;&nbsp;'+stop.q+'&nbsp;&raquo;</div>' : '')
           +(stop.r ? '<div class="px" style="margin-top:4px;color:#667788;font-style:italic">'+stop.r+'</div>' : '');
