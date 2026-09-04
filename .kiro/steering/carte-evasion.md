@@ -52,6 +52,5 @@ Les mentions (type `mention`) et les gares (type `gare`) ont un préfixe spécia
 
 ## Notes
 - Les numéros peuvent changer si des stops sont ajoutés ou supprimés. Mettre à jour cette table après chaque modification.
-- `type: "mention"` → préfixe ⊙ dans la sidebar, marqueur petit
-- `type: "gare"` → préfixe 🚉 dans la sidebar, marqueur petit avec icône gare
-- `type: "gare"` et `type: "mention"` sont comptés dans stepN mais leur icône de marqueur n'affiche pas le numéro
+- Tous les stops ont un numéro séquentiel, affiché dans la sidebar et sur le marqueur de la carte.
+- `type: "mention"` et `type: "gare"` ne changent plus le style visuel — ils ont le même badge numéro que les autres.

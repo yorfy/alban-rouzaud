@@ -61,11 +61,27 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 #elevcanvas{display:block;width:100%;height:196px}
 #elevtoggle{position:absolute;right:10px;bottom:10px;z-index:600;background:#0f3460;color:#a0b4c8;border:1px solid #1a4a7a;border-radius:6px;padding:5px 11px;font-size:.82em;cursor:pointer;}
 #elevtip{position:fixed;pointer-events:none;background:rgba(22,33,62,.97);color:#e0e0e0;padding:4px 9px;border-radius:4px;font-size:.8em;line-height:1.5;display:none;z-index:900;border:1px solid #1a4a7a}
-#coords{position:absolute;right:10px;bottom:10px;z-index:600;background:rgba(15,22,40,.92);color:#f5a623;padding:5px 12px;border-radius:5px;font-size:.82em;font-family:monospace;border:1px solid #0f3460;pointer-events:none;}
-#layerswitch{position:absolute;top:10px;left:10px;z-index:500;background:rgba(15,22,40,.9);border:1px solid #0f3460;border-radius:6px;padding:8px 10px;font-size:.82em;color:#a0b4c8}
-#layerswitch b{color:#e0e0e0;display:block;margin-bottom:5px}
-#layerswitch label{display:flex;align-items:center;gap:6px;margin:3px 0;cursor:pointer}
-#pitch-info{position:absolute;bottom:10px;left:10px;z-index:600;background:rgba(15,22,40,.85);color:#a0b4c8;border-radius:5px;padding:4px 9px;font-size:.78em;font-family:monospace;border:1px solid #0f3460;pointer-events:none;}
+#coords{display:none}
+.maplibregl-ctrl-bottom-right{
+  left:50%!important;
+  right:auto!important;
+  transform:translateX(-50%);
+}
+.maplibregl-ctrl-attrib{
+  background:rgba(10,14,26,0.55)!important;
+  font-size:.68em!important;
+  opacity:.5;
+  transition:opacity .2s;
+}
+.maplibregl-ctrl-attrib:hover{opacity:1;}
+.maplibregl-ctrl-attrib a{color:#8899aa!important;}
+#layerswitch{position:absolute;top:10px;left:20px;z-index:500;background:rgba(15,22,40,.9);border:1px solid #0f3460;border-radius:6px;font-size:.82em;color:#a0b4c8}
+#layerswitch-header{padding:7px 10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;user-select:none}
+#layerswitch-header b{color:#e0e0e0}
+#layerswitch-header span{font-size:.8em;opacity:.6}
+#layerswitch-body{padding:0 10px 8px;border-top:1px solid #1a4a7a}
+#layerswitch label{display:flex;align-items:center;gap:6px;margin:3px 0;cursor:pointer;padding-top:3px}
+#pitch-info{display:none}
 /* Marqueurs CPA */
 .cpa-inner{width:26px;height:26px;border-radius:50%;background:#c8a96e;border:2px solid rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.5);transition:transform .12s,border-color .12s,background .12s;transform-origin:center center;position:relative;}
 .cpa-badge{position:absolute;top:-5px;right:-5px;background:#e94560;color:#fff;font-size:8px;font-weight:700;font-family:Arial,sans-serif;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #fff;pointer-events:none;}
@@ -99,7 +115,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 <body>
 <div id="header">
   <div id="header-left">
-    <h1>Alban Rouzaud &#8212; L'&#201;vasion &#8212; <span style="color:#e94560;font-weight:400;font-size:.65em">MapLibre GL JS · Terrain 3D · Marqueurs HTML</span></h1>
+    <h1>Alban Rouzaud &#8212; L'&#201;vasion</h1>
     <p>&#201;crits de Guerre 1939&#8209;1941 &#8212; Weiz (Styrie) &#8594; arrestation en Italie, sept.&#8209;oct. 1941</p>
   </div>
   <div id="header-controls">
@@ -112,8 +128,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   <div id="top-row">
   <div id="sidebar">
     <div class="legend">
-      <h3>&#192; propos de cette carte</h3>
-      <p>MapLibre GL JS · terrain 3D <b>Re:Earth Terrain</b> · Marqueurs HTML avec ic&#244;nes th&#233;matiques SVG inline.</p>
+      <h3 style="cursor:pointer;display:flex;align-items:center;justify-content:space-between;" onclick="var b=document.getElementById('legend-body');b.style.display=b.style.display==='none'?'block':'none';">&#192; propos de cette carte<span style="width:18px;height:18px;border-radius:50%;border:1.5px solid #e94560;color:#e94560;font-size:.8em;font-weight:700;font-style:italic;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-family:serif;">i</span></h3>
+      <div id="legend-body" style="display:none">
+      <p style="text-align:justify">Cette carte est une reconstitution du parcours d'Alban Rouzaud et de son compagnon Andr&#233; depuis leur Arbeitskommando pr&#232;s de Weiz (Styrie) jusqu'&#224; leur arrestation par des carabiniers en Italie, en septembre&#8209;octobre&#160;1941. Apr&#232;s environ deux semaines de marche &#224; travers les Alpes autrichiennes, guid&#233;s par une boussole et une carte copi&#233;e &#224; la main, ils franchissent la fronti&#232;re italienne avant d'&#234;tre arr&#234;t&#233;s et renvoy&#233;s au Stalag XVIII&#160;D de Marburg.</p>
+      </div>
     </div>
     <div id="sl"></div>
   </div>
@@ -121,7 +139,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   <div id="map-wrap">
     <div id="map"></div>
     <div id="layerswitch">
-      <b>Fond de carte</b>
+      <div id="layerswitch-header" onclick="var b=document.getElementById('layerswitch-body');var a=document.getElementById('layerswitch-arrow');b.style.display=b.style.display==='none'?'block':'none';a.textContent=b.style.display==='none'?'▶':'▼';">
+        <b>Fond de carte</b><span id="layerswitch-arrow">▶</span>
+      </div>
+      <div id="layerswitch-body" style="display:none">
       <label><input type="radio" name="basemap" value="basegris" checked> 🗺️ Basemap.at Gris</label>
       <label><input type="radio" name="basemap" value="terrain"> 🏔️ Basemap.at Terrain</label>
       <label><input type="radio" name="basemap" value="ortho"> 🛰️ Basemap.at Ortho</label>
@@ -133,6 +154,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
       <label><input type="checkbox" id="ck-hillshade" checked> Ombrage terrain</label>
       <hr style="border-color:#1a4a7a;margin:5px 0">
       <label><input type="checkbox" id="ck-cpa" checked> 📷 Cartes postales</label>
+      </div>
     </div>
     <div id="pitch-info">pitch: 45° | bear: 0°</div>
     <div id="coords">lat: &#8212; &nbsp;lng: &#8212;</div>
@@ -582,7 +604,6 @@ var map = new maplibregl.Map({
   attributionControl: { compact: true }
 });
 
-map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }), 'bottom-right');
 map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
 // Rose des vents custom
@@ -823,11 +844,9 @@ function addMarkers() {
   var stepN = 0;
   S.forEach(function(s) {
     var color = PC[s.p] || '#888';
-    var isMention = s.type === 'mention';
-    var isGare = s.type === 'gare';
-    var small = isMention || isGare;
+    var small = false;
     stepN++;
-    var iconSvg = isGare ? STOP_ICONS['gare'] : makeBadgeSVG(String(stepN));
+    var iconSvg = makeBadgeSVG(String(stepN));
     var el = makePinEl(color, iconSvg, small);
     el.title = s.n;
     var pinH = small ? 32 : 46;
@@ -835,22 +854,32 @@ function addMarkers() {
       .setLngLat([s.lng, s.lat])
       .addTo(map);
     (function(stop, ph) {
+      stopPopupData[stop.id] = { stop: stop, ph: ph };
       el.addEventListener('click', function(e) {
         e.stopPropagation();
-        var h = '<div class="pt">'+stop.n+'</div>'
-          +'<div class="pp" style="color:'+(PC[stop.p]||'#888')+';">'+(PN[stop.p]||'')+'</div>'
-          +(stop.date ? '<div class="pp" style="color:#e94560;font-size:.9em;">\uD83D\uDCC5 '+stop.date+'</div>' : '')
-          +'<div class="px">'+(stop.d||'')+'</div>'
-          +(stop.q ? '<div class="pq">&laquo;&nbsp;'+stop.q+'&nbsp;&raquo;</div>' : '')
-          +(stop.r ? '<div class="px" style="margin-top:4px;color:#667788;font-style:italic">'+stop.r+'</div>' : '');
-        new maplibregl.Popup({ offset:[0,-ph], maxWidth:'400px', closeOnClick:true })
-          .setLngLat([stop.lng, stop.lat])
-          .setHTML(h)
-          .addTo(map);
+        openStopPopup(stop, ph);
       });
     })(s, pinH);
     htmlMarkers.push(marker);
   });
+}
+
+// Registre des données de popup et fonction commune
+var stopPopupData = {};
+var activePopup = null;
+function openStopPopup(stop, ph) {
+  if (activePopup) { try { activePopup.remove(); } catch(e){} activePopup = null; }
+  var h = '<div class="pt">'+stop.n+'</div>'
+    +'<div class="pp" style="color:'+(PC[stop.p]||'#888')+';">'+(PN[stop.p]||'')+'</div>'
+    +(stop.date ? '<div class="pp" style="color:#e94560;font-size:.9em;">\uD83D\uDCC5 '+stop.date+'</div>' : '')
+    +'<div class="px">'+(stop.d||'')+'</div>'
+    +(stop.q ? '<div class="pq">&laquo;&nbsp;'+stop.q+'&nbsp;&raquo;</div>' : '')
+    +(stop.r ? '<div class="px" style="margin-top:4px;color:#667788;font-style:italic">'+stop.r+'</div>' : '');
+  activePopup = new maplibregl.Popup({ offset:[0,-(ph||46)], maxWidth:'400px', closeOnClick:true })
+    .setLngLat([stop.lng, stop.lat])
+    .setHTML(h)
+    .addTo(map);
+  activePopup.on('close', function(){ activePopup = null; });
 }
 
 // =====================================================================
@@ -904,23 +933,34 @@ map.on('style.load', function() {
     var title = document.createElement('div'); title.className='grp-t';
     title.style.background = col+'22';
     title.innerHTML = '<span class="grp-dot" style="background:'+col+'"></span>'+(PN[p]||'Phase '+p);
-    var list = document.createElement('div'); list.className='grp-s';
-    title.addEventListener('click', function(){ list.style.display = list.style.display==='none'?'block':'none'; });
+    var list = document.createElement('div'); list.className='grp-s'; list.style.display='none';
+    title.addEventListener('click', function(){
+      var open = list.style.display === 'none';
+      list.style.display = open ? 'block' : 'none';
+      if (open) {
+        // Zoom sur l'ensemble de la phase
+        var lngs = byPhase[p].map(function(s){ return s.lng; });
+        var lats = byPhase[p].map(function(s){ return s.lat; });
+        var minLng = Math.min.apply(null, lngs), maxLng = Math.max.apply(null, lngs);
+        var minLat = Math.min.apply(null, lats), maxLat = Math.max.apply(null, lats);
+        map.fitBounds([[minLng, minLat],[maxLng, maxLat]], { padding:60, duration:800, maxZoom:13 });
+      }
+    });
     byPhase[p].forEach(function(s){
       var isMention = s.type==='mention';
       var isGare = s.type==='gare';
       stepN++;
       var item = document.createElement('div'); item.className='si';
       item.style.borderLeftColor = col;
-      var pfx = isMention ? '<span style="color:#667788">⊙</span>\u00a0'
-              : isGare    ? '<span style="font-size:.9em">🚉</span>\u00a0'
-              : '<span style="color:'+col+'">'+stepN+'.</span>\u00a0';
+      var pfx = '<span style="color:'+col+'">'+stepN+'.</span>\u00a0';
       var h = '<div class="sn">'+pfx+s.n+'</div>';
       if (s.date) h += '<div class="sd" style="color:#e94560">📅 '+s.date+'</div>';
       if (s.d)    h += '<div class="sd">'+s.d.substring(0,120)+(s.d.length>120?'…':'')+'</div>';
       if (s.r)    h += '<div class="sr">🛣️ '+s.r+'</div>';
       item.innerHTML = h;
       item.addEventListener('click', function(){
+        var pd = stopPopupData[s.id];
+        if (pd) openStopPopup(pd.stop, pd.ph);
         map.flyTo({ center:[s.lng,s.lat], zoom:Math.max(map.getZoom(),11), duration:900 });
       });
       list.appendChild(item);
@@ -1006,17 +1046,19 @@ var CPA_STOPS = [
     { img:'cartes_postales/akon_weiz_1.jpg',         title:'Weiz — Ruine Sturmberg, forêt et rivière', desc:'C\'est de ce paysage qu\'ils s\'enfuient dans la nuit du 20 septembre 1941.' }
   ]},
   { lat:47.19880, lng:15.46776, loc:'Kesselfallklamm / Semriach (Styrie)', cpa:[
-    { img:'cartes_postales/akon_schoeckl_1.jpg',    title:'Der Schöckl vom Rosenberg aus, ~1900',        desc:'Le vallon boisé du Schöckl. « Ça vaut le coup de s\'évader quand même ! »' },
+    { img:'cartes_postales/akon_schoeckl_1.jpg',    title:'Der Schöckl vom Rosenberg aus, ~1900',        desc:'Le vallon boisé du Schöckl, visible depuis leur itinéraire. Les Alpes styriennes dans toute leur splendeur.' },
     { img:'cartes_postales/akon_schoeckelhaus.jpg', title:'Schöcklhaus — Le refuge alpin',               desc:'Le sommet du Schöckl (1445 m) d\'où descend le Rötschbach.' }
   ]},
   { lat:47.20499, lng:15.39888, loc:'Kesselfallklamm — La cascade (Styrie)', cpa:[
-    { img:'cartes_postales/kasselfalls_vintage.png', title:'Kesselfallklamm — La cascade et les passerelles', desc:'« Ça vaut le coup de s\'évader quand même. Ne serait-ce que pour ça ! »' }
+    { img:'cartes_postales/kasselfalls_vintage.png', title:'Kesselfallklamm — La cascade et les passerelles', desc:'« Ça vaut le coup de s\'évader quand même. Ne serait-ce que pour ça ! » Alban et André s\'arrêtent sur les passerelles de la gorge pour admirer la cascade.' },
+    { img:'cartes_postales_c1/pierre_lys_trou_cure.jpg', title:'Gorges de la Pierre Lys — Le Trou du Curé (Aude)', desc:'« La Pierre Lys, St Georges, Galamus… de belles parties de camping… » Devant la cascade autrichienne, Alban et André évoquent les gorges pyrénéennes qu\'ils connaissent bien.' },
+    { img:'cartes_postales_c1/gorges_saint_georges_axat.jpg', title:'Gorges Saint-Georges — Axat (Aude)', desc:'Les gorges de Saint-Georges d\'Axat dans l\'Aude — l\'une des gorges pyrénéennes évoquées par les deux évadés devant la Kesselfallklamm.' }
   ]},
   { lat:47.269, lng:15.325, loc:'Frohnleiten — Pont sur la Mur (Styrie)', cpa:[
     { img:'cartes_postales/frohnleiten_lithographie_1830.jpg', title:'Frohnleiten — Lithographie J.F. Kaiser, 1830', desc:'« Vier Pfennigo, bitte ! » Un vieux gardien. Ils se font passer pour des Croates.' },
     { img:'cartes_postales/akon_frohnleiten_2.jpg',            title:'Frohnleiten — La Mur et le pont',             desc:'Vue panoramique avec la Mur et le pont bien visible.' },
     { img:'cartes_postales/akon_frohnleiten_3.jpg',            title:'Frohnleiten — Sommerfrische, les vergers',    desc:'Après le pont, un prisonnier français dans une scierie.' },
-    { img:'cartes_postales/akon_frohnleiten_4.jpg',            title:'Frohnleiten — Le Stadtturm entre les sapins', desc:'Après le pont, les fugitifs bivouaquent dans les feuilles sèches.' }
+    { img:'cartes_postales/akon_frohnleiten_4.jpg',            title:'Frohnleiten — Le Stadtturm entre les sapins', desc:'Après le pont, les évadés bivouaquent dans les feuilles sèches.' }
   ]},
   { lat:47.320, lng:15.360, loc:'Mixnitz / Bärenschützklamm (Styrie)', cpa:[
     { img:'cartes_postales/akon_mixnitz_baerenschutz.jpg', title:'Mixnitz — Bärenschützschlucht et Hochlantsch', desc:'Contexte géographique du parcours sur la Mur.' },
@@ -1033,26 +1075,25 @@ var CPA_STOPS = [
   ]},
   { lat:47.213, lng:14.827, loc:'Knittelfeld — Vallée de la Mur (Styrie)', cpa:[
     { img:'cartes_postales/akon_knittelfeld_1.jpg', title:'Knittelfeld — Vue depuis le Dremmelberg',    desc:'« Knittelfeld ? Judenbourg ? — Peu importe. Il n\'y a qu\'à suivre la Mur. »' },
-    { img:'cartes_postales/akon_knittelfeld_2.jpg', title:'Knittelfeld — Roseggerstraße et les usines', desc:'Hypothèse du texte. Identification non confirmée.' }
+    { img:'cartes_postales/akon_knittelfeld_2.jpg', title:'Knittelfeld — Roseggerstraße et les usines', desc:'« Un gros bourg sur l\'autre rive — Knittelfeld ? Judenbourg ? — Feu de camp au bord de l\'eau, thé au lait, rasage. Ils décident de remonter la rivière vers l\'ouest. »' }
   ]},
   { lat:47.169, lng:14.662, loc:'Judenburg (Styrie)', cpa:[
     { img:'cartes_postales/akon_judenburg_1.jpg', title:'Judenburg — Le Stadtturm depuis les sapins',      desc:'Identifiée via une pancarte déchirée : « Juden… »' },
-    { img:'cartes_postales/akon_judenburg_2.jpg', title:'Judenburg — Vue panoramique, la Mur et les Alpes',desc:'Judenburg dans son écrin alpin. Puis la gare de marchandises.' },
-    { img:'cartes_postales/judenburg_1938.jpg',   title:'Judenburg — Après l\'Anschluss, 1938',           desc:'« Deux heures tapis le long de la clôture. Les trains ne s\'arrêtent pas. »' }
+    { img:'cartes_postales/akon_judenburg_2.jpg', title:'Judenburg — Vue panoramique, la Mur et les Alpes',desc:'Judenburg dans son écrin alpin. Puis la gare de marchandises.' }
   ]},
   { lat:46.768, lng:14.360, loc:'St. Veit an der Glan (Carinthie)', cpa:[
     { img:'cartes_postales/st_veit_kino_1900.jpg',      title:'St. Veit — Stadt-Kino-Theater, ~1900', desc:'Traversée à deux heures. « Et ce sacré briquet d\'Alban qui ne marchait pas ! »' },
     { img:'cartes_postales/st_veit_friesacher_tor.jpg', title:'St. Veit — Porte de Friesach',         desc:'Un soldat demande du feu. Le briquet est à sec.' },
     { img:'cartes_postales/hochosterwitz_1910.png',     title:'Burg Hochosterwitz — CPA ~1910',       desc:'Le paysage carinthien : routes militarisées, soldats partout.' }
   ]},
-  { lat:46.670, lng:13.980, loc:'Lac d\'Ossiach (Carinthie)', cpa:[
+  { lat:46.68890, lng:13.99229, loc:'Lac d\'Ossiach (Carinthie)', cpa:[
     { img:'cartes_postales/ossiach_gierymski_1886.jpg', title:'Lac d\'Ossiach — Gierymski, 1886', desc:'« Le lac d\'Ossiach ! » — bord marécageux. « Wohin ? — Villach ! »' }
   ]},
   { lat:46.440, lng:13.310, loc:'Alpes juliennes — Arrestation (Italie)', cpa:[
-    { img:'cartes_postales/Gabinio.Carabinieri_In_Servizio_Al_Confine_Alpino._Valli_Di_Lanzo,_Pian_Della_Mussa,_Due_Carabinieri_In_Pattuglia_2A79.jpg', title:'Deux carabiniers en patrouille à la frontière alpine, ~1902', desc:'Photo de Mario Gabinio (~1902). « À la sortie d\'un village qu\'on ne pouvait contourner à cause de la montagne à pic, deux sentinelles relevées de la garde d\'un tunnel leur demandent les papiers. Un vieux montait avec une corbeille de raisins — la plaine était toute proche. »' }
+    { img:'cartes_postales/Gabinio.Carabinieri_In_Servizio_Al_Confine_Alpino._Valli_Di_Lanzo,_Pian_Della_Mussa,_Due_Carabinieri_In_Pattuglia_2A79.jpg', title:'Deux carabiniers en patrouille à la frontière alpine, ~1902', desc:'Photo de Mario Gabinio (~1902). « À la sortie d\'un village qu\'on ne pouvait contourner à cause de la montagne à pic, deux sentinelles relevées de la garde d\'un tunnel leur demandent les papiers. »' }
   ]},
   { lat:46.53371, lng:13.64296, loc:'Pontafel / Pontebba — Frontière austro-italienne', cpa:[
-    { img:'cartes_postales/Pontebba1900.JPG', title:'Pontafel/Pontebba — Vue du village, ~1900', desc:'Pontafel (côté autrichien) / Pontebba (côté italien), village frontalier du Kanaltal. En 1941, la frontière a été déplacée plus au nord à Thörl-Maglern — c\'est par là qu\'Alban et André franchissent la frontière le 3 octobre à 15h30.' },
+    { img:'cartes_postales/Pontebba1900.JPG', title:'Pontafel/Pontebba — Vue du village, ~1900', desc:'Pontafel (côté autrichien) / Pontebba (côté italien), village frontalier du Kanaltal. C\'est sur la crête à l\'est, au sud de Thörl-Maglern, qu\'Alban et André franchissent la frontière le 3 octobre à 15h30.' },
     { img:'cartes_postales/Pontebba_(UD)_-_vecchia_stazione_ferroviaria_-_cartolina.jpg', title:'Gare de Pontebba — Ancienne station frontière, CPA', desc:'L\'ancienne gare de Pontebba, station frontière vers l\'Autriche jusqu\'à la Première Guerre mondiale. « Elles font une drôle d\'impression, ces ferrailles qui t\'emprisonnent les mains. » Alban et André seront escortés jusqu\'à Tarvisio puis Udine.' }
   ]},
   { lat:46.610, lng:13.852, loc:'Villach (Carinthie)', cpa:[
