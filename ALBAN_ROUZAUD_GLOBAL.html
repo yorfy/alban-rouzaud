@@ -157,6 +157,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   .ctab{padding:4px 7px;font-size:.76em}
 }
 </style>
+<script src="data/data_c1.js"></script>
+<script src="data/data_c2.js"></script>
+<script src="data/data_c3.js"></script>
+<script src="data/data_c4.js"></script>
 </head>
 <body>
 
@@ -300,26 +304,9 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   </div>
 </div>
 
-<!-- ===================================================================
-     DONNÉES C1 — La Guerre (Août 1939 – Juin 1940)
-     =================================================================== -->
+<!-- C1 data moved to data_c1.js -->
 <script>
-// =====================================================================
-// DONNÉES CAHIER 1 — La Guerre (Août 1939 – Juin 1940)
-// =====================================================================
-var PC_C1 = {
-  1: '#f5a623',
-  2: '#e94560',
-  3: '#3498db',
-  4: '#9b59b6'
-};
-var PN_C1 = {
-  1: 'Août 1939 — Derniers jours de paix',
-  2: 'Sept. 1939 — Mobilisation',
-  3: 'Hiver 1939-40 — Drôle de guerre',
-  4: 'Mai-Juin 1940 — Vers Verdun'
-};
-
+// C1 legacy vars (kept for compatibility, data is now in CAHIER_1_DATA)
 var S_C1 = [
   {id:1,p:1,n:"Lavelanet",lat:42.9372,lng:1.8478,
    d:"Ville de l'auteur. Il y vit avec sa femme et sa fille. C'est dans l'escalier de son immeuble qu'il entend la mobilisation générale à la radio.",
@@ -372,33 +359,33 @@ var S_C1 = [
 
 var CPA_C1 = [
   { lat:42.9372, lng:1.8478, loc:"Lavelanet (Ariège)", cpa:[
-    { img:"cartes_postales_c1/tarascon_vicdessos_sabart.jpg",
+    { img:"cartes_postales/tarascon_vicdessos_sabart.jpg",
       title:"Tarascon-sur-Ariège — Sabart et la vallée du Vicdessos",
       desc:"La région ariégeoise d'Alban Rouzaud. La vallée du Vicdessos où il fait une dernière virée en torpedo avec ses amis avant la mobilisation." }
   ]},
   { lat:43.6047, lng:1.4442, loc:"Toulouse (Haute-Garonne)", cpa:[
-    { img:"cartes_postales_c1/toulouse_matabiau_cpa.jpg",
+    { img:"cartes_postales/toulouse_matabiau_cpa.jpg",
       title:"Toulouse — Gare Matabiau, CPA",
       desc:"La gare de Toulouse d'où Alban et ses camarades partent rejoindre leurs régiments en septembre 1939. « Le grand troupeau »." }
   ]},
   { lat:48.8564, lng:7.3192, loc:"La Petite-Pierre (Bas-Rhin)", cpa:[
-    { img:"cartes_postales_c1/pirmasens_1905.jpg",
+    { img:"cartes_postales/pirmasens_1905.jpg",
       title:"Pirmasens (Allemagne) — CPA 1905",
       desc:"Pirmasens, la ville allemande visible depuis les avant-postes d'Alban Rouzaud. « Les ceux d'en face. » La drôle de guerre vue depuis la ligne Maginot." }
   ]},
   { lat:49.16, lng:5.3833, loc:"Verdun (Meuse)", cpa:[
-    { img:"cartes_postales_c1/verdun_bombardé_1918.jpg",
+    { img:"cartes_postales/verdun_bombardé_1918.jpg",
       title:"Verdun bombardé — CPA 1918",
       desc:"Verdun, destination finale du Cahier 1. Le régiment doit y prendre position « en bretelle » pour colmater la poche allemande de juin 1940." },
-    { img:"cartes_postales_c1/verdun_ruines_1914.jpg",
+    { img:"cartes_postales/verdun_ruines_1914.jpg",
       title:"Verdun en ruines — CPA 1914",
       desc:"Les ruines de Verdun, symbole de 1914-1918. En juin 1940, l'histoire se répète tragiquement." }
   ]},
   { lat:48.178, lng:6.451, loc:"Épinal (Vosges)", cpa:[
-    { img:"cartes_postales_c1/bundesarchiv_prisonniers_francais_1940.jpg",
+    { img:"cartes_postales/bundesarchiv_prisonniers_francais_1940.jpg",
       title:"Prisonniers français — juin 1940 (Bundesarchiv)",
       desc:"Photo d'archives allemandes (Bundesarchiv) montrant des prisonniers français en juin 1940. Alban Rouzaud sera capturé à Épinal en juillet 1940." },
-    { img:"cartes_postales_c1/french_weeps_1940.jpg",
+    { img:"cartes_postales/french_weeps_1940.jpg",
       title:"Soldat français pleurant l'armistice — juin 1940",
       desc:"« Une main qui ne fait pas l'aumône. Une main qui donne simplement. » La capture à Épinal." }
   ]}
@@ -912,8 +899,8 @@ var CPA_C3 = [
   ]},
   { lat:47.20499, lng:15.39888, loc:'Kesselfallklamm — La cascade (Styrie)', cpa:[
     { img:'cartes_postales/kasselfalls_vintage.png', title:'Kesselfallklamm — La cascade et les passerelles', desc:'« Ça vaut le coup de s\'évader quand même. Ne serait-ce que pour ça ! » Alban et André s\'arrêtent sur les passerelles de la gorge pour admirer la cascade.' },
-    { img:'cartes_postales_c1/pierre_lys_trou_cure.jpg', title:'Gorges de la Pierre Lys — Le Trou du Curé (Aude)', desc:'« La Pierre Lys, St Georges, Galamus… de belles parties de camping… » Devant la cascade autrichienne, Alban et André évoquent les gorges pyrénéennes qu\'ils connaissent bien.' },
-    { img:'cartes_postales_c1/gorges_saint_georges_axat.jpg', title:'Gorges Saint-Georges — Axat (Aude)', desc:'Les gorges de Saint-Georges d\'Axat dans l\'Aude — l\'une des gorges pyrénéennes évoquées par les deux évadés devant la Kesselfallklamm.' }
+    { img:'cartes_postales/pierre_lys_trou_cure.jpg', title:'Gorges de la Pierre Lys — Le Trou du Curé (Aude)', desc:'« La Pierre Lys, St Georges, Galamus… de belles parties de camping… » Devant la cascade autrichienne, Alban et André évoquent les gorges pyrénéennes qu\'ils connaissent bien.' },
+    { img:'cartes_postales/gorges_saint_georges_axat.jpg', title:'Gorges Saint-Georges — Axat (Aude)', desc:'Les gorges de Saint-Georges d\'Axat dans l\'Aude — l\'une des gorges pyrénéennes évoquées par les deux évadés devant la Kesselfallklamm.' }
   ]},
   { lat:47.269, lng:15.325, loc:'Frohnleiten — Pont sur la Mur (Styrie)', cpa:[
     { img:'cartes_postales/frohnleiten_lithographie_1830.jpg', title:'Frohnleiten — Lithographie J.F. Kaiser, 1830', desc:'« Vier Pfennigo, bitte ! » Un vieux gardien. Ils se font passer pour des Croates.' },
@@ -1178,13 +1165,24 @@ var CAHIER_META = {
 // =====================================================================
 function getCahierData(n) {
   var meta = CAHIER_META[n];
+  // Prefer external CAHIER_N_DATA if loaded, fall back to inline vars for large data (routes/elevProfile)
+  var cd = (n===1?CAHIER_1_DATA : n===2?CAHIER_2_DATA : n===3?CAHIER_3_DATA : CAHIER_4_DATA) || {};
+  // Routes: use CAHIER_N_DATA.staticRoutes if non-empty, else fall back to inline var
+  var inlineRoutes = (n===1?(typeof staticRoutes_C1!=='undefined'?staticRoutes_C1:[])
+                    : n===2?(typeof staticRoutes_C2!=='undefined'?staticRoutes_C2:[])
+                    : n===3?(typeof staticRoutes_C3!=='undefined'?staticRoutes_C3:[])
+                    : (typeof staticRoutes_C4!=='undefined'?staticRoutes_C4:[]));
+  var inlineElev   = (n===1?(typeof elevProfile_C1!=='undefined'?elevProfile_C1:[])
+                    : n===2?(typeof elevProfile_C2!=='undefined'?elevProfile_C2:[])
+                    : n===3?(typeof elevProfile_C3!=='undefined'?elevProfile_C3:[])
+                    : (typeof elevProfile_C4!=='undefined'?elevProfile_C4:[]));
   return {
-    S:           (n===1?S_C1 : n===2?S_C2 : n===3?S_C3 : S_C4) || [],
-    PC:          (n===1?PC_C1 : n===2?PC_C2 : n===3?PC_C3 : PC_C4) || {},
-    PN:          (n===1?PN_C1 : n===2?PN_C2 : n===3?PN_C3 : PN_C4) || {},
-    CPA:         (n===1?CPA_C1 : n===2?CPA_C2 : n===3?CPA_C3 : CPA_C4) || [],
-    routes:      (n===1?staticRoutes_C1 : n===2?staticRoutes_C2 : n===3?staticRoutes_C3 : staticRoutes_C4) || [],
-    elevProfile: (n===1?elevProfile_C1 : n===2?elevProfile_C2 : n===3?elevProfile_C3 : elevProfile_C4) || [],
+    S:           (cd.stops)         || [],
+    PC:          (cd.PC)            || {},
+    PN:          (cd.PN)            || {},
+    CPA:         (cd.cpa)           || [],
+    routes:      (cd.staticRoutes && cd.staticRoutes.length > 0 ? cd.staticRoutes : inlineRoutes) || [],
+    elevProfile: (cd.elevProfile && cd.elevProfile.length > 0   ? cd.elevProfile  : inlineElev)   || [],
     bbox:        meta.bbox,
     initialView: meta.initialView,
     noElevation: !!meta.noElevation,

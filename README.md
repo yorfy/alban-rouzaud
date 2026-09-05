@@ -22,10 +22,13 @@ ALBAN ROUZAUD_N_TITRE/
 ├── pages/                           ← un .txt par page
 ├── ALBAN ROUZAUD_N_TITRE_rapport.md ← rapport de transcription
 └── images/ / images_small/          ← pages scannées (exclues du repo)
-ALBAN_ROUZAUD_N_CARTE.html           ← carte interactive du parcours
+ALBAN_ROUZAUD_N_CARTE.html           ← carte interactive du parcours (par cahier)
+ALBAN_ROUZAUD_GLOBAL.html            ← carte interactive globale des 4 cahiers
 FRISE_CHRONOLOGIQUE.html             ← frise chronologique
 ANALYSE_GLOBALE_TAMPONS_*.md         ← analyses transversales
 ```
+
+**ALBAN_ROUZAUD_GLOBAL.html** — Carte interactive globale des 4 cahiers de guerre (MapLibre GL JS 4.7.1). Page de garde narrative, onglets par cahier, modèle accumulatif (les parcours restent visibles), profil d'altitude pour C3, cartes postales anciennes.
 
 ## Prérequis
 

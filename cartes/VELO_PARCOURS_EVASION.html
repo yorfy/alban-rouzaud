@@ -1,0 +1,660 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Sur les traces d'Alban Rouzaud — Itinéraire vélo BRouter 3D</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"/>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a2e1a;color:#e0e0d0;overflow:hidden;height:100vh;display:flex;flex-direction:column}
+
+#header{background:linear-gradient(135deg,#1e3a1e,#2d5a2d);padding:9px 18px;border-bottom:3px solid #5a9e5a;display:flex;align-items:center;gap:14px;flex-shrink:0}
+#header h1{font-size:1.15em;color:#fff;margin-bottom:1px}
+#header p{font-size:.76em;color:#a0c0a0}
+#header-left{flex:1}
+#header-controls{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+.hbtn{background:#1e3a1e;border:1px solid #3a6a3a;color:#a0c0a0;padding:4px 10px;border-radius:5px;font-size:.76em;cursor:pointer;transition:background .2s;white-space:nowrap}
+.hbtn:hover,.hbtn.active{background:#2d5a2d;color:#fff}
+
+#loading{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%);z-index:3000;background:rgba(15,30,15,.97);border:2px solid #5a9e5a;border-radius:10px;padding:22px 30px;text-align:center;color:#a0c0a0;font-size:.92em;min-width:280px;display:none}
+#loading b{color:#7ecf7e;display:block;font-size:1.1em;margin-bottom:8px}
+#progress{width:220px;height:6px;background:#2d5a2d;border-radius:3px;margin:10px auto 0;overflow:hidden}
+#progress-bar{height:100%;background:linear-gradient(90deg,#4caf50,#7ecf7e);border-radius:3px;transition:width .3s;width:0%}
+#loading-status{margin-top:8px;font-size:.76em;color:#5a9e5a;min-height:1.2em}
+
+#layout{display:flex;height:calc(100vh - 58px)}
+
+#sidebar{width:310px;min-width:310px;background:#1a2e1a;overflow-y:auto;padding:10px;border-right:2px solid #2d5a2d;transition:width .25s,min-width .25s,padding .25s}
+#sidebar.collapsed{width:0;min-width:0;padding:0;overflow:hidden;border-right-width:0}
+#sbtoggle{position:absolute;top:58px;left:310px;height:calc(100vh - 58px);width:9px;z-index:1100;background:#2d5a2d;color:#a0c0a0;border:none;padding:0;font-size:.5em;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:left .25s}
+#sbtoggle:hover{background:#3a7a3a}
+#sidebar.collapsed~#sbtoggle{left:0}
+
+#map-wrap{flex:1;position:relative}
+#map{width:100%;height:100%}
+
+/* Contrôles 3D superposés */
+#ctrl3d{position:absolute;top:10px;right:10px;z-index:500;display:flex;flex-direction:column;gap:5px}
+.cbtn{background:rgba(15,30,15,.9);border:1px solid #3a6a3a;color:#a0c0a0;padding:6px 9px;border-radius:5px;font-size:.76em;cursor:pointer;white-space:nowrap;transition:background .2s;min-width:75px;text-align:center}
+.cbtn:hover{background:#1a3a1a;color:#fff}
+
+/* Info coin bas gauche */
+#pitch-info{position:absolute;bottom:32px;left:10px;z-index:400;background:rgba(15,30,15,.85);color:#7a9a7a;border-radius:4px;padding:3px 8px;font-size:.72em;font-family:monospace;border:1px solid #2d5a2d;pointer-events:none}
+
+/* Fond de carte */
+#basemap-switch{position:absolute;top:10px;left:10px;z-index:500;background:rgba(15,30,15,.92);border:1px solid #3a6a3a;border-radius:6px;padding:7px 9px;font-size:.75em;color:#a0c0a0;max-width:190px}
+#basemap-switch b{color:#c0d8c0;display:block;margin-bottom:4px;font-size:.82em}
+#basemap-switch label{display:flex;align-items:center;gap:5px;margin:2px 0;cursor:pointer}
+#basemap-switch hr{border:none;border-top:1px solid #2d5a2d;margin:5px 0}
+
+.legend-box{background:rgba(15,30,15,.85);border-radius:7px;padding:9px 11px;margin-bottom:8px;border:1px solid #3a6a3a}
+.legend-box h3{font-size:.78em;color:#7ecf7e;margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em}
+
+.seg-item{display:flex;align-items:center;gap:8px;padding:4px 3px;cursor:pointer;border-radius:4px;transition:background .15s}
+.seg-item:hover{background:rgba(255,255,255,.07)}
+.seg-line{width:24px;height:5px;border-radius:3px;flex-shrink:0}
+.seg-info{flex:1;min-width:0}
+.seg-name{font-size:.78em;color:#d0e8d0;font-weight:600}
+.seg-sub{font-size:.69em;color:#7a9a7a}
+.seg-dist{font-size:.7em;color:#5a9e5a;white-space:nowrap;flex-shrink:0}
+
+.poi-item{display:flex;align-items:flex-start;gap:6px;padding:3px 3px;cursor:pointer;border-radius:4px;transition:background .15s}
+.poi-item:hover{background:rgba(255,255,255,.07)}
+.poi-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:3px;border:1.5px solid rgba(255,255,255,.3)}
+.poi-name{font-size:.77em;color:#d0e8d0;line-height:1.25}
+.poi-note{font-size:.69em;color:#7a9a7a;margin-top:1px}
+
+.stats-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-top:5px}
+.stat-card{background:rgba(25,55,25,.8);border-radius:5px;padding:6px 8px;text-align:center;border:1px solid #3a6a3a}
+.stat-val{font-size:1.15em;font-weight:700;color:#7ecf7e}
+.stat-lab{font-size:.63em;color:#7a9a7a;margin-top:1px}
+
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:2px 0}
+.toggle-row label{font-size:.77em;color:#c0d8c0;cursor:pointer;display:flex;align-items:center;gap:6px}
+.toggle-row input[type=checkbox]{accent-color:#5a9e5a;cursor:pointer}
+
+/* Popup */
+.maplibregl-popup-content{background:#0f1e0f!important;color:#e0e0d0;border-radius:8px;border:1px solid #3a6a3a;padding:9px 12px;max-width:270px;font-family:'Segoe UI',Tahoma,sans-serif;font-size:.84em}
+.maplibregl-popup-tip{border-top-color:#3a6a3a!important;border-bottom-color:#3a6a3a!important}
+.maplibregl-popup-close-button{color:#a0c0a0!important}
+.pt{font-weight:700;font-size:.98em;margin-bottom:2px;color:#fff}
+.pb{font-size:.73em;color:#7ecf7e;margin-bottom:3px;font-weight:600}
+.px{font-size:.81em;color:#a0c0a0;line-height:1.4}
+.pq{font-style:italic;border-left:3px solid #5a9e5a;padding-left:6px;margin-top:4px;font-size:.75em;color:#7a9a7a}
+</style>
+</head>
+<body>
+
+<div id="header">
+  <div id="header-left">
+    <h1>🚴 Sur les traces d'Alban Rouzaud — Itinéraire vélo <span style="color:#7ecf7e;font-size:.72em;font-weight:400">BRouter · fastbike · terrain 3D</span></h1>
+    <p>Weiz (Styrie) → Frohnleiten → Bruck → Judenburg → Villach → Tarvisio → Udine · Re:Earth DEM · Mapterhorn CC BY 4.0</p>
+  </div>
+  <div id="header-controls">
+    <button class="hbtn active" id="btn-reset">⌂ Vue d'ensemble</button>
+    <button class="hbtn active" id="btn-terrain">⛰ Terrain 3D</button>
+    <button class="hbtn active" id="btn-hillshade">☀ Ombrage</button>
+    <button class="hbtn" id="btn-reload">↺ Recalculer</button>
+  </div>
+</div>
+
+<div id="loading">
+  <b>⏳ Calcul des itinéraires BRouter…</b>
+  Profil fastbike · waypoints calés sur les vallées
+  <div id="progress"><div id="progress-bar"></div></div>
+  <div id="loading-status"></div>
+</div>
+
+<div id="layout">
+  <div id="sidebar">
+
+    <div class="legend-box">
+      <h3>📊 Résumé</h3>
+      <div class="stats-grid">
+        <div class="stat-card"><div class="stat-val" id="stat-dist">—</div><div class="stat-lab">km total</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-asc">—</div><div class="stat-lab">m dénivelé +</div></div>
+        <div class="stat-card"><div class="stat-val" id="stat-days">—</div><div class="stat-lab">jours (6h/j)</div></div>
+      </div>
+    </div>
+
+    <div class="legend-box">
+      <h3>👁 Affichage</h3>
+      <div class="toggle-row"><label><input type="checkbox" id="chk-velo" checked> Itinéraire vélo BRouter</label></div>
+      <div class="toggle-row"><label><input type="checkbox" id="chk-evasion" checked> Parcours d'Alban (à pied)</label></div>
+      <div class="toggle-row"><label><input type="checkbox" id="chk-poi" checked> Points d'étape</label></div>
+    </div>
+
+    <div class="legend-box">
+      <h3>🚴 Segments</h3>
+      <div class="seg-item" onclick="flyToSeg(0)">
+        <div class="seg-line" style="background:#f5a623"></div>
+        <div class="seg-info">
+          <div class="seg-name">Seg. 1 — Weiz → Frohnleiten</div>
+          <div class="seg-sub">Routes secondaires · Raabklamm · ~53 km</div>
+        </div>
+        <div class="seg-dist" id="seg-dist-1">—</div>
+      </div>
+      <div class="seg-item" onclick="flyToSeg(1)">
+        <div class="seg-line" style="background:#4caf50"></div>
+        <div class="seg-info">
+          <div class="seg-name">Seg. 2 — Frohnleiten → Judenburg</div>
+          <div class="seg-sub">Murradweg R2 · Bruck · Leoben · fond de vallée</div>
+        </div>
+        <div class="seg-dist" id="seg-dist-2">—</div>
+      </div>
+      <div class="seg-item" onclick="flyToSeg(2)">
+        <div class="seg-line" style="background:#2196f3"></div>
+        <div class="seg-info">
+          <div class="seg-name">Seg. 3 — Judenburg → Villach</div>
+          <div class="seg-sub">Col vers Carinthie · St. Veit · lac d'Ossiach · 2100 m d+</div>
+        </div>
+        <div class="seg-dist" id="seg-dist-3">—</div>
+      </div>
+      <div class="seg-item" onclick="flyToSeg(3)">
+        <div class="seg-line" style="background:#e94560"></div>
+        <div class="seg-info">
+          <div class="seg-name">Seg. 4 — Villach → Udine</div>
+          <div class="seg-sub">Alpe-Adria R3/FVG1 · ancienne voie ferrée · descente</div>
+        </div>
+        <div class="seg-dist" id="seg-dist-4">—</div>
+      </div>
+    </div>
+
+    <div class="legend-box">
+      <h3>📍 Étapes</h3>
+      <div class="poi-item" onclick="flyTo([15.628,47.218],13,50)"><div class="poi-dot" style="background:#f5a623"></div><div><div class="poi-name">🟡 Weiz — Départ</div><div class="poi-note">Kommando d'Hohenilz à 2 km</div></div></div>
+      <div class="poi-item" onclick="flyTo([15.529,47.245],13,50)"><div class="poi-dot" style="background:#f5a623"></div><div><div class="poi-name">Raabklamm</div><div class="poi-note">Gorges de la Raab · gués d'Alban</div></div></div>
+      <div class="poi-item" onclick="flyTo([15.324,47.269],13,50)"><div class="poi-dot" style="background:#4caf50"></div><div><div class="poi-name">Frohnleiten — Pont sur la Mur</div><div class="poi-note">« Vier Pfennigo, bitte ! »</div></div></div>
+      <div class="poi-item" onclick="flyTo([15.268,47.411],11,45)"><div class="poi-dot" style="background:#4caf50"></div><div><div class="poi-name">Bruck an der Mur</div><div class="poi-note">Jonction Mur/Mürz · Murradweg R2</div></div></div>
+      <div class="poi-item" onclick="flyTo([15.095,47.385],11,45)"><div class="poi-dot" style="background:#4caf50"></div><div><div class="poi-name">Leoben</div><div class="poi-note">Murradweg R2 · piste continue</div></div></div>
+      <div class="poi-item" onclick="flyTo([14.663,47.169],12,50)"><div class="poi-dot" style="background:#4caf50"></div><div><div class="poi-name">Judenburg</div><div class="poi-note">Gare de marchandises · fin Murradweg</div></div></div>
+      <div class="poi-item" onclick="flyTo([14.354,46.778],12,50)"><div class="poi-dot" style="background:#2196f3"></div><div><div class="poi-name">St. Veit an der Glan</div><div class="poi-note">Traversée · soldat qui demande du feu</div></div></div>
+      <div class="poi-item" onclick="flyTo([13.980,46.670],12,45)"><div class="poi-dot" style="background:#2196f3"></div><div><div class="poi-name">Lac d'Ossiach</div><div class="poi-note">R2A · orage & arc-en-ciel du récit</div></div></div>
+      <div class="poi-item" onclick="flyTo([13.852,46.610],13,50)"><div class="poi-dot" style="background:#2196f3"></div><div><div class="poi-name">Villach</div><div class="poi-note">« Italia 21 km »</div></div></div>
+      <div class="poi-item" onclick="flyTo([13.703,46.522],13,55)"><div class="poi-dot" style="background:#e94560"></div><div><div class="poi-name">⭐ Frontière Autriche-Italie</div><div class="poi-note">« Cassa ! On y est ! » · ils s'embrassent</div></div></div>
+      <div class="poi-item" onclick="flyTo([13.604,46.511],13,55)"><div class="poi-dot" style="background:#e94560"></div><div><div class="poi-name">Tarvisio</div><div class="poi-note">Début descente Alpe-Adria</div></div></div>
+      <div class="poi-item" onclick="flyTo([13.314,46.444],13,55)"><div class="poi-dot" style="background:#ff6b6b"></div><div><div class="poi-name">⚠ Dogna — Arrestation</div><div class="poi-note">Village encaissé · sentinelles du tunnel</div></div></div>
+      <div class="poi-item" onclick="flyTo([13.236,46.069],12,30)"><div class="poi-dot" style="background:#e94560"></div><div><div class="poi-name">🔴 Udine — Arrivée</div><div class="poi-note">Prison Centrale</div></div></div>
+    </div>
+
+    <div class="legend-box">
+      <h3>ℹ Légende</h3>
+      <div style="display:flex;align-items:center;gap:8px;margin:3px 0"><div style="width:24px;height:3px;background:#9966cc;opacity:.7;border-radius:2px"></div><span style="font-size:.73em;color:#9a9aaa">Parcours Alban (à pied, pointillé)</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:3px 0"><div style="width:24px;height:5px;background:#f5a623;border-radius:2px"></div><span style="font-size:.73em;color:#9a9aaa">Seg.1 Weiz→Frohnleiten</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:3px 0"><div style="width:24px;height:5px;background:#4caf50;border-radius:2px"></div><span style="font-size:.73em;color:#9a9aaa">Seg.2 Murradweg R2</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:3px 0"><div style="width:24px;height:5px;background:#2196f3;border-radius:2px"></div><span style="font-size:.73em;color:#9a9aaa">Seg.3 Judenburg→Villach</span></div>
+      <div style="display:flex;align-items:center;gap:8px;margin:3px 0"><div style="width:24px;height:5px;background:#e94560;border-radius:2px"></div><span style="font-size:.73em;color:#9a9aaa">Seg.4 Alpe-Adria R3</span></div>
+    </div>
+
+  </div>
+  <button id="sbtoggle">◀</button>
+
+  <div id="map-wrap">
+    <div id="map"></div>
+
+    <!-- Contrôles 3D -->
+    <div id="ctrl3d">
+      <button class="cbtn" id="btn-pitch-up">⇧ +15°</button>
+      <button class="cbtn" id="btn-pitch-dn">⇩ −15°</button>
+      <button class="cbtn" id="btn-bear-l">↶ −45°</button>
+      <button class="cbtn" id="btn-bear-r">↷ +45°</button>
+      <button class="cbtn" id="btn-north">⊕ Nord</button>
+    </div>
+
+    <!-- Fond de carte -->
+    <div id="basemap-switch">
+      <b>Fond de carte</b>
+      <label><input type="radio" name="bm" value="osm" checked> OpenStreetMap</label>
+      <label><input type="radio" name="bm" value="topo"> OpenTopoMap</label>
+      <label><input type="radio" name="bm" value="cycleOSM"> CyclOSM ⬅ sans clé</label>
+      <label><input type="radio" name="bm" value="cycle"> OpenCycleMap 🔑</label>
+      <label><input type="radio" name="bm" value="sat"> Satellite</label>
+      <div id="tf-key-row" style="display:none;margin-top:5px">
+        <input id="tf-key-input" type="text" placeholder="Clé Thunderforest…"
+          style="width:100%;background:#0f1e0f;border:1px solid #3a6a3a;color:#c0d8c0;border-radius:4px;padding:3px 6px;font-size:.73em;box-sizing:border-box">
+        <div style="font-size:.65em;color:#5a9e5a;margin-top:2px">
+          <a href="https://www.thunderforest.com/" target="_blank" style="color:#5a9e5a">thunderforest.com</a> · gratuit jusqu'à 150k/mois
+        </div>
+      </div>
+    </div>
+
+    <div id="pitch-info">pitch: 45° | bearing: 0°</div>
+  </div>
+</div>
+
+<script>
+// =========================================================
+//  SEGMENTS BROUTER
+// =========================================================
+const SEGMENTS = [
+  {
+    id: 's1', label: 'Seg. 1 · Weiz → Frohnleiten', color: '#f5a623', uiIdx: 1,
+    waypoints: '15.628,47.218|15.529,47.245|15.467,47.228|15.400,47.208|15.338,47.260|15.324,47.269',
+    bounds: [[15.28, 47.19], [15.68, 47.29]]
+  },
+  {
+    id: 's2', label: 'Seg. 2 · Murradweg R2 · Frohnleiten → Judenburg', color: '#4caf50', uiIdx: 2,
+    // Waypoints ancrés sur les villes en fond de vallée de la Mur
+    waypoints: '15.324,47.269|15.268,47.411|15.095,47.385|14.824,47.213|14.663,47.169',
+    bounds: [[14.60, 47.14], [15.36, 47.45]]
+  },
+  {
+    id: 's3', label: 'Seg. 3 · Judenburg → St. Veit → lac Ossiach → Villach', color: '#2196f3', uiIdx: 3,
+    waypoints: '14.663,47.169|14.526,47.099|14.354,46.778|14.066,46.735|13.982,46.671|13.852,46.610',
+    bounds: [[13.80, 46.58], [14.70, 47.20]]
+  },
+  {
+    id: 's4', label: 'Seg. 4 · Alpe-Adria · Villach → Udine', color: '#e94560', uiIdx: 4,
+    waypoints: '13.852,46.610|13.773,46.550|13.703,46.522|13.604,46.511|13.489,46.481|13.314,46.444|13.236,46.069',
+    bounds: [[13.20, 46.04], [13.90, 46.65]]
+  }
+];
+
+// Parcours évasion d'Alban (à pied)
+const EVASION_COORDS = [
+  [15.687,47.238],[15.628,47.218],[15.613,47.219],[15.561,47.233],
+  [15.529,47.245],[15.460,47.225],[15.400,47.208],[15.378,47.231],
+  [15.330,47.246],[15.324,47.269],[15.312,47.277],[15.099,47.261],
+  [14.920,47.234],[14.859,47.228],[14.848,47.216],[14.711,47.178],
+  [14.662,47.169],[14.451,47.202],[14.405,47.011],[14.360,46.768],
+  [13.980,46.670],[13.852,46.610],[13.773,46.550],[13.703,46.522],
+  [13.626,46.512],[13.604,46.511],[13.314,46.444],[13.236,46.069]
+];
+
+const POI_DATA = [
+  { coord:[15.628,47.218], label:'🟡 Weiz — Départ', seg:'Segment 1', note:'Kommando d\'Hohenilz à 2 km', color:'#f5a623' },
+  { coord:[15.529,47.245], label:'Raabklamm', seg:'Segment 1', note:'Gorges de la Raab · gués d\'Alban et André · eau froide à mi-mollets', color:'#f5a623' },
+  { coord:[15.467,47.228], label:'Semriach (plateau)', seg:'Segment 1', note:'« Aïe mes pieds ! — Et ces putains de sacs ! »', color:'#f5a623' },
+  { coord:[15.324,47.269], label:'Frohnleiten — Pont sur la Mur', seg:'Seg. 1→2', note:'Le pont à péage · « Vier Pfennigo, bitte ! » · début Murradweg R2', color:'#4caf50' },
+  { coord:[15.268,47.411], label:'Bruck an der Mur', seg:'Segment 2', note:'Jonction Mur/Mürz · Murradweg R2 balisé', color:'#4caf50' },
+  { coord:[15.095,47.385], label:'Leoben', seg:'Segment 2', note:'Murradweg R2 · piste asphaltée bord de Mur', color:'#4caf50' },
+  { coord:[14.663,47.169], label:'Judenburg', seg:'Seg. 2→3', note:'Gare de marchandises · « Y a pas moyen. On se débine ? »', color:'#4caf50' },
+  { coord:[14.354,46.778], label:'St. Veit an der Glan', seg:'Segment 3', note:'Traversée parmi soldats et civils · « Ce sacré briquet qui ne marchait pas »', color:'#2196f3' },
+  { coord:[13.980,46.670], label:'Lac d\'Ossiach', seg:'Segment 3', note:'Piste R2A · orage soudain · arc-en-ciel des sept couleurs', color:'#2196f3' },
+  { coord:[13.852,46.610], label:'Villach', seg:'Seg. 3→4', note:'Pont sur la Drau · « Italien. Grenze 21 Km. » · début Alpe-Adria', color:'#2196f3' },
+  { coord:[13.703,46.522], label:'⭐ Frontière Autriche-Italie', seg:'Segment 4', note:'Crête · « Cassa ! On y est bien ! » · ils s\'embrassent', color:'#e94560' },
+  { coord:[13.604,46.511], label:'Tarvisio', seg:'Segment 4', note:'Alpe-Adria sur ancienne voie ferrée · début descente vers le Frioul', color:'#e94560' },
+  { coord:[13.314,46.444], label:'⚠ Dogna — Arrestation', seg:'Segment 4', note:'Village encaissé · sentinelles du tunnel · dimanche matin', color:'#ff6b6b' },
+  { coord:[13.236,46.069], label:'🔴 Udine — Prison Centrale', seg:'Fin', note:'« Une espèce de forteresse sans fenêtres. »', color:'#e94560' },
+];
+
+// =========================================================
+//  STYLE DE BASE
+// =========================================================
+// Clé API Thunderforest (OpenCycleMap) — gratuit jusqu'à 150 000 tiles/mois
+// Obtenez la vôtre sur https://www.thunderforest.com/
+const THUNDERFOREST_KEY = 'YOUR_API_KEY'; // ← remplacez ici
+
+function makeStyle(tiles, attr) {
+  return {
+    version: 8,
+    sources: { base: { type:'raster', tiles:tiles, tileSize:256, attribution:attr } },
+    layers: [
+      { id:'bg', type:'background', paint:{'background-color':'#0d1a0d'} },
+      { id:'base', type:'raster', source:'base' }
+    ]
+  };
+}
+const STYLES = {
+  osm:    makeStyle(
+    ['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],
+    '© <a href="https://openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+  ),
+  topo:   makeStyle(
+    ['https://tile.opentopomap.org/{z}/{x}/{y}.png'],
+    '© <a href="https://opentopomap.org">OpenTopoMap</a> CC-BY-SA'
+  ),
+  cycle:  makeStyle(
+    // OpenCycleMap via Thunderforest (nécessite clé API)
+    [`https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=${THUNDERFOREST_KEY}`],
+    '© <a href="https://www.thunderforest.com">Thunderforest</a> · © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
+  ),
+  // Fallback sans clé : tuiles cycle d'OSM France (moins complet mais fonctionne)
+  cycleOSM: makeStyle(
+    ['https://a.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
+     'https://b.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png',
+     'https://c.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'],
+    '© <a href="https://www.cyclosm.org">CyclOSM</a> · © <a href="https://openstreetmap.org/copyright">OpenStreetMap</a>'
+  ),
+  sat:    makeStyle(
+    ['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'],
+    'Esri World Imagery'
+  )
+};
+
+// =========================================================
+//  CARTE
+// =========================================================
+const map = new maplibregl.Map({
+  container: 'map',
+  style: STYLES.osm,
+  center: [14.5, 46.95],
+  zoom: 6.8,
+  pitch: 45,
+  bearing: -10,
+  attributionControl: { compact: true }
+});
+map.addControl(new maplibregl.NavigationControl(), 'bottom-right');
+map.addControl(new maplibregl.ScaleControl({ maxWidth: 100, unit:'metric' }), 'bottom-right');
+
+// =========================================================
+//  TERRAIN & HILLSHADE
+// =========================================================
+let terrainOn = true;
+let hillshadeOn = true;
+
+function addDEM() {
+  if (!map.getSource('dem')) {
+    map.addSource('dem', {
+      type: 'raster-dem',
+      url: 'https://terrain.reearth.land/mapbox/elevation/tilejson.json',
+      tileSize: 256,
+      maxzoom: 15,
+      attribution: 'Re:Earth Terrain · Mapterhorn CC BY 4.0'
+    });
+  }
+}
+
+function applyTerrain() {
+  addDEM();
+  map.setTerrain(terrainOn ? { source:'dem', exaggeration:1.2 } : null);
+}
+
+function applyHillshade() {
+  addDEM();
+  if (map.getLayer('hillshade')) map.removeLayer('hillshade');
+  if (!hillshadeOn) return;
+  // Insérer avant les premiers labels (couches symbol)
+  let firstSym = null;
+  map.getStyle().layers.forEach(l => { if (!firstSym && l.type === 'symbol') firstSym = l.id; });
+  map.addLayer({
+    id: 'hillshade', type: 'hillshade', source: 'dem',
+    paint: {
+      'hillshade-exaggeration': 0.5,
+      'hillshade-shadow-color': 'rgba(0,0,0,0.45)',
+      'hillshade-highlight-color': 'rgba(255,255,255,0.28)',
+      'hillshade-illumination-direction': 335
+    }
+  }, firstSym || undefined);
+}
+
+// =========================================================
+//  DONNÉES GLOBALES
+// =========================================================
+let segData = {};
+let totalDist = 0, totalAscend = 0;
+
+// =========================================================
+//  CHARGEMENT BROUTER
+// =========================================================
+function setProgress(pct, msg) {
+  document.getElementById('progress-bar').style.width = pct + '%';
+  if (msg) document.getElementById('loading-status').textContent = msg;
+}
+
+async function fetchSegment(seg) {
+  const url = `https://brouter.de/brouter?lonlats=${seg.waypoints}&profile=fastbike&alternativeidx=0&format=geojson`;
+  const resp = await fetch(url);
+  if (!resp.ok) throw new Error(`BRouter HTTP ${resp.status}`);
+  const json = await resp.json();
+  const feat = json.features[0];
+  const p = feat.properties;
+  return {
+    coords: feat.geometry.coordinates.map(c => [c[0],c[1]]),
+    coords3d: feat.geometry.coordinates,
+    distance: Math.round(parseInt(p['track-length']) / 100) / 10,
+    ascend: parseInt(p['filtered ascend']) || 0,
+    time: parseInt(p['total-time']) || 0
+  };
+}
+
+async function loadAllSegments() {
+  document.getElementById('loading').style.display = 'block';
+  setProgress(0, 'Démarrage…');
+  totalDist = 0; totalAscend = 0;
+
+  for (let i = 0; i < SEGMENTS.length; i++) {
+    const seg = SEGMENTS[i];
+    setProgress(i * 25, `Segment ${i+1}/4 : ${seg.label}…`);
+    try {
+      const data = await fetchSegment(seg);
+      segData[seg.id] = data;
+      totalDist += data.distance;
+      totalAscend += data.ascend;
+      document.getElementById('seg-dist-' + seg.uiIdx).textContent = data.distance + ' km';
+      setProgress((i+1) * 25, `✓ Seg.${i+1} : ${data.distance} km · ${data.ascend} m d+`);
+      addSegmentToMap(seg, data);
+    } catch(e) {
+      console.warn('Seg', seg.id, 'failed:', e);
+      document.getElementById('seg-dist-' + seg.uiIdx).textContent = '⚠ err';
+      setProgress((i+1) * 25, `⚠ Seg.${i+1} échoué : ${e.message}`);
+    }
+  }
+
+  document.getElementById('stat-dist').textContent = Math.round(totalDist);
+  document.getElementById('stat-asc').textContent = (Math.round(totalAscend / 100) * 100).toLocaleString('fr');
+  document.getElementById('stat-days').textContent = (totalDist / (20 * 6)).toFixed(1);
+
+  setProgress(100, '✓ Tous les segments chargés');
+  setTimeout(() => { document.getElementById('loading').style.display = 'none'; }, 1000);
+}
+
+function addSegmentToMap(seg, data) {
+  const geoData = {
+    type: 'FeatureCollection',
+    features: [{
+      type: 'Feature',
+      properties: { label: seg.label, distance: data.distance + ' km', ascend: data.ascend + ' m', color: seg.color },
+      geometry: { type: 'LineString', coordinates: data.coords }
+    }]
+  };
+  if (map.getSource(seg.id)) {
+    map.getSource(seg.id).setData(geoData);
+    return;
+  }
+  map.addSource(seg.id, { type:'geojson', data:geoData });
+  map.addLayer({ id:seg.id+'-glow', type:'line', source:seg.id,
+    layout:{'line-cap':'round','line-join':'round'},
+    paint:{'line-color':seg.color,'line-width':14,'line-opacity':0.18}
+  });
+  map.addLayer({ id:seg.id+'-line', type:'line', source:seg.id,
+    layout:{'line-cap':'round','line-join':'round'},
+    paint:{'line-color':seg.color,'line-width':5,'line-opacity':0.93}
+  });
+  map.on('click', seg.id+'-line', e => {
+    const p = e.features[0].properties;
+    new maplibregl.Popup().setLngLat(e.lngLat).setHTML(
+      `<div class="pt">${p.label}</div>
+       <div class="pb">${p.distance} · ↑${p.ascend}</div>
+       <div class="px">Calculé par <b>BRouter</b> · profil fastbike</div>`
+    ).addTo(map);
+  });
+  map.on('mouseenter', seg.id+'-line', () => map.getCanvas().style.cursor = 'pointer');
+  map.on('mouseleave', seg.id+'-line', () => map.getCanvas().style.cursor = '');
+}
+
+function addEvasionTrace() {
+  map.addSource('evasion', {
+    type:'geojson',
+    data:{ type:'FeatureCollection', features:[{
+      type:'Feature', properties:{},
+      geometry:{ type:'LineString', coordinates:EVASION_COORDS }
+    }]}
+  });
+  map.addLayer({ id:'evasion-glow', type:'line', source:'evasion',
+    layout:{'line-cap':'round','line-join':'round'},
+    paint:{'line-color':'#9966cc','line-width':9,'line-opacity':0.12}
+  });
+  map.addLayer({ id:'evasion-line', type:'line', source:'evasion',
+    layout:{'line-cap':'round','line-join':'round'},
+    paint:{'line-color':'#9966cc','line-width':2.5,'line-opacity':0.65,'line-dasharray':[3,4]}
+  });
+}
+
+function addPOI() {
+  const feats = POI_DATA.map(p => ({
+    type:'Feature', properties:{...p},
+    geometry:{ type:'Point', coordinates:p.coord }
+  }));
+  map.addSource('poi', { type:'geojson', data:{ type:'FeatureCollection', features:feats } });
+  map.addLayer({ id:'poi-halo', type:'circle', source:'poi',
+    paint:{'circle-radius':9,'circle-color':'#fff','circle-opacity':0.88}
+  });
+  map.addLayer({ id:'poi-circle', type:'circle', source:'poi',
+    paint:{'circle-radius':7,'circle-color':['get','color'],'circle-opacity':1,
+           'circle-stroke-width':2,'circle-stroke-color':'#fff'}
+  });
+  map.addLayer({ id:'poi-label', type:'symbol', source:'poi',
+    layout:{
+      'text-field':['get','label'],
+      'text-font':['Open Sans Bold'],
+      'text-size':11,'text-offset':[0,1.2],'text-anchor':'top','text-max-width':12
+    },
+    paint:{'text-color':'#fff','text-halo-color':'#0f1e0f','text-halo-width':2}
+  });
+  map.on('click','poi-circle', e => {
+    const p = e.features[0].properties;
+    new maplibregl.Popup({offset:12}).setLngLat(e.features[0].geometry.coordinates).setHTML(
+      `<div class="pt">${p.label}</div>
+       <div class="pb">${p.seg}</div>
+       <div class="px">${p.note}</div>`
+    ).addTo(map);
+  });
+  map.on('mouseenter','poi-circle', () => map.getCanvas().style.cursor = 'pointer');
+  map.on('mouseleave','poi-circle', () => map.getCanvas().style.cursor = '');
+}
+
+// =========================================================
+//  INIT
+// =========================================================
+map.on('style.load', () => {
+  try { applyTerrain(); } catch(e) { console.warn('terrain:', e); }
+  try { applyHillshade(); } catch(e) { console.warn('hillshade:', e); }
+  addEvasionTrace();
+  addPOI();
+  loadAllSegments();
+});
+
+// Affichage pitch/bearing
+map.on('move', () => {
+  const p = Math.round(map.getPitch());
+  const b = Math.round(map.getBearing());
+  document.getElementById('pitch-info').textContent = `pitch: ${p}° | bearing: ${b}°`;
+});
+
+// =========================================================
+//  CONTRÔLES HEADER
+// =========================================================
+document.getElementById('btn-reset').addEventListener('click', () => {
+  map.flyTo({ center:[14.5,46.95], zoom:6.8, pitch:45, bearing:-10, duration:1500 });
+});
+
+document.getElementById('btn-terrain').addEventListener('click', function() {
+  terrainOn = !terrainOn;
+  this.classList.toggle('active', terrainOn);
+  applyTerrain();
+});
+
+document.getElementById('btn-hillshade').addEventListener('click', function() {
+  hillshadeOn = !hillshadeOn;
+  this.classList.toggle('active', hillshadeOn);
+  applyHillshade();
+});
+
+document.getElementById('btn-reload').addEventListener('click', () => loadAllSegments());
+
+// =========================================================
+//  CONTRÔLES 3D
+// =========================================================
+document.getElementById('btn-pitch-up').addEventListener('click', () => map.easeTo({pitch:Math.min(85,map.getPitch()+15),duration:400}));
+document.getElementById('btn-pitch-dn').addEventListener('click', () => map.easeTo({pitch:Math.max(0,map.getPitch()-15),duration:400}));
+document.getElementById('btn-bear-l').addEventListener('click', () => map.easeTo({bearing:map.getBearing()-45,duration:400}));
+document.getElementById('btn-bear-r').addEventListener('click', () => map.easeTo({bearing:map.getBearing()+45,duration:400}));
+document.getElementById('btn-north').addEventListener('click', () => map.easeTo({bearing:0,pitch:45,duration:600}));
+
+// =========================================================
+//  FOND DE CARTE
+// =========================================================
+function applyBasemap(key) {
+  map.setStyle(STYLES[key]);
+  map.once('style.load', () => {
+    try { applyTerrain(); } catch(e) {}
+    try { applyHillshade(); } catch(e) {}
+    addEvasionTrace();
+    addPOI();
+    SEGMENTS.forEach(seg => {
+      if (segData[seg.id]) addSegmentToMap(seg, segData[seg.id]);
+    });
+  });
+}
+
+document.querySelectorAll('input[name=bm]').forEach(r => {
+  r.addEventListener('change', function() {
+    const tfRow = document.getElementById('tf-key-row');
+    tfRow.style.display = (this.value === 'cycle') ? 'block' : 'none';
+    applyBasemap(this.value);
+  });
+});
+
+// Mise à jour dynamique de la clé Thunderforest
+document.getElementById('tf-key-input').addEventListener('input', function() {
+  const key = this.value.trim();
+  if (key.length > 10) {
+    STYLES.cycle.sources.base.tiles = [
+      `https://tile.thunderforest.com/cycle/{z}/{x}/{y}.png?apikey=${key}`
+    ];
+    // Recharge le fond seulement si OpenCycleMap est actif
+    const checked = document.querySelector('input[name=bm]:checked');
+    if (checked && checked.value === 'cycle') applyBasemap('cycle');
+  }
+});
+
+// =========================================================
+//  SIDEBAR & TOGGLE
+// =========================================================
+document.getElementById('sbtoggle').addEventListener('click', function() {
+  const sb = document.getElementById('sidebar');
+  sb.classList.toggle('collapsed');
+  this.textContent = sb.classList.contains('collapsed') ? '▶' : '◀';
+  this.style.left = sb.classList.contains('collapsed') ? '0' : '310px';
+});
+
+// =========================================================
+//  VISIBILITÉ DES COUCHES
+// =========================================================
+document.getElementById('chk-evasion').addEventListener('change', function() {
+  const v = this.checked ? 'visible' : 'none';
+  ['evasion-glow','evasion-line'].forEach(id => { if(map.getLayer(id)) map.setLayoutProperty(id,'visibility',v); });
+});
+document.getElementById('chk-velo').addEventListener('change', function() {
+  const v = this.checked ? 'visible' : 'none';
+  SEGMENTS.forEach(s => {
+    [s.id+'-glow', s.id+'-line'].forEach(id => { if(map.getLayer(id)) map.setLayoutProperty(id,'visibility',v); });
+  });
+});
+document.getElementById('chk-poi').addEventListener('change', function() {
+  const v = this.checked ? 'visible' : 'none';
+  ['poi-halo','poi-circle','poi-label'].forEach(id => { if(map.getLayer(id)) map.setLayoutProperty(id,'visibility',v); });
+});
+
+// =========================================================
+//  FLY TO
+// =========================================================
+function flyTo(center, zoom, pitch) {
+  map.flyTo({ center, zoom, pitch: pitch||45, duration:1300 });
+}
+function flyToSeg(idx) {
+  const seg = SEGMENTS[idx];
+  if (segData[seg.id]) {
+    const c = segData[seg.id].coords;
+    const lons = c.map(p=>p[0]), lats = c.map(p=>p[1]);
+    map.fitBounds([[Math.min(...lons),Math.min(...lats)],[Math.max(...lons),Math.max(...lats)]], {padding:60,pitch:50,duration:1300});
+  } else {
+    map.fitBounds(seg.bounds, {padding:60,pitch:50,duration:1300});
+  }
+}
+</script>
+</body>
+</html>

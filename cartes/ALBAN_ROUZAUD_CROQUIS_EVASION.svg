@@ -1,0 +1,648 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Carte croquis — Évasion d'Alban Rouzaud, sept.–oct. 1941
+  Projection équirectangulaire : lon 13.20–15.75 / lat 45.90–47.55
+  Canvas 900×680, marges 60px
+  Toutes les positions calculées depuis les vraies coordonnées géographiques.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 680" width="900" height="680">
+
+<defs>
+  <!-- Grain papier -->
+  <filter id="grain" x="0%" y="0%" width="100%" height="100%">
+    <feTurbulence type="fractalNoise" baseFrequency="0.75" numOctaves="4"
+                  stitchTiles="stitch" result="noise"/>
+    <feColorMatrix type="matrix"
+      values="0 0 0 0 0.82  0 0 0 0 0.72  0 0 0 0 0.52  0 0 0 0.18 0"
+      in="noise" result="tinted"/>
+    <feBlend in="SourceGraphic" in2="tinted" mode="multiply"/>
+  </filter>
+  <!-- Trait tremblé léger (style crayon) -->
+  <filter id="crayon" x="-4%" y="-4%" width="108%" height="108%">
+    <feTurbulence type="turbulence" baseFrequency="0.025 0.04"
+                  numOctaves="3" seed="7" result="noise"/>
+    <feDisplacementMap in="SourceGraphic" in2="noise"
+                       scale="2.2" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <!-- Léger tremblement pour le texte -->
+  <filter id="encre" x="-3%" y="-3%" width="106%" height="106%">
+    <feTurbulence type="turbulence" baseFrequency="0.05 0.08"
+                  numOctaves="2" seed="3" result="noise"/>
+    <feDisplacementMap in="SourceGraphic" in2="noise"
+                       scale="1.0" xChannelSelector="R" yChannelSelector="G"/>
+  </filter>
+  <!-- Flèche pour la route d'évasion -->
+  <marker id="fleche" markerWidth="7" markerHeight="7"
+          refX="6" refY="3.5" orient="auto">
+    <path d="M0,0.5 L6,3.5 L0,6.5 Z" fill="#8b1a1a" opacity="0.85"/>
+  </marker>
+  <!-- Hachures pour les reliefs -->
+  <pattern id="hachures" x="0" y="0" width="6" height="6" patternUnits="userSpaceOnUse">
+    <line x1="0" y1="6" x2="6" y2="0" stroke="#9c8560" stroke-width="0.6" opacity="0.5"/>
+  </pattern>
+</defs>
+
+<!-- ═══════════════════════════════════════════
+     FOND PAPIER VIEILLI
+═══════════════════════════════════════════ -->
+<rect width="900" height="680" fill="#efe3c0"/>
+<rect width="900" height="680" filter="url(#grain)" fill="#efe3c0" opacity="0.6"/>
+<!-- Vignettage aux coins -->
+<radialGradient id="vignette" cx="50%" cy="50%" r="75%">
+  <stop offset="60%" stop-color="#efe3c0" stop-opacity="0"/>
+  <stop offset="100%" stop-color="#b8944a" stop-opacity="0.28"/>
+</radialGradient>
+<rect width="900" height="680" fill="url(#vignette)"/>
+<!-- Bords -->
+<rect x="6" y="6" width="888" height="668" fill="none"
+      stroke="#8b6520" stroke-width="1.5" opacity="0.55"
+      stroke-dasharray="5,10"/>
+
+<!-- ═══════════════════════════════════════════
+     TITRE
+═══════════════════════════════════════════ -->
+<text x="450" y="38" text-anchor="middle"
+      font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="21" fill="#3a1a06" opacity="0.92" filter="url(#encre)">
+  Carte de notre évasion  —  Sept.–Oct. 1941
+</text>
+<text x="450" y="56" text-anchor="middle"
+      font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="12" fill="#6b4515" opacity="0.78" filter="url(#encre)">
+  A. Rouzaud  ·  de Weiz (Styrie) jusqu'à la frontière italienne
+</text>
+<line x1="140" y1="62" x2="760" y2="62"
+      stroke="#8b6520" stroke-width="0.9" opacity="0.45" filter="url(#crayon)"/>
+
+<!-- ═══════════════════════════════════════════
+     RELIEFS SCHÉMATIQUES
+     Montagnes indiquées par des rangées de petits M
+     Positions approximatives des massifs principaux
+═══════════════════════════════════════════ -->
+<g font-family="serif" font-size="9" fill="#9c8560" opacity="0.5"
+   filter="url(#crayon)">
+
+  <!-- Alpes de Styrie septentrionale (ligne Bruck–Leoben–nord) -->
+  <!-- Hochschwab / Eisenerzer Alpen, ~lat 47.50–47.55 -->
+  <text x="618" y="80">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+  <text x="600" y="90">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+
+  <!-- Niederen Tauern (nord de la Mur, lat ~47.35) -->
+  <text x="380" y="130">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+  <text x="370" y="140">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+
+  <!-- Grazer Bergland (sud-est de Graz) -->
+  <text x="720" y="260">∧∧∧∧∧∧∧∧</text>
+  <text x="715" y="270">∧∧∧∧∧∧∧∧∧</text>
+
+  <!-- Gurktaler Alpen (Carinthie centre, autour de Murau/St.Veit) -->
+  <text x="310" y="235">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+  <text x="300" y="245">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+
+  <!-- Saualpe / Koralpe (entre St.Veit et Leibnitz) -->
+  <text x="490" y="310">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+  <text x="485" y="320">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+
+  <!-- Karawanken (frontière Autriche/Slovénie, lat ~46.47) -->
+  <text x="200" y="430">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+  <text x="190" y="440">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+
+  <!-- Alpes juliennes (frontière italo-autrichienne) -->
+  <text x="120" y="470">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+  <text x="112" y="480">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+
+  <!-- Frioul / prealpes italiennes (bas de carte) -->
+  <text x="65"  y="530">∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧∧</text>
+
+  <!-- Noms des massifs -->
+  <text x="630" y="72" font-size="8" fill="#7a6040" opacity="0.55"
+        font-style="italic">Eisenerzer Alpen</text>
+  <text x="390" y="123" font-size="8" fill="#7a6040" opacity="0.55"
+        font-style="italic">Niedere Tauern</text>
+  <text x="155" y="463" font-size="8" fill="#7a6040" opacity="0.55"
+        font-style="italic">Karawanken</text>
+  <text x="100" y="460" font-size="8" fill="#7a6040" opacity="0.55"
+        font-style="italic">Alpes juliennes</text>
+</g>
+
+<!-- ═══════════════════════════════════════════
+     RIVIÈRES
+     Toutes tracées depuis les vraies coordonnées
+═══════════════════════════════════════════ -->
+
+<!--
+  LA MUR — tracé réel :
+  Source (Styrie, ~14.00, 47.10) → Murau(357,210) → Judenburg(507,189)
+  → Knittelfeld(556,174) → Leoben(638,117) → Bruck(698,107)
+  → tourne vers SE → Graz(745,222) → Leibnitz(776,320) → Slovénie
+-->
+<path d="
+  M 290,230
+  Q 320,222 357,210
+  Q 405,198 455,193
+  Q 480,191 507,189
+  Q 530,185 556,174
+  Q 590,160 620,140
+  Q 638,128 660,115
+  Q 678,108 698,107
+  Q 712,107 722,112
+  Q 735,118 745,130
+  Q 752,145 752,165
+  Q 750,185 748,205
+  Q 746,215 745,222
+  Q 744,235 748,255
+  Q 752,275 760,295
+  Q 768,310 776,320
+  Q 784,332 792,350
+  Q 800,368 808,390
+  Q 812,400 812,412"
+  fill="none" stroke="#4a7fa5" stroke-width="3.8" opacity="0.7"
+  filter="url(#crayon)"/>
+<text x="420" y="183" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="11" fill="#2a5f85" opacity="0.85" font-style="italic"
+      transform="rotate(-5,420,183)" filter="url(#encre)">la Mur</text>
+
+<!--
+  LA MÜRZ — vient de NE, confluent à Bruck
+  Mürzbruck → Kapfenberg(700,95) → Bruck(698,107)
+-->
+<path d="
+  M 750,78
+  Q 730,82 718,88
+  Q 708,93 700,95
+  Q 699,100 698,107"
+  fill="none" stroke="#4a7fa5" stroke-width="2" opacity="0.6"
+  filter="url(#crayon)"/>
+<text x="715" y="86" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9" fill="#2a5f85" opacity="0.7" font-style="italic"
+      transform="rotate(-20,715,86)" filter="url(#encre)">Mürz</text>
+
+<!--
+  LA RAAB — vient du SW de Weiz, coule vers l'est (Hongrie)
+  Schematique : depuis Raabklamm (772,163) vers l'est
+-->
+<path d="
+  M 772,163
+  Q 790,160 820,162
+  Q 845,163 870,160"
+  fill="none" stroke="#4a7fa5" stroke-width="1.6" opacity="0.5"
+  filter="url(#crayon)"/>
+<text x="830" y="157" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9" fill="#2a5f85" opacity="0.6" font-style="italic"
+      filter="url(#encre)">Raab →</text>
+
+<!--
+  LA DRAU / DRAVA — Villach(259,379) vers l'est (Maribor)
+  Tracé réel : Villach → Klagenfurt(398,374) → Maribor(808,397)
+-->
+<path d="
+  M 130,400
+  Q 160,392 200,388
+  Q 230,385 259,379
+  Q 285,376 320,375
+  Q 360,374 398,374
+  Q 450,374 500,376
+  Q 580,380 650,385
+  Q 720,390 770,392
+  Q 790,393 808,397"
+  fill="none" stroke="#4a7fa5" stroke-width="2.8" opacity="0.65"
+  filter="url(#crayon)"/>
+<text x="310" y="368" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="11" fill="#2a5f85" opacity="0.8" font-style="italic"
+      transform="rotate(-2,310,368)" filter="url(#encre)">la Drau</text>
+
+<!--
+  LA GAIL — de Villach(259,379) vers le SW (vallée de la Gail)
+  Frontière austro-italienne
+-->
+<path d="
+  M 259,379
+  Q 245,385 230,390
+  Q 210,395 195,400
+  Q 178,406 165,412
+  Q 148,418 135,422
+  Q 118,428 105,432"
+  fill="none" stroke="#4a7fa5" stroke-width="1.8" opacity="0.55"
+  filter="url(#crayon)"/>
+<text x="178" y="398" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9" fill="#2a5f85" opacity="0.65" font-style="italic"
+      transform="rotate(20,178,398)" filter="url(#encre)">Gail</text>
+
+<!--
+  LE LIESER — relie Murau à la Drau (afflue à Spittal)
+-->
+<path d="
+  M 357,210
+  Q 340,240 320,268
+  Q 305,292 292,315
+  Q 278,342 268,362
+  Q 260,378 255,390"
+  fill="none" stroke="#4a7fa5" stroke-width="1.5" opacity="0.45"
+  filter="url(#crayon)"/>
+
+<!--
+  SAVE (Sava) — vers le bas (Slovénie / Maribor)
+  très schématique
+-->
+<path d="
+  M 808,412
+  Q 820,440 830,470
+  Q 840,500 848,530"
+  fill="none" stroke="#4a7fa5" stroke-width="1.4" opacity="0.4"
+  filter="url(#crayon)"/>
+<text x="824" y="465" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9" fill="#2a5f85" opacity="0.5" font-style="italic"
+      transform="rotate(70,824,465)" filter="url(#encre)">Save</text>
+
+<!-- ═══════════════════════════════════════════
+     FRONTIÈRE AUSTRO-ITALIENNE
+     tracé approximatif des Alpes juliennes / Karawanken
+═══════════════════════════════════════════ -->
+<path d="M 68,510 Q 90,490 110,475 Q 140,455 170,445
+         Q 200,435 214,408 Q 228,382 240,370
+         Q 252,360 259,379"
+  fill="none" stroke="#5c3a1e" stroke-width="1.4"
+  stroke-dasharray="7,5" opacity="0.6" filter="url(#crayon)"/>
+<text x="108" y="497" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8.5" fill="#5c3a1e" opacity="0.65"
+      transform="rotate(-35,108,497)" filter="url(#encre)">— frontière —</text>
+
+<!-- Limite Autriche / Slovénie (Karawanken) -->
+<path d="M 260,378 Q 320,374 398,374 Q 500,374 600,378
+         Q 690,382 760,388 Q 800,392 812,400"
+  fill="none" stroke="#5c3a1e" stroke-width="1.2"
+  stroke-dasharray="6,4" opacity="0.45" filter="url(#crayon)"/>
+
+<!-- ═══════════════════════════════════════════
+     ROUTE D'ÉVASION
+     Tracé depuis les coordonnées calculées
+     Weiz(802,172) → Raabklamm(772,163) → Semriach(751,170)
+     → Cascade(733,176) → Frohnleiten(709,155) → forêt W
+     → Knittelfeld(556,174) → Judenburg(507,189)
+     → vélo(442,178) → St.Veit(414,325) → Ossiach(298,358)
+     → Villach(259,379) → frontière(213,408)
+═══════════════════════════════════════════ -->
+<path d="
+  M 820,166
+  Q 815,165 802,172
+  Q 790,167 772,163
+  Q 762,165 751,170
+  Q 742,172 733,176
+  Q 724,165 709,155
+  Q 695,148 678,145
+  Q 660,143 640,148
+  Q 610,155 580,162
+  Q 556,168 540,172
+  Q 525,175 507,180
+  Q 490,182 475,180
+  Q 460,178 442,178
+  Q 430,178 420,185
+  Q 408,198 408,215
+  Q 407,240 408,265
+  Q 410,290 412,310
+  Q 413,320 414,325
+  Q 415,335 410,345
+  Q 400,356 380,361
+  Q 360,364 340,364
+  Q 318,366 298,366
+  Q 285,368 272,372
+  Q 265,375 259,379
+  Q 252,382 245,386
+  Q 235,392 225,397
+  Q 213,403 213,408
+  Q 208,416 200,422
+  Q 188,432 175,438
+  Q 160,445 147,452
+  Q 130,460 115,466
+  Q 96,473 80,478"
+  fill="none" stroke="#8b1a1a" stroke-width="3.2" opacity="0.82"
+  marker-end="url(#fleche)"
+  filter="url(#crayon)"/>
+
+<!-- Petits tirets "pas à pied" perpendiculaires au trajet -->
+<g stroke="#8b1a1a" stroke-width="1.3" opacity="0.38">
+  <line x1="790" y1="163" x2="788" y2="170"/>
+  <line x1="780" y1="162" x2="778" y2="169"/>
+  <line x1="760" y1="164" x2="758" y2="171"/>
+  <line x1="740" y1="170" x2="738" y2="177"/>
+  <line x1="718" y1="160" x2="716" y2="167"/>
+  <line x1="660" y1="143" x2="658" y2="150"/>
+  <line x1="620" y1="150" x2="618" y2="157"/>
+  <line x1="570" y1="164" x2="568" y2="171"/>
+  <line x1="530" y1="173" x2="528" y2="180"/>
+  <line x1="475" y1="180" x2="473" y2="187"/>
+  <line x1="455" y1="178" x2="453" y2="185"/>
+  <line x1="415" y1="250" x2="408" y2="253"/>
+  <line x1="415" y1="300" x2="408" y2="303"/>
+  <line x1="298" y1="364" x2="296" y2="371"/>
+  <line x1="272" y1="372" x2="270" y2="379"/>
+  <line x1="238" y1="390" x2="236" y2="397"/>
+  <line x1="210" y1="408" x2="208" y2="415"/>
+  <line x1="190" y1="428" x2="188" y2="435"/>
+  <line x1="155" y1="447" x2="153" y2="454"/>
+  <line x1="115" y1="466" x2="113" y2="473"/>
+</g>
+
+<!-- ═══════════════════════════════════════════
+     VILLES DU PARCOURS  (cercles + noms)
+═══════════════════════════════════════════ -->
+
+<!-- WEIZ — départ (double cercle) -->
+<circle cx="802" cy="172" r="8" fill="none" stroke="#8b1a1a"
+        stroke-width="1.8" opacity="0.7" filter="url(#crayon)"/>
+<circle cx="802" cy="172" r="5" fill="#8b1a1a" opacity="0.88"/>
+<text x="812" y="168" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="13" fill="#2a0a00" font-weight="bold" filter="url(#encre)">Weiz</text>
+<text x="812" y="180" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9" fill="#5c2a10" opacity="0.8" font-style="italic" filter="url(#encre)">départ 20 sept.</text>
+
+<!-- PUCH / KOMMANDO -->
+<circle cx="820" cy="166" r="3.5" fill="#8b1a1a" opacity="0.7"/>
+<text x="832" y="164" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9.5" fill="#2a0a00" filter="url(#encre)">Puch (Kommando)</text>
+
+<!-- RAABKLAMM -->
+<circle cx="772" cy="163" r="3" fill="#5c7a3a" opacity="0.75"/>
+<text x="775" y="156" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9" fill="#3a5220" font-style="italic" filter="url(#encre)">Raabklamm</text>
+
+<!-- SEMRIACH -->
+<circle cx="751" cy="170" r="3.5" fill="#5c3a1e" opacity="0.75"/>
+<text x="754" y="163" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9.5" fill="#2a0a00" filter="url(#encre)">Semriach</text>
+
+<!-- FROHNLEITEN — pont à péage -->
+<circle cx="709" cy="155" r="5.5" fill="#8b1a1a" opacity="0.85" filter="url(#crayon)"/>
+<text x="694" y="145" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="11" fill="#2a0a00" filter="url(#encre)">Frohnleiten</text>
+<text x="696" y="156" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8.5" fill="#8b1a1a" opacity="0.85" font-style="italic" filter="url(#encre)">pont à péage ✓</text>
+<!-- petit pont schématique -->
+<g filter="url(#crayon)" opacity="0.65">
+  <path d="M 697,160 Q 703,156 709,158 Q 715,160 721,158"
+        fill="none" stroke="#5c3a1e" stroke-width="1.5"/>
+  <line x1="700" y1="157" x2="700" y2="163" stroke="#5c3a1e" stroke-width="1"/>
+  <line x1="709" y1="156" x2="709" y2="162" stroke="#5c3a1e" stroke-width="1"/>
+  <line x1="718" y1="157" x2="718" y2="163" stroke="#5c3a1e" stroke-width="1"/>
+</g>
+
+<!-- KNITTELFELD -->
+<circle cx="556" cy="174" r="4" fill="#5c3a1e" opacity="0.8"/>
+<text x="540" y="167" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="10" fill="#2a0a00" filter="url(#encre)">Knittelfeld</text>
+
+<!-- JUDENBURG -->
+<circle cx="507" cy="189" r="6" fill="#8b1a1a" opacity="0.88" filter="url(#crayon)"/>
+<text x="515" y="184" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="12" fill="#2a0a00" font-weight="bold" filter="url(#encre)">Judenburg</text>
+<text x="515" y="196" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8.5" fill="#5c3a1e" font-style="italic" filter="url(#encre)">gare de mchses</text>
+<!-- icône gare minimaliste -->
+<g filter="url(#crayon)" opacity="0.6" transform="translate(490,192)">
+  <rect x="0" y="0" width="11" height="6" fill="none" stroke="#5c3a1e" stroke-width="1"/>
+  <path d="M 0,0 L 0,-3 L 11,-3 L 11,0" fill="none" stroke="#5c3a1e" stroke-width="1"/>
+  <line x1="0" y1="6" x2="-4" y2="6" stroke="#5c3a1e" stroke-width="1.5"/>
+  <line x1="11" y1="6" x2="15" y2="6" stroke="#5c3a1e" stroke-width="1.5"/>
+</g>
+
+<!-- ACCIDENT VÉLO (borne Klagenfurt 76 km) -->
+<path d="M 438,172 L 447,182 M 443,172 L 438,182"
+      stroke="#8b1a1a" stroke-width="2" opacity="0.7"/>
+<text x="450" y="170" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8.5" fill="#8b1a1a" font-style="italic" filter="url(#encre)">accident vélo</text>
+<text x="449" y="180" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="7.5" fill="#8b1a1a" opacity="0.75" font-style="italic" filter="url(#encre)">Klgft. 76 km</text>
+
+<!-- ST. VEIT AN DER GLAN -->
+<circle cx="414" cy="325" r="4.5" fill="#5c3a1e" opacity="0.82"/>
+<text x="420" y="320" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="10.5" fill="#2a0a00" filter="url(#encre)">St. Veit a.d.G.</text>
+
+<!-- LAC D'OSSIACH -->
+<ellipse cx="298" cy="355" rx="20" ry="8" fill="#b8d8f0" stroke="#4a7fa5"
+         stroke-width="1.2" opacity="0.72" filter="url(#crayon)"/>
+<text x="268" y="345" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8.5" fill="#2a5f85" font-style="italic" filter="url(#encre)">Lac d'Ossiach</text>
+
+<!-- VILLACH -->
+<circle cx="259" cy="379" r="6.5" fill="#8b1a1a" opacity="0.88" filter="url(#crayon)"/>
+<text x="265" y="372" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="13" fill="#2a0a00" font-weight="bold" filter="url(#encre)">Villach</text>
+<text x="265" y="384" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8.5" fill="#5c3a1e" font-style="italic" filter="url(#encre)">pont sur la Drau</text>
+
+<!-- FRONTIÈRE — croix + texte -->
+<circle cx="80" cy="478" r="6" fill="none" stroke="#8b1a1a"
+        stroke-width="2.2" opacity="0.88" filter="url(#crayon)"/>
+<line x1="70" y1="478" x2="90" y2="478" stroke="#8b1a1a" stroke-width="2" opacity="0.8"/>
+<line x1="80" y1="468" x2="80" y2="488" stroke="#8b1a1a" stroke-width="2" opacity="0.8"/>
+<text x="92" y="473" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="13" fill="#2a0a00" font-weight="bold" filter="url(#encre)">Italie !</text>
+<text x="91" y="485" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9" fill="#8b1a1a" font-style="italic" filter="url(#encre)">3 oct. — 15h30</text>
+
+<!-- ═══════════════════════════════════════════
+     VILLES RÉGIONALES (hors parcours direct)
+     Cercles creux + nom en plus petit
+═══════════════════════════════════════════ -->
+
+<!-- GRAZ -->
+<circle cx="745" cy="222" r="7.5" fill="#e8d8b0" stroke="#3a1a06"
+        stroke-width="1.8" opacity="0.85" filter="url(#crayon)"/>
+<text x="754" y="218" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="13" fill="#2a0a00" font-weight="bold" filter="url(#encre)">Graz</text>
+<!-- petite croix de ville -->
+<line x1="738" y1="222" x2="752" y2="222" stroke="#3a1a06" stroke-width="0.9" opacity="0.6"/>
+<line x1="745" y1="215" x2="745" y2="229" stroke="#3a1a06" stroke-width="0.9" opacity="0.6"/>
+
+<!-- LEOBEN -->
+<circle cx="638" cy="128" r="5" fill="#e8d8b0" stroke="#3a1a06"
+        stroke-width="1.5" opacity="0.82" filter="url(#crayon)"/>
+<text x="644" y="124" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="11" fill="#2a0a00" filter="url(#encre)">Leoben</text>
+
+<!-- BRUCK AN DER MUR -->
+<circle cx="698" cy="107" r="5" fill="#e8d8b0" stroke="#3a1a06"
+        stroke-width="1.5" opacity="0.82" filter="url(#crayon)"/>
+<text x="704" y="104" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="10.5" fill="#2a0a00" filter="url(#encre)">Bruck a.d.M.</text>
+
+<!-- KAPFENBERG -->
+<circle cx="700" cy="95" r="3.5" fill="#e8d8b0" stroke="#3a1a06"
+        stroke-width="1.2" opacity="0.7" filter="url(#crayon)"/>
+<text x="706" y="92" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9.5" fill="#2a0a00" filter="url(#encre)">Kapfenberg</text>
+
+<!-- MURAU -->
+<circle cx="357" cy="210" r="4" fill="#e8d8b0" stroke="#3a1a06"
+        stroke-width="1.3" opacity="0.75" filter="url(#crayon)"/>
+<text x="362" y="206" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="10" fill="#2a0a00" filter="url(#encre)">Murau</text>
+
+<!-- KLAGENFURT (nommée Wagenfurt par Alban) -->
+<circle cx="398" cy="374" r="6" fill="#e8d8b0" stroke="#3a1a06"
+        stroke-width="1.6" opacity="0.82" filter="url(#crayon)"/>
+<text x="404" y="369" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="11.5" fill="#2a0a00" font-weight="bold" filter="url(#encre)">Klagenfurt</text>
+<text x="405" y="381" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8" fill="#8b6520" font-style="italic" filter="url(#encre)">(« Wagenfurt »)</text>
+
+<!-- LEIBNITZ -->
+<circle cx="776" cy="320" r="4" fill="#e8d8b0" stroke="#3a1a06"
+        stroke-width="1.2" opacity="0.7" filter="url(#crayon)"/>
+<text x="780" y="316" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9.5" fill="#2a0a00" filter="url(#encre)">Leibnitz</text>
+
+<!-- MARIBOR (Marburg — Stalag) -->
+<circle cx="808" cy="397" r="5" fill="#e8d8b0" stroke="#3a1a06"
+        stroke-width="1.4" opacity="0.75" filter="url(#crayon)"/>
+<text x="814" y="393" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="10" fill="#2a0a00" filter="url(#encre)">Maribor</text>
+<text x="814" y="403" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8" fill="#5c3a1e" font-style="italic" filter="url(#encre)">(Stalag XVIII D)</text>
+
+<!-- TARVISIO -->
+<circle cx="183" cy="412" r="3.5" fill="#e8d8b0" stroke="#3a1a06"
+        stroke-width="1.2" opacity="0.7" filter="url(#crayon)"/>
+<text x="188" y="408" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9.5" fill="#2a0a00" filter="url(#encre)">Tarvisio</text>
+
+<!-- UDINE (en bas, hors zone principale) -->
+<circle cx="71" cy="562" r="4" fill="#e8d8b0" stroke="#3a1a06"
+        stroke-width="1.2" opacity="0.65" filter="url(#crayon)"/>
+<text x="77" y="558" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9.5" fill="#2a0a00" filter="url(#encre)">Udine</text>
+<text x="77" y="569" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8" fill="#5c3a1e" font-style="italic" filter="url(#encre)">(prison)</text>
+
+<!-- ═══════════════════════════════════════════
+     ANNOTATIONS MANUSCRITES
+═══════════════════════════════════════════ -->
+
+<!-- Note Frohnleiten -->
+<text x="640" y="175" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8.5" fill="#8b1a1a" opacity="0.72" font-style="italic"
+      transform="rotate(-10,640,175)" filter="url(#encre)">« Vier Pfennigo, bitte ! »</text>
+
+<!-- Note Judenburg -->
+<text x="438" y="210" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8" fill="#5c3a1e" opacity="0.68" font-style="italic"
+      transform="rotate(8,438,210)" filter="url(#encre)">trains ne s'arrêtent pas…</text>
+
+<!-- Note frontière -->
+<text x="85" y="498" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8.5" fill="#8b1a1a" opacity="0.82" font-style="italic"
+      transform="rotate(-5,85,498)" filter="url(#encre)">« Cassa ! En italien ! »</text>
+
+<!-- Boussole → Ouest -->
+<text x="450" y="165" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8" fill="#5c3a1e" opacity="0.60" font-style="italic"
+      transform="rotate(-12,450,165)" filter="url(#encre)">boussole : cap O</text>
+
+<!-- Note Villach panneau -->
+<text x="200" y="372" font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="8.5" fill="#5c3a1e" opacity="0.70" font-style="italic"
+      filter="url(#encre)">« Italien. Grenze 21 Km »</text>
+
+<!-- ═══════════════════════════════════════════
+     ROSE DES VENTS (style croquis)
+═══════════════════════════════════════════ -->
+<g transform="translate(835,525)" filter="url(#crayon)">
+  <circle cx="0" cy="0" r="26" fill="#ede3c2" stroke="#7a5c20"
+          stroke-width="1.1" opacity="0.62"/>
+  <!-- branches cardinales -->
+  <line x1="0" y1="-26" x2="0" y2="-8" stroke="#8b1a1a" stroke-width="2.5" opacity="0.82"/>
+  <polygon points="0,-26 -4,-16 4,-16" fill="#8b1a1a" opacity="0.85"/>
+  <line x1="0" y1="8"  x2="0"  y2="26" stroke="#6b4515" stroke-width="1.4" opacity="0.6"/>
+  <line x1="-26" y1="0" x2="26" y2="0" stroke="#6b4515" stroke-width="1" opacity="0.5"/>
+  <!-- branches diagonales légères -->
+  <line x1="-18" y1="-18" x2="18" y2="18" stroke="#8b7040" stroke-width="0.7" opacity="0.35"/>
+  <line x1="18"  y1="-18" x2="-18" y2="18" stroke="#8b7040" stroke-width="0.7" opacity="0.35"/>
+  <text x="-4"  y="-30" font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="14" fill="#2a0a00" font-weight="bold" filter="url(#encre)">N</text>
+  <text x="-4"  y="42"  font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="10" fill="#5c3a1e" opacity="0.7" filter="url(#encre)">S</text>
+  <text x="-42" y="4"   font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="10" fill="#5c3a1e" opacity="0.7" filter="url(#encre)">O</text>
+  <text x="30"  y="4"   font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="10" fill="#5c3a1e" opacity="0.7" filter="url(#encre)">E</text>
+</g>
+
+<!-- ═══════════════════════════════════════════
+     LÉGENDE
+═══════════════════════════════════════════ -->
+<g transform="translate(620,440)" filter="url(#encre)">
+  <rect x="-10" y="-18" width="215" height="125" rx="3"
+        fill="#ede3c2" fill-opacity="0.72"
+        stroke="#8b6520" stroke-width="1.1" opacity="0.8"/>
+  <text x="97" y="-4" text-anchor="middle"
+        font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="11.5" fill="#2a0a00" font-weight="bold">Légende</text>
+  <line x1="-2" y1="2" x2="193" y2="2" stroke="#8b6520" stroke-width="0.7" opacity="0.55"/>
+  <!-- Route -->
+  <line x1="4" y1="17" x2="34" y2="17" stroke="#8b1a1a" stroke-width="2.8" opacity="0.82"/>
+  <text x="40" y="21"
+        font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="10" fill="#2a0a00">chemin suivi</text>
+  <!-- Étape parcours -->
+  <circle cx="17" cy="36" r="5" fill="#8b1a1a" opacity="0.85"/>
+  <text x="28" y="40"
+        font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="10" fill="#2a0a00">étape du parcours</text>
+  <!-- Ville régionale -->
+  <circle cx="17" cy="55" r="5" fill="#e8d8b0" stroke="#3a1a06" stroke-width="1.5" opacity="0.85"/>
+  <text x="28" y="59"
+        font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="10" fill="#2a0a00">ville de la région</text>
+  <!-- Rivière -->
+  <path d="M 4,72 Q 12,69 20,73 Q 28,77 36,73"
+        fill="none" stroke="#4a7fa5" stroke-width="2.8" opacity="0.72"/>
+  <text x="42" y="76"
+        font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="10" fill="#2a0a00">rivière</text>
+  <!-- Frontière -->
+  <line x1="4" y1="91" x2="34" y2="91" stroke="#5c3a1e" stroke-width="1.4"
+        stroke-dasharray="6,4" opacity="0.7"/>
+  <text x="40" y="95"
+        font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="10" fill="#2a0a00">frontière</text>
+</g>
+
+<!-- ═══════════════════════════════════════════
+     ÉCHELLE
+═══════════════════════════════════════════ -->
+<!--
+  1 degré lon ≈ 75 km à cette latitude
+  lonMax-lonMin = 2.55° → 780px = ~191 km → 1px ≈ 0.245 km
+  50 km = ~204 px → trop large ; on fait une barre de 40 km = ~163 px
+  Simplifié : 100 px ≈ 24 km
+-->
+<g transform="translate(625,582)" filter="url(#encre)">
+  <line x1="0" y1="0" x2="120" y2="0" stroke="#5c3a1e" stroke-width="2" opacity="0.7"/>
+  <line x1="0"   y1="-4" x2="0"   y2="4" stroke="#5c3a1e" stroke-width="1.5" opacity="0.7"/>
+  <line x1="60"  y1="-3" x2="60"  y2="3" stroke="#5c3a1e" stroke-width="1.2" opacity="0.6"/>
+  <line x1="120" y1="-4" x2="120" y2="4" stroke="#5c3a1e" stroke-width="1.5" opacity="0.7"/>
+  <!-- remplissage alterné noir/blanc -->
+  <rect x="0" y="-2" width="30" height="4" fill="#5c3a1e" opacity="0.55"/>
+  <rect x="60" y="-2" width="30" height="4" fill="#5c3a1e" opacity="0.55"/>
+  <text x="-4"   y="14" font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="9" fill="#5c3a1e" opacity="0.8">0</text>
+  <text x="52"   y="14" font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="9" fill="#5c3a1e" opacity="0.8">~30 km</text>
+  <text x="108"  y="14" font-family="'Segoe Script','Brush Script MT',cursive"
+        font-size="9" fill="#5c3a1e" opacity="0.8">~60 km</text>
+</g>
+
+<!-- ═══════════════════════════════════════════
+     NOTE DE BAS DE PAGE
+═══════════════════════════════════════════ -->
+<line x1="30" y1="652" x2="870" y2="652"
+      stroke="#8b6520" stroke-width="0.8" opacity="0.4"/>
+<text x="450" y="664" text-anchor="middle"
+      font-family="'Segoe Script','Brush Script MT',cursive"
+      font-size="9" fill="#8b6520" opacity="0.72" font-style="italic"
+      filter="url(#encre)">
+  Reconstitution d'après le récit d'Alban Rouzaud, cahier III  « L'Évasion »  ·  ~400 km à pied, 15 jours
+</text>
+
+</svg>

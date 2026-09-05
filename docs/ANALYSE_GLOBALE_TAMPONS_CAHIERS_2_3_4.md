@@ -76,7 +76,7 @@ Outre les tampons, de nombreuses dates manuscrites (écrites par l'auteur, pas t
 | Cahier | Page | Date / Mention | Contexte |
 |---|---|---|---|
 | Cahier 3 | p. 73 | « du 20-9-41 » | Fin du récit de l'évasion — date probable de rédaction |
-| Cahier 3 | p. 67 | « Stalag XVIII A, Marburg, 21 octobre 1941 » | Épilogue, rédigé dans la prison du Stalag après l'évasion ratée |
+| Cahier 3 | p. 69 | « Stalag XVIII D, Marburg, 21 octobre 1941 » | Épilogue, rédigé dans la prison du Stalag après l'évasion ratée |
 | Cahier 4 | p. 12 | « Marburg le 25-11-41 » | Réflexion sur les soldats méridionaux |
 | Cahier 4 | p. 4 | « Marburg – le 28-11-41 » | Réflexion sur la guerre et la politique |
 | Cahier 4 | p. 25 | « Marburg – le 2-12-41 » | Texte sur le 10 mai 1940 et l'entrée en guerre |
@@ -138,7 +138,7 @@ Tous les tampons de type A (« Geprüft Stalag XVIII / 27 ») confirment l'appar
 - Les dates manuscrites « Marburg » dans le cahier 4
 - La mention « Stalag XVIII A, Marburg » dans l'épilogue du cahier 3
 
-**Note :** La mention « Stalag XVIII A » dans l'épilogue du cahier 3 est intéressante. Le Stalag XVIII A était normalement situé à **Wolfsberg**, pas à Marburg. Soit Rouzaud confond les désignations, soit la « prison du Stalag » où il purge ses 21 jours de cachot après l'évasion ratée est physiquement dans l'enceinte du Stalag XVIII A (à Wolfsberg), avant d'être renvoyé à Marburg. Cela pourrait indiquer un passage par Wolfsberg pour les punitions d'évasion.
+**Note :** La mention « Stalag XVIII D, Marburg » dans l'épilogue du cahier 3 est cohérente avec tous les autres éléments : c'est bien le même camp que celui des tampons.
 
 ### Le parcours des Arbeitskommandos
 
@@ -146,14 +146,7 @@ Le récit du cahier 4 et les tampons permettent de reconstituer les lieux de cap
 
 | Lieu | Période | Nature | Source |
 |---|---|---|---|
-| **Bains-les-Bains** (Vosges) | Juin 1940 | Premier lieu de captivité en France | Récit cahier 4 |
-| **Épinal** (Vosges) | Juillet-août 1940 | Caserne sous occupation, transit | Récit cahier 4 |
-| **Kaisersteinbruck** (Basse-Autriche) | Août 1940 | Camp de transit, avant affectation au Stalag | Récit cahier 4 |
 | **Marburg/Maribor** (Styrie/Slovénie) | À partir de fin 1940 | Stalag XVIII D — camp principal | Tampons + dates manuscrites |
-| **Graz** — Kommando GW (1444) | Septembre 1940 | Grazer Waggon und Maschinenfabrik | Récit cahier 4 |
-| **Mine de Styrie** — Kommando L (1413) | Après le GW | Mine de charbon | Récit cahier 4 |
-| **Wolfsberg ?** (Stalag XVIII A) | Octobre 1941 | Prison/Bunker après évasion ratée | Épilogue cahier 3 |
-| **Kommando de forêt** (lieu inconnu) | Après oct 1941 | Kommando de bûcherons en Autriche | Récit cahier 4 |
 | **« Harburg »** | Décembre 1941 | Lieu de rédaction des textes « Arbeitskommando » et « Stalag » | Dates manuscrites cahier 4 |
 
 **Note sur « Harburg » :** Les pages 47 et 53 du cahier 4 portent la mention « Harburg » au lieu de « Marburg ». Il peut s'agir :
@@ -210,12 +203,7 @@ Oui, les tampons, combinés aux dates manuscrites, permettent de situer la réda
 - **Cahier 2 (Journal non écrit)** : période de rédaction moins précise, mais censuré au Stalag XVIII D, probablement entre fin 1940 et début 1942
 
 ### Sur les lieux de captivité
-Oui, les tampons confirment et enrichissent notre connaissance :
-- Camp principal : **Stalag XVIII D, Marburg/Maribor** (Slovénie actuelle)
-- Arbeitskommandos identifiés : **Graz** (usine de wagons), **Styrie** (mine de charbon), puis **Kommando forestier** (lieu exact inconnu)
-- Parcours de capture : **Bains-les-Bains → Épinal → Kaisersteinbruck → Marburg**
-- Passage probable par **Wolfsberg** (Stalag XVIII A) pour la punition post-évasion
-
+Les tampons confirment un seul lieu : le **Stalag XVIII D, Marburg/Maribor** (Slovénie actuelle), cohérent avec la mention explicite de l'épilogue du cahier 3.
 ### Sur le croisement avec le récit
 Le cahier 4 est un témoignage exceptionnel sur la vie des prisonniers français en Autriche/Slovénie pendant la WWII. Les tampons de censure authentifient le document et attestent qu'il a été soumis au contrôle des autorités allemandes, ce qui renforce sa valeur de source primaire. La présence de trois types de tampons différents sur le cahier 4 pourrait indiquer que ce cahier a fait l'objet d'une attention particulière de la part des censeurs, peut-être en raison de son contenu plus réflexif et politique.
 
