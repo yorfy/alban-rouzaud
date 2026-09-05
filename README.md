@@ -14,21 +14,46 @@ Transcription automatique de documents manuscrits (PDF ou images) via le skill K
 Les fichiers PDF sont hébergés sur Google Drive (trop volumineux pour git).
 Les transcriptions `.txt`, les rapports `.md`, les cartes `.html` et la config Kiro sont dans ce repo.
 
-## Structure du workspace
+## Structure du repo
 
 ```
-ALBAN ROUZAUD_N_TITRE.txt            ← transcription finale assemblée
-ALBAN ROUZAUD_N_TITRE/
-├── pages/                           ← un .txt par page
-├── ALBAN ROUZAUD_N_TITRE_rapport.md ← rapport de transcription
-└── images/ / images_small/          ← pages scannées (exclues du repo)
-ALBAN_ROUZAUD_N_CARTE.html           ← carte interactive du parcours (par cahier)
-ALBAN_ROUZAUD_GLOBAL.html            ← carte interactive globale des 4 cahiers
-FRISE_CHRONOLOGIQUE.html             ← frise chronologique
-ANALYSE_GLOBALE_TAMPONS_*.md         ← analyses transversales
+ALBAN_ROUZAUD_GLOBAL.html        ← livrable principal (carte interactive des 4 cahiers, 78 KB)
+README.md
+extract_data.py                  ← script de maintenance (extraction données HTML → JS)
+│
+├── data/                        ← données géographiques et textuelles par cahier
+│   ├── data_c1.js               ← C1 : stops, CPA, routes GPS (La Guerre)
+│   ├── data_c2.js               ← C2 : stops, routes GPS (Journal non écrit)
+│   ├── data_c3.js               ← C3 : stops, CPA, routes GPS, profil altitude (L'Évasion)
+│   └── data_c4.js               ← C4 : stops, CPA (Captivité)
+│
+├── cartes/                      ← cartes HTML secondaires et fichiers géo
+│   ├── ALBAN_ROUZAUD_1_CARTE.html
+│   ├── ALBAN ROUZAUD_2_CARTE_PARCOURS.html
+│   ├── ALBAN ROUZAUD_3_CARTE_EVASION.html
+│   ├── ALBAN_ROUZAUD_3_EVASION_MARKERS.html
+│   ├── ALBAN_ROUZAUD_3_EVASION_MAPLIBRE.html
+│   ├── ALBAN_ROUZAUD_3_EVASION_PARCOURS.kml
+│   ├── ALBAN_ROUZAUD_CROQUIS_EVASION.svg
+│   ├── CARTES_POSTALES_ANCIENNES.html
+│   └── VELO_PARCOURS_EVASION.html
+│
+├── cartes_postales/             ← images (cartes postales anciennes, photos d'archives)
+│
+├── docs/                        ← transcriptions et analyses
+│   ├── ALBAN ROUZAUD_N_TITRE.txt      ← transcription finale
+│   ├── ALBAN ROUZAUD_N_TITRE.docx     ← version mise en page
+│   ├── ANALYSE_GLOBALE_TAMPONS_*.md
+│   ├── ARBEITSKOMMANDOS_STALAG_XVIII_A.md
+│   └── BIBLIOGRAPHIE_JEAN_BELLUS.md
+│
+└── ALBAN ROUZAUD_N_TITRE/       ← dossiers de travail par cahier
+    ├── pages/                   ← un .txt par page scannée
+    ├── *_rapport.md             ← rapport de transcription
+    └── images/ / images_small/  ← pages scannées (exclues du repo)
 ```
 
-**ALBAN_ROUZAUD_GLOBAL.html** — Carte interactive globale des 4 cahiers de guerre (MapLibre GL JS 4.7.1). Page de garde narrative, onglets par cahier, modèle accumulatif (les parcours restent visibles), profil d'altitude pour C3, cartes postales anciennes.
+**ALBAN_ROUZAUD_GLOBAL.html** — Carte interactive des 4 cahiers de guerre d'Alban Rouzaud (MapLibre GL JS 4.7.1). Le HTML ne contient que la structure et le moteur JS (~78 KB) ; les données géographiques sont dans `data/`. Page de garde narrative, onglets par cahier, modèle accumulatif, profil altitude C3, cartes postales, contrôle d'exagération du relief (clic milieu + drag), pill ×1.0 sous la boussole.
 
 ## Prérequis
 
