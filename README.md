@@ -40,17 +40,24 @@ extract_data.py                  ← script de maintenance (extraction données 
 │
 ├── cartes_postales/             ← images (cartes postales anciennes, photos d'archives)
 │
-├── docs/                        ← transcriptions et analyses
-│   ├── ALBAN ROUZAUD_N_TITRE.txt      ← transcription finale
+├── docs/                        ← documents et analyses
+│   ├── ALBAN ROUZAUD_N_TITRE.txt      ← transcription finale assemblée
 │   ├── ALBAN ROUZAUD_N_TITRE.docx     ← version mise en page
 │   ├── ANALYSE_GLOBALE_TAMPONS_*.md
 │   ├── ARBEITSKOMMANDOS_STALAG_XVIII_A.md
 │   └── BIBLIOGRAPHIE_JEAN_BELLUS.md
 │
-└── ALBAN ROUZAUD_N_TITRE/       ← dossiers de travail par cahier
-    ├── pages/                   ← un .txt par page scannée
-    ├── *_rapport.md             ← rapport de transcription
-    └── images/ / images_small/  ← pages scannées (exclues du repo)
+├── transcriptions/              ← dossiers de travail par cahier (pages, rapports)
+│   └── ALBAN ROUZAUD_N_TITRE/
+│       ├── pages/               ← un .txt par page scannée
+│       ├── *_rapport.md         ← rapport de transcription
+│       └── images/              ← pages scannées (exclues du repo, ignorées par git)
+│
+└── cahiers/                     ← PDFs originaux (ignorés par git, hébergés sur Google Drive)
+    ├── ALBAN ROUZAUD_1_LA GUERRE.pdf
+    ├── ALBAN ROUZAUD_2_JOURNAL NON ECRIT (...).pdf
+    ├── ALBAN ROUZAUD_3_L'EVASION.pdf
+    └── ALBAN ROUZAUD_4_CAPTIVITE, RECITS ET REFLEXIONS.pdf
 ```
 
 **ALBAN_ROUZAUD_GLOBAL.html** — Carte interactive des 4 cahiers de guerre d'Alban Rouzaud (MapLibre GL JS 4.7.1). Le HTML ne contient que la structure et le moteur JS (~78 KB) ; les données géographiques sont dans `data/`. Page de garde narrative, onglets par cahier, modèle accumulatif, profil altitude C3, cartes postales, contrôle d'exagération du relief (clic milieu + drag), pill ×1.0 sous la boussole.
