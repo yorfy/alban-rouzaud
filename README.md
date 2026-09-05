@@ -35,10 +35,11 @@ extract_data.py                  ← script de maintenance (extraction données 
 │   ├── ALBAN_ROUZAUD_3_EVASION_MAPLIBRE.html
 │   ├── ALBAN_ROUZAUD_3_EVASION_PARCOURS.kml
 │   ├── ALBAN_ROUZAUD_CROQUIS_EVASION.svg
-│   ├── CARTES_POSTALES_ANCIENNES.html
 │   └── VELO_PARCOURS_EVASION.html
 │
-├── cartes_postales/             ← images (cartes postales anciennes, photos d'archives)
+├── cartes_postales/             ← images + galerie HTML (cartes postales, photos d'archives)
+│   ├── CARTES_POSTALES_ANCIENNES.html   ← galerie interactive
+│   └── *.jpg / *.png / *.JPG
 │
 ├── docs/                        ← documents et analyses
 │   ├── ALBAN ROUZAUD_N_TITRE.txt      ← transcription finale assemblée
