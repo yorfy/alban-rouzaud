@@ -21,3 +21,26 @@ desktop.ini
 *.tmp
 *.bak
 *.swp
+
+# Node.js
+node_modules/
+package-lock.json
+
+# Fichiers temporaires Word (~$ prefix)
+~$*
+
+# Archives et ressources volumineuses
+RH 49_159.zip
+RH49_159/
+
+# Fichiers de test internes
+_test_*.html
+_test_*.js
+_tmp_*.js
+_server.js
+
+# Outils internes Python
+extract_kml.py
+
+# Kiro (specs et skills internes — à exclure du repo public)
+.kiro/
