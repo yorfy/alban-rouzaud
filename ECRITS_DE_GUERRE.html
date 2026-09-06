@@ -11,23 +11,59 @@
    BASE — copié intégralement depuis ALBAN_ROUZAUD_3_EVASION_MARKERS.html
    ===================================================================== */
 *{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden}
-#header{background:linear-gradient(135deg,#16213e,#0f3460);padding:12px 20px;border-bottom:3px solid #e94560;display:flex;align-items:center;gap:12px;flex-shrink:0;flex-wrap:wrap}
-#header h1{font-size:1.3em;color:#fff;margin-bottom:2px}
-#header p{font-size:.85em;color:#a0b4c8}
-#header-left{flex-shrink:0}
-#header-controls{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden;isolation:isolate}
+/* ---- HEADER style browser ---- */
+#header-border{height:6px;background:#16213e;flex-shrink:0;position:relative;z-index:100;transition:background .2s}
+#map-wrap{flex:1;position:relative;z-index:1;padding-top:8px;background:#16213e}
+#map{width:100%;height:100%;position:relative;z-index:1}
+/* Onglets style Chrome */
+#header{background:#0a0f1e;padding:0;border-bottom:none;display:flex;align-items:flex-end;gap:0;flex-shrink:0;height:40px;position:relative;z-index:100}
+#header-nav{display:flex;align-items:center;gap:2px;padding:0 6px 0 8px;height:100%;flex-shrink:0;z-index:1}
+#btn-home,#btn-overview{background:none;border:none;color:#aaa;padding:0 7px;height:32px;font-size:1em;cursor:pointer;flex-shrink:0;transition:background .15s,color .15s;display:flex;align-items:center;border-radius:4px}
+#btn-home:hover,#btn-overview:hover{background:rgba(255,255,255,.1);color:#fff}
+#header-sep{width:1px;background:#1a4a7a;height:20px;margin:0 4px;flex-shrink:0;align-self:center;z-index:1}
+#cahier-tabs{display:flex;align-items:flex-end;gap:0;flex-shrink:0;height:100%;z-index:1;padding:6px 4px 0 4px}
+.ctab{
+  position:relative;
+  background:#0a1628;
+  border:none;
+  color:#aaa;
+  padding:0 14px;
+  font-size:.82em;
+  cursor:pointer;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+  width:148px;
+  flex:0 0 148px;
+  height:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-radius:8px 8px 0 0;
+  transition:background .15s,color .15s;
+  box-shadow:none;
+  z-index:1;
+}
+.ctab:hover{background:#1a3a6a;color:#ddd}
+.ctab.active{background:#16213e;color:#fff;font-weight:500;z-index:3;box-shadow:none}
+.ctab-sep{width:1px;height:55%;background:#1a4a7a;align-self:center;flex-shrink:0;transition:opacity .15s}
+.ctab-sep.hidden{opacity:0}
+/* Titre à droite */
+#header-info{position:absolute;left:315px;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:0;padding:0 16px;transition:left .25s}
+#header-title{font-size:.92em;color:#c0cce0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
+#header-controls{display:flex;gap:6px;align-items:center;flex-shrink:0;padding-right:8px;z-index:1}
 .hbtn{background:#0f3460;border:1px solid #1a4a7a;color:#a0b4c8;padding:5px 11px;border-radius:5px;font-size:.85em;cursor:pointer;transition:background .2s}
 .hbtn:hover,.hbtn.active{background:#1a5a9a;color:#fff}
 .hbtn:disabled{opacity:.35;cursor:default}
-#layout{display:flex;flex-direction:column;flex:1;min-height:0}
+#layout{display:flex;flex-direction:column;flex:1;min-height:0;position:relative;z-index:1}
 #top-row{display:flex;flex:1;overflow:hidden;min-height:0;position:relative}
-#sbtoggle{position:absolute;top:0;left:315px;height:100%;width:10px;z-index:1100;background:#0f3460;color:#cddaeb;border:none;border-left:1px solid #1a4a7a;border-right:1px solid #1a4a7a;padding:0;font-size:.55em;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:2px 0 6px rgba(0,0,0,.35);transition:left .25s}
+#sbtoggle{position:absolute;top:8px;left:315px;height:calc(100% - 8px);width:10px;z-index:1100;background:#0f3460;color:#cddaeb;border:none;border-left:1px solid #1a4a7a;border-right:1px solid #1a4a7a;padding:0;font-size:.55em;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:2px 0 6px rgba(0,0,0,.35);transition:left .25s}
 #sbtoggle:hover{background:#15497a;color:#fff}
 #sidebar.collapsed~#sbtoggle{left:0}
-#sidebar{width:315px;min-width:315px;background:#16213e;overflow-y:auto;padding:15px;border-right:2px solid #0f3460;transition:width .25s,min-width .25s,padding .25s}
+#sidebar{width:315px;min-width:315px;background:#16213e;overflow-y:auto;padding:8px 15px 15px;border-right:none;transition:width .25s,min-width .25s,padding .25s;scrollbar-gutter:stable}
 #sidebar::-webkit-scrollbar{width:6px}
-#sidebar::-webkit-scrollbar-track{background:#0f1628}
+#sidebar::-webkit-scrollbar-track{background:#0f1628;margin-top:8px}
 #sidebar::-webkit-scrollbar-thumb{background:#1a4a7a;border-radius:3px}
 #sidebar::-webkit-scrollbar-thumb:hover{background:#2a6aaa}
 #sidebar.collapsed{width:0;min-width:0;padding:0;overflow:hidden;border-right-width:0}
@@ -36,7 +72,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 .legend{background:#0f3460;border-radius:8px;padding:12px 15px;margin-bottom:15px}
 .legend h3{font-size:1em;margin-bottom:8px;color:#e94560}
 .legend p{font-size:.88em;color:#8899aa;line-height:1.5}
-.grp{margin-bottom:16px}
+.grp{margin-bottom:14px}
 .grp-t{font-size:1.05em;font-weight:700;padding:8px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .2s}
 .grp-t:hover{filter:brightness(1.2)}
 .grp-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.3)}
@@ -69,7 +105,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 .maplibregl-ctrl-attrib{background:rgba(10,14,26,0.55)!important;color:#c0c8d8!important;font-size:.68em!important;opacity:.6;transition:opacity .2s}
 .maplibregl-ctrl-attrib:hover{opacity:1}
 .maplibregl-ctrl-attrib a{color:#a0c4e0!important}
-#layerswitch{position:absolute;top:10px;left:20px;z-index:500;background:rgba(15,22,40,.9);border:1px solid #0f3460;border-radius:6px;font-size:.82em;color:#a0b4c8}
+#layerswitch{position:absolute;top:18px;left:20px;z-index:500;background:#16213e;border:1px solid #0f3460;border-radius:6px;font-size:.82em;color:#a0b4c8}
 #layerswitch-header{padding:7px 10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;user-select:none}
 #layerswitch-header b{color:#e0e0e0}
 #layerswitch-header span{font-size:.8em;opacity:.6}
@@ -112,49 +148,51 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
    NOUVEAUX STYLES — page de garde, onglets cahiers
    ===================================================================== */
 
-/* Onglets cahiers */
-#cahier-tabs{display:flex;gap:6px;align-items:center;flex-shrink:0;flex-wrap:wrap}
-.ctab{background:#0f3460;border:1px solid #1a4a7a;color:#a0b4c8;padding:5px 10px;border-radius:5px;font-size:.82em;cursor:pointer;transition:background .2s,border-color .2s}
-.ctab:hover{background:#1a5a9a;color:#fff}
-.ctab.active{color:#fff;border-width:2px}
-.ctab[data-n="1"].active{background:#a37000;border-color:#f5a623}
-.ctab[data-n="2"].active{background:#b01030;border-color:#e94560}
-.ctab[data-n="3"].active{background:#1a8a50;border-color:#2ecc71}
-.ctab[data-n="4"].active{background:#1a60a0;border-color:#3498db}
+/* Onglets cahiers — styles dans la section header */
 
 /* Page de garde */
 #coverpage{position:fixed;inset:0;background:linear-gradient(160deg,#0a0f1e 0%,#0f1628 60%,#0a1830 100%);z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;transition:opacity .3s}
 #coverpage.hidden{display:none}
-#cover-inner{max-width:900px;width:100%;text-align:center}
+#cover-inner{max-width:1120px;width:100%;text-align:center}
 #cover-inner h1{font-size:2em;color:#fff;margin-bottom:6px;letter-spacing:.02em}
 .cover-years{font-size:1em;color:#e94560;margin-bottom:12px;letter-spacing:.1em}
-.cover-bio{font-size:.95em;color:#a0b4c8;line-height:1.65;max-width:680px;margin:0 auto 24px;text-align:justify}
+.cover-subtitle{font-size:1.15em;color:#c8d8f0;letter-spacing:.18em;text-transform:uppercase;margin-bottom:4px;font-weight:300}
+.cover-bio{font-size:.95em;color:#a0b4c8;line-height:1.65;max-width:1088px;margin:0 auto 24px;text-align:justify}
 #cover-cahiers{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-.cover-card{background:rgba(15,52,96,.55);border:1px solid #1a4a7a;border-radius:10px;padding:18px 16px;width:190px;cursor:pointer;transition:background .2s,border-color .2s,transform .15s;text-align:left}
-.cover-card:hover{background:rgba(26,74,122,.75);transform:translateY(-3px)}
+/* Structure interne de chaque carte */
+.cover-card{background:rgba(15,52,96,.55);border:1px solid #1a4a7a;border-radius:10px;width:260px;display:flex;flex-direction:column;text-align:left;overflow:hidden;transition:border-color .2s,transform .15s}
+.cover-card:hover{transform:translateY(-3px)}
 .cover-card[data-n="1"]{border-top:3px solid #f5a623}
 .cover-card[data-n="2"]{border-top:3px solid #e94560}
 .cover-card[data-n="3"]{border-top:3px solid #2ecc71}
 .cover-card[data-n="4"]{border-top:3px solid #3498db}
+/* En-tête de la carte : numéro + icône manuscrit */
+.cover-card-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 8px}
 .cover-num{font-size:.75em;font-weight:700;letter-spacing:.1em;opacity:.7}
 .cover-card[data-n="1"] .cover-num{color:#f5a623}
 .cover-card[data-n="2"] .cover-num{color:#e94560}
 .cover-card[data-n="3"] .cover-num{color:#2ecc71}
 .cover-card[data-n="4"] .cover-num{color:#3498db}
-.cover-card h2{font-size:1em;color:#fff;margin:4px 0 3px}
+.cover-orig{text-decoration:none;opacity:.6;transition:opacity .2s;cursor:pointer;display:flex;align-items:center;color:#a0b4c8}
+.cover-orig:hover{opacity:1}
+/* Lien principal (transcription PDF) */
+.cover-card-link{display:block;padding:0 16px 16px;text-decoration:none;color:inherit;flex:1}
+.cover-card-link h2{font-size:1em;color:#fff;margin:4px 0 3px}
 .cover-period{font-size:.78em;color:#8899aa;margin-bottom:6px}
-.cover-card p{font-size:.82em;color:#a0b4c8;line-height:1.45}
-#btn-entrer{background:#e94560;border:none;color:#fff;padding:10px 32px;border-radius:6px;font-size:1em;cursor:pointer;letter-spacing:.04em;transition:background .2s}
-#btn-entrer:hover{background:#c0304a}
+.cover-card-link p{font-size:.82em;color:#a0b4c8;line-height:1.45}
+.cover-card-link:hover .cover-pdf-hint{color:#a0b4c8}
+/* Pied de carte : supprimé */
+#btn-entrer{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#1a4a7a,#0f3460);border:1px solid #2a6aaa;color:#fff;padding:12px 36px;border-radius:8px;font-size:1.05em;cursor:pointer;letter-spacing:.06em;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}
+#btn-entrer:hover{background:linear-gradient(135deg,#2a6aaa,#1a4a7a);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.5)}
+
 
 /* Responsive mobile */
 @media(max-width:800px){
   #cover-cahiers{flex-direction:column;align-items:center}
-  .cover-card{width:100%;max-width:360px}
-  #header{padding:8px 10px;gap:8px}
-  #header h1{font-size:1em}
-  #cahier-tabs{gap:4px}
-  .ctab{padding:4px 7px;font-size:.76em}
+  .cover-card{width:100%;max-width:400px}
+  #header{height:38px}
+  .ctab{padding:0 8px;font-size:.72em;max-width:90px}
+  #header-info{display:none}
 }
 </style>
 <script src="data/data_c1.js"></script>
@@ -170,6 +208,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 <div id="coverpage">
   <div id="cover-inner">
     <h1>Alban Rouzaud</h1>
+    <div class="cover-subtitle">Écrits de Guerre</div>
     <div class="cover-years">1939 — 1945</div>
     <p class="cover-bio">
       Instituteur à Lavelanet (Ariège), Alban Rouzaud est mobilisé en août&nbsp;1939. Il vit la
@@ -181,32 +220,61 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
       de prisonnier jusqu'à la Libération en&nbsp;1945. Ces quatre cahiers en sont le témoignage.
     </p>
     <div id="cover-cahiers">
-      <div class="cover-card" data-n="1" onclick="loadCahier(1);closeCover()">
-        <div class="cover-num">CAHIER 1</div>
-        <h2>La Guerre</h2>
-        <div class="cover-period">Août 1939 – Juin 1940</div>
-        <p>De la mobilisation dans les Pyrénées ariégeoises jusqu'aux avant-postes face à Pirmasens, puis la débâcle vers Verdun. La «&#160;drôle de guerre&#160;» vue d'en bas.</p>
+
+      <!-- CAHIER 1 -->
+      <div class="cover-card" data-n="1">
+        <div class="cover-card-head">
+          <div class="cover-num">CAHIER 1</div>
+          <a class="cover-orig" href="https://drive.google.com/file/d/1eEFtKvP_8kEG_qQVTPKMJxi6TKhQs4-I/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
+        </div>
+        <a class="cover-card-link" href="docs/ALBAN ROUZAUD_1_LA GUERRE.pdf" target="_blank">
+          <h2>La Guerre</h2>
+          <div class="cover-period">Août 1939 – Juin 1940</div>
+          <p>De la mobilisation dans les Pyrénées ariégeoises jusqu'aux avant-postes face à Pirmasens, puis la débâcle vers Verdun. La «&#160;drôle de guerre&#160;» vue d'en bas.</p>
+        </a>
       </div>
-      <div class="cover-card" data-n="2" onclick="loadCahier(2);closeCover()">
-        <div class="cover-num">CAHIER 2</div>
-        <h2>Journal non écrit</h2>
-        <div class="cover-period">Mai – Juin 1940</div>
-        <p>Mai–juin&#160;1940&#160;: le repli à travers la France en déroute, les routes embouteillées, les ordres contradictoires, et finalement la capture.</p>
+
+      <!-- CAHIER 2 -->
+      <div class="cover-card" data-n="2">
+        <div class="cover-card-head">
+          <div class="cover-num">CAHIER 2</div>
+          <a class="cover-orig" href="https://drive.google.com/file/d/1JKTnWPOrwgF-Oi9N0_5aGpOe_2UbRlX9/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
+        </div>
+        <a class="cover-card-link" href="docs/ALBAN ROUZAUD_2_JOURNAL NON ECRIT D'UN FANTASSIN EN REPLIS STRATEGIQUE.pdf" target="_blank">
+          <h2>Journal non écrit d'un fantassin en repli stratégique</h2>
+          <div class="cover-period">Mai – Juin 1940</div>
+          <p>Mai–juin&#160;1940&#160;: le repli à travers la France en déroute, les routes embouteillées, les ordres contradictoires, et finalement la capture.</p>
+        </a>
       </div>
-      <div class="cover-card" data-n="3" onclick="loadCahier(3);closeCover()">
-        <div class="cover-num">CAHIER 3</div>
-        <h2>L'Évasion</h2>
-        <div class="cover-period">Sept. – Oct. 1941</div>
-        <p>Nuit du 20&#160;septembre&#160;1941&#160;: Alban et André sautent dans le noir depuis leur Kommando. Deux semaines à pied dans les Alpes autrichiennes, boussole et carte copiée à la main.</p>
+
+      <!-- CAHIER 3 -->
+      <div class="cover-card" data-n="3">
+        <div class="cover-card-head">
+          <div class="cover-num">CAHIER 3</div>
+          <a class="cover-orig" href="https://drive.google.com/file/d/1mRKi9u4zP9oXgVjFl_Fuj4GTTESVpxIA/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
+        </div>
+        <a class="cover-card-link" href="docs/ALBAN ROUZAUD_3_L'EVASION.pdf" target="_blank">
+          <h2>L'Évasion</h2>
+          <div class="cover-period">Sept. – Oct. 1941</div>
+          <p>Nuit du 20&#160;septembre&#160;1941&#160;: Alban et André sautent dans le noir depuis leur Kommando. Deux semaines à pied dans les Alpes autrichiennes, boussole et carte copiée à la main.</p>
+        </a>
       </div>
-      <div class="cover-card" data-n="4" onclick="loadCahier(4);closeCover()">
-        <div class="cover-num">CAHIER 4</div>
-        <h2>Captivité</h2>
-        <div class="cover-period">1940 – 1945</div>
-        <p>Écrites depuis le Stalag XVIII&#160;D et les Kommandos de Styrie, les réflexions d'un instituteur ariégeois prisonnier — ses souvenirs, ses lectures, ses pensées sur la guerre et la liberté.</p>
+
+      <!-- CAHIER 4 -->
+      <div class="cover-card" data-n="4">
+        <div class="cover-card-head">
+          <div class="cover-num">CAHIER 4</div>
+          <a class="cover-orig" href="https://drive.google.com/file/d/1ZW2hv8iLNkZE0e73iSyS1fN-bNBj3H_X/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
+        </div>
+        <a class="cover-card-link" href="docs/ALBAN ROUZAUD_4_CAPTIVITE, RECITS ET REFLEXIONS.pdf" target="_blank">
+          <h2>Captivité, récits et réflexions</h2>
+          <div class="cover-period">1940 – 1945</div>
+          <p>Écrites depuis le Stalag XVIII&#160;D et les Kommandos de Styrie, les réflexions d'un instituteur ariégeois prisonnier — ses souvenirs, ses lectures, ses pensées sur la guerre et la liberté.</p>
+        </a>
       </div>
+
     </div>
-    <button id="btn-entrer" onclick="loadCahier(1);closeCover()">Entrer →</button>
+    <button id="btn-entrer" onclick="loadAllCahiers();closeCover()"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>Carte interactive</button>
   </div>
 </div>
 
@@ -214,18 +282,30 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
      HEADER
      =================================================================== -->
 <div id="header">
-  <div id="header-left">
-    <h1 id="header-title">Alban Rouzaud — Écrits de Guerre 1939–1945</h1>
-    <p id="header-subtitle">Sélectionnez un cahier pour commencer</p>
+  <div id="header-nav">
+    <button id="btn-home" onclick="showCover()" title="Page de garde — navigation entre cahiers">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+    </button>
+    <button id="btn-overview" onclick="loadAllCahiers()" title="Vue d'ensemble — tous les cahiers">
+      <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
+    </button>
   </div>
+  <div id="header-sep"></div>
   <div id="cahier-tabs">
-    <button class="ctab" data-n="1" onclick="loadCahier(1)">C1 — La Guerre</button>
-    <button class="ctab" data-n="2" onclick="loadCahier(2)">C2 — Repli</button>
-    <button class="ctab" data-n="3" onclick="loadCahier(3)">C3 — L'Évasion</button>
-    <button class="ctab" data-n="4" onclick="loadCahier(4)">C4 — Captivité</button>
+    <button class="ctab" data-n="1" onclick="loadCahier(1)">La Guerre</button>
+    <div class="ctab-sep"></div>
+    <button class="ctab" data-n="2" onclick="loadCahier(2)">Journal non écrit…</button>
+    <div class="ctab-sep"></div>
+    <button class="ctab" data-n="3" onclick="loadCahier(3)">L'Évasion</button>
+    <div class="ctab-sep"></div>
+    <button class="ctab" data-n="4" onclick="loadCahier(4)">Captivité…</button>
+  </div>
+  <div id="header-info">
+    <div id="header-title">Alban Rouzaud — Écrits de Guerre 1939–1945</div>
   </div>
   <div id="header-controls"></div>
 </div>
+<div id="header-border"></div>
 
 <!-- ===================================================================
      LAYOUT PRINCIPAL
@@ -237,10 +317,11 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
         <h3 style="cursor:pointer;display:flex;align-items:center;gap:8px;"
             onclick="var b=document.getElementById('legend-body');b.style.display=b.style.display==='none'?'block':'none';">
           <span style="width:18px;height:18px;border-radius:50%;border:1.5px solid #e94560;color:#e94560;font-size:.8em;font-weight:700;font-style:italic;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-family:serif;">i</span>
-          &#192; propos de cette carte
+          <span style="flex:1">À propos</span>
+          <span id="legend-links" style="display:flex;gap:6px;margin-left:auto"></span>
         </h3>
         <div id="legend-body" style="display:none">
-          <p style="text-align:justify">Carte interactive des quatre cahiers de guerre d'Alban Rouzaud (1939–1945). Cliquez sur un onglet pour charger un cahier. Les cahiers chargés restent tous visibles sur la carte.</p>
+          <p id="legend-subtitle" style="color:#c0cce0;font-size:.9em;margin-bottom:6px;font-style:italic"></p>
         </div>
       </div>
       <div id="sl">
@@ -256,13 +337,17 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
           <b>Fond de carte</b><span id="layerswitch-arrow">&#9654;</span>
         </div>
         <div id="layerswitch-body" style="display:none">
-          <label><input type="radio" name="basemap" value="basegris" checked> &#128506;&#65039; Basemap.at Gris</label>
-          <label><input type="radio" name="basemap" value="terrain"> &#127956;&#65039; Basemap.at Terrain</label>
-          <label><input type="radio" name="basemap" value="ortho"> &#128752;&#65039; Basemap.at Ortho</label>
-          <label><input type="radio" name="basemap" value="topo"> &#9968;&#65039; OpenTopoMap</label>
-          <label><input type="radio" name="basemap" value="osm"> &#127757; OpenStreetMap</label>
-          <label><input type="radio" name="basemap" value="satellite"> &#127760; Satellite Esri</label>
+          <label><input type="radio" name="basemap" value="ofm" checked> 🗺 OpenFreeMap</label>
+          <label><input type="radio" name="basemap" value="osm"> 🌍 OpenStreetMap</label>
+          <label><input type="radio" name="basemap" value="topo"> ⛰️ OpenTopoMap</label>
+          <label><input type="radio" name="basemap" value="ign1950"> 🗺️ IGN Carte 1:50 000 (1950)</label>
+          <label><input type="radio" name="basemap" value="etatmajor"> 🏰 IGN État-Major (1820-1866)</label>
+          <label><input type="radio" name="basemap" value="basegris"> 🗾 Basemap.at Gris</label>
+          <label><input type="radio" name="basemap" value="terrain"> 🏔️ Basemap.at Terrain</label>
+          <label><input type="radio" name="basemap" value="ortho"> 🎞️ Basemap.at Ortho</label>
+          <label><input type="radio" name="basemap" value="satellite"> 🌐 Satellite Esri</label>
           <hr style="border-color:#1a4a7a;margin:5px 0">
+          <label><input type="checkbox" id="ck-cadastre"> 🏛️ Cadastre franciscain (~1830)</label>
           <label><input type="checkbox" id="ck-hillshade" checked> Ombrage terrain</label>
           <hr style="border-color:#1a4a7a;margin:5px 0">
           <label><input type="checkbox" id="ck-cpa" checked> &#128247; Cartes postales</label>
@@ -328,8 +413,35 @@ var cpaMarkers    = {1:[],2:[],3:[],4:[]};
 var terrainOn           = true;
 var terrainExaggeration = 1.0;
 var hillshadeOn         = true;
-var currentBasemap = 'basegris';
+var currentBasemap = 'ofm';
 var cpaGlobalVisible = true;
+
+// =====================================================================
+// CADASTRE FRANCISCAIN (~1820-1860) — overlay transparent
+// WMS ArcGIS du Land Steiermark, superposé au-dessus du fond
+// =====================================================================
+var cadastreOn = false;
+
+function addCadastre() {
+  if (map.getLayer('cadastre')) map.removeLayer('cadastre');
+  if (map.getSource('cadastre-src')) map.removeSource('cadastre-src');
+  if (!cadastreOn) return;
+  map.addSource('cadastre-src', {
+    type: 'raster',
+    tiles: ['https://gis.stmk.gv.at/arcgis/rest/services/OGD/FranziszeischerKataster/MapServer/export'
+      + '?dpi=96&transparent=true&format=png32&layers=show:2'
+      + '&bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&f=image'],
+    tileSize: 256,
+    minzoom: 10, maxzoom: 18,
+    attribution: '&copy; Land Steiermark — Cadastre franciscain (~1820-1860)'
+  });
+  map.addLayer({
+    id: 'cadastre',
+    type: 'raster',
+    source: 'cadastre-src',
+    paint: { 'raster-opacity': 0.75 }
+  });
+}
 
 // stopPopupData per notebook: { stopId: { stop, pinHeight } }
 var stopPopupData = {};
@@ -342,6 +454,9 @@ var CAHIER_META = {
   1: {
     title:       'La Guerre',
     subtitle:    'Août 1939 \u2013 Juin 1940 \u2014 Mobilisation en Ariège, vers Verdun',
+    resume:      'Mobilisé le 3\u00a0septembre\u00a01939 depuis Lavelanet (Ariège), Alban Rouzaud rejoint le 11\u00b0\u00a0Régiment d\u2019Infanterie en Alsace. Il vit la \u00ab\u00a0drôle de guerre\u00a0\u00bb dans les avant-postes face à Pirmasens, entre faction, poker et pernod, avant que la débâcle de mai\u2013juin\u00a01940 ne l\u2019entraîne vers Verdun et la capture.',
+    pdfTranscript: 'docs/ALBAN ROUZAUD_1_LA GUERRE.pdf',
+    pdfOriginal:   'https://drive.google.com/file/d/1eEFtKvP_8kEG_qQVTPKMJxi6TKhQs4-I/view?usp=sharing',
     color:       '#f5a623',
     bbox:        [[-0.5,42.5],[6.5,50.0]],
     initialView: {center:[3,46.5],zoom:6,pitch:0},
@@ -350,6 +465,9 @@ var CAHIER_META = {
   2: {
     title:       'Journal non écrit',
     subtitle:    'Mai \u2013 Juin 1940 \u2014 Repli stratégique et capture',
+    resume:      'Mai\u2013juin\u00a01940\u00a0: la France s\u2019effondre. Alban Rouzaud retrace le repli chaotique de son unité à travers la Lorraine et la Champagne \u2014 routes embouteillées de civils, ordres contradictoires, villages en flammes \u2014 jusqu\u2019à la capture et le début de la captivité.',
+    pdfTranscript: 'docs/ALBAN ROUZAUD_2_JOURNAL NON ECRIT D\'UN FANTASSIN EN REPLIS STRATEGIQUE.pdf',
+    pdfOriginal:   'https://drive.google.com/file/d/1JKTnWPOrwgF-Oi9N0_5aGpOe_2UbRlX9/view?usp=sharing',
     color:       '#e94560',
     bbox:        [[-0.5,46.5],[7.0,51.0]],
     initialView: {center:[3.5,48.5],zoom:6,pitch:0},
@@ -358,6 +476,9 @@ var CAHIER_META = {
   3: {
     title:       'L\u2019\u00c9vasion',
     subtitle:    'Sept.\u2013Oct. 1941 \u2014 Weiz (Styrie) \u2192 arrestation en Italie',
+    resume:      'Reconstitution du parcours d\u2019Alban Rouzaud et de son compagnon André depuis leur Arbeitskommando près de Weiz (Styrie) jusqu\u2019à leur arrestation par des carabiniers en Italie, en septembre\u2013octobre\u00a01941. Après environ deux semaines de marche à travers les Alpes autrichiennes, guidés par une boussole et une carte copiée à la main, ils franchissent la frontière italienne avant d\u2019être arrêtés et renvoyés au Stalag XVIII\u00a0D de Marburg.',
+    pdfTranscript: 'docs/ALBAN ROUZAUD_3_L\'EVASION.pdf',
+    pdfOriginal:   'https://drive.google.com/file/d/1mRKi9u4zP9oXgVjFl_Fuj4GTTESVpxIA/view?usp=sharing',
     color:       '#2ecc71',
     bbox:        [[13.3,46.3],[15.8,47.4]],
     initialView: {center:[14.5,47.0],zoom:7,pitch:45}
@@ -365,6 +486,9 @@ var CAHIER_META = {
   4: {
     title:       'Captivit\u00e9',
     subtitle:    '1940\u20131945 \u2014 R\u00e9flexions depuis le Stalag XVIII D',
+    resume:      'Écrites depuis le Stalag XVIII\u00a0D de Marburg an der Drau (Slovénie) et les Kommandos de Styrie, les réflexions d\u2019un instituteur ariégeois prisonnier de guerre\u00a0: ses souvenirs, ses lectures, ses pensées sur la guerre, la liberté et le retour. Un témoignage intérieur sur cinq années de captivité.',
+    pdfTranscript: 'docs/ALBAN ROUZAUD_4_CAPTIVITE, RECITS ET REFLEXIONS.pdf',
+    pdfOriginal:   'https://drive.google.com/file/d/1ZW2hv8iLNkZE0e73iSyS1fN-bNBj3H_X/view?usp=sharing',
     color:       '#3498db',
     bbox:        [[7.0,46.0],[16.0,52.0]],
     initialView: {center:[12,48.5],zoom:5,pitch:0},
@@ -418,8 +542,11 @@ function makeRasterStyle(tiles, attribution) {
   };
 }
 var STYLES = {
+  ofm:       'https://tiles.openfreemap.org/styles/liberty',
   osm:       makeRasterStyle(['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],       '&copy; OpenStreetMap contributors'),
   topo:      makeRasterStyle(['https://tile.opentopomap.org/{z}/{x}/{y}.png'],         '&copy; OpenTopoMap contributors (CC-BY-SA)'),
+  ign1950:   makeRasterStyle(['https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN50.1950&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'], '&copy; IGN — Carte 1:50 000 (1950)'),
+  etatmajor: makeRasterStyle(['https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'], '&copy; IGN — État-Major (1820-1866)'),
   basegris:  makeRasterStyle(['https://maps.wien.gv.at/basemap/bmapgrau/normal/google3857/{z}/{y}/{x}.png'],     '&copy; <a href="https://basemap.at">basemap.at</a> (CC-BY 4.0)'),
   terrain:   makeRasterStyle(['https://maps.wien.gv.at/basemap/bmapgelaende/grau/google3857/{z}/{y}/{x}.jpeg'], '&copy; <a href="https://basemap.at">basemap.at</a> Terrain (CC-BY 4.0)'),
   ortho:     makeRasterStyle(['https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/{z}/{y}/{x}.jpeg'], '&copy; <a href="https://basemap.at">basemap.at</a> Orthofoto (CC-BY 4.0)'),
@@ -431,7 +558,7 @@ var STYLES = {
 // =====================================================================
 var map = new maplibregl.Map({
   container: 'map',
-  style:     STYLES.basegris,
+  style:     STYLES.ofm,
   center:    [8, 47.5],
   zoom:      5,
   pitch:     0,
@@ -448,7 +575,7 @@ map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 (function() {
   var el = document.createElement('div');
   el.id = 'compass-widget';
-  el.style.cssText = 'position:absolute;top:10px;right:10px;z-index:600;cursor:pointer;'
+  el.style.cssText = 'position:absolute;top:18px;right:10px;z-index:600;cursor:pointer;'
     + 'width:64px;height:64px;'
     + 'filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));';
   el.title = 'Cliquer pour remettre nord';
@@ -485,7 +612,6 @@ map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
   var pill = document.createElement('button');
   pill.id = 'exag-pill';
   pill.title = 'Clic : activer/désactiver terrain\nDouble-clic : reset ×1.0\nBouton molette + glisser sur la carte : ajuster';
-  pill.textContent = '×' + terrainExaggeration.toFixed(1);
   document.getElementById('map-wrap').appendChild(pill);
 
   pill.addEventListener('click', function() {
@@ -516,7 +642,8 @@ function applyTerrain() {
 function updateExagBtn() {
   var btn = document.getElementById('exag-pill');
   if (!btn) return;
-  btn.textContent = '\u00d7' + terrainExaggeration.toFixed(1);
+  var svgMtn = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><polygon points="3 20 9 8 13 14 17 9 21 20"/></svg>';
+  btn.innerHTML = svgMtn + terrainExaggeration.toFixed(1);
   btn.classList.toggle('active', terrainOn);
 }
 function applyHillshade() {
@@ -931,19 +1058,118 @@ function updateVueEnsembleBtn() {
 // =====================================================================
 function updateHeader(n) {
   var meta = CAHIER_META[n];
-  document.getElementById('header-title').textContent    = 'Alban Rouzaud \u2014 ' + meta.title;
-  document.getElementById('header-subtitle').textContent = meta.subtitle;
+  var fullTitles = {
+    1: 'Cahier 1\u00a0: La Guerre',
+    2: 'Cahier 2\u00a0: Journal non \u00e9crit d\u2019un fantassin en repli strat\u00e9gique',
+    3: 'Cahier 3\u00a0: L\u2019\u00c9vasion',
+    4: 'Cahier 4\u00a0: Captivit\u00e9, r\u00e9cits et r\u00e9flexions'
+  };
+  document.getElementById('header-title').textContent = fullTitles[n] || ('Cahier ' + n + '\u00a0: ' + meta.title);
+  // Icônes-liens dans l'entête "À propos"
+  var links = document.getElementById('legend-links');
+  if (links) {
+    links.innerHTML =
+      '<a href="'+meta.pdfTranscript+'" target="_blank" title="Lire la transcription (PDF)" style="color:#a0b4c8;opacity:.7;transition:opacity .15s;display:flex;align-items:center" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7" onclick="event.stopPropagation()">'
+      + '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>'
+      + '</a>'
+      + '<a href="'+meta.pdfOriginal+'" target="_blank" title="Manuscrit original (Google Drive)" style="color:#a0b4c8;opacity:.7;transition:opacity .15s;display:flex;align-items:center" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7" onclick="event.stopPropagation()">'
+      + '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>'
+      + '</a>';
+  }
+  var sub = document.getElementById('legend-subtitle');
+  if (sub) {
+    sub.textContent = meta.subtitle;
+    var body = document.getElementById('legend-body');
+    if (body) {
+      body.style.display = 'block';
+      // Mettre à jour ou créer le paragraphe de résumé
+      var resumeP = document.getElementById('legend-resume');
+      if (!resumeP) {
+        resumeP = document.createElement('p');
+        resumeP.id = 'legend-resume';
+        resumeP.style.cssText = 'text-align:justify;margin-top:6px';
+        body.appendChild(resumeP);
+      }
+      resumeP.textContent = meta.resume || '';
+    }
+  }
+}
+
+// =====================================================================
+// setCahierVisibility(n, visible) — affiche ou masque marqueurs + lignes d'un cahier
+// =====================================================================
+function setCahierVisibility(n, visible) {
+  // Marqueurs stops
+  htmlMarkers[n].forEach(function(m) {
+    if (visible) { try { m.addTo(map); } catch(e){} }
+    else         { try { m.remove();   } catch(e){} }
+  });
+  // Marqueurs CPA (si visibles globalement)
+  if (cpaGlobalVisible) {
+    cpaMarkers[n].forEach(function(m) {
+      if (visible) { try { m.addTo(map); } catch(e){} }
+      else         { try { m.remove();   } catch(e){} }
+    });
+  }
+  // Lignes
+  var vis = visible ? 'visible' : 'none';
+  ['route-c'+n+'-solid', 'route-c'+n+'-dashed'].forEach(function(id) {
+    if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', vis);
+  });
 }
 
 // =====================================================================
 // setActiveCahier(n)
 // =====================================================================
-function setActiveCahier(n) {
+function setActiveCahier(n, noFit) {
   // 1. Onglet actif
   document.querySelectorAll('.ctab').forEach(function(btn) {
     var match = parseInt(btn.getAttribute('data-n')) === n;
     btn.classList.toggle('active', match);
+    btn.style.background = '';
   });
+  // Séparateurs : masquer ceux adjacents à l'onglet actif
+  document.querySelectorAll('.ctab-sep').forEach(function(sep) {
+    sep.classList.remove('hidden');
+  });
+  var activeBtn = document.querySelector('.ctab[data-n="'+n+'"]');
+  if (activeBtn) {
+    var prev = activeBtn.previousElementSibling;
+    var next = activeBtn.nextElementSibling;
+    if (prev && prev.classList.contains('ctab-sep')) prev.classList.add('hidden');
+    if (next && next.classList.contains('ctab-sep')) next.classList.add('hidden');
+  }
+  // Barre de couleur sous les onglets
+  var border = document.getElementById('header-border');
+  if (border) border.style.background = '';
+  // Visibilité C4 : exclusif (masque C1-3) ; C1-3 : masque C4
+  if (n === 4) {
+    [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, false); });
+    if (loadedCahiers.has(4)) setCahierVisibility(4, true);
+  } else {
+    [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, true); });
+    if (loadedCahiers.has(4)) setCahierVisibility(4, false);
+  }
+  // Zoom sur l'étendue réelle des stops du cahier
+  var meta = CAHIER_META[n];
+  if (!noFit && meta) {
+    var data = getCahierData(n);
+    var stops = data.S || [];
+    if (stops.length >= 2) {
+      var lngs = stops.map(function(s){ return s.lng; });
+      var lats = stops.map(function(s){ return s.lat; });
+      var sw = [Math.min.apply(null,lngs), Math.min.apply(null,lats)];
+      var ne = [Math.max.apply(null,lngs), Math.max.apply(null,lats)];
+      map.fitBounds([sw, ne], {
+        padding: 80,
+        duration: 1200,
+        pitch:   meta.initialView && meta.initialView.pitch ? meta.initialView.pitch : 0,
+        bearing: 0
+      });
+    } else if (meta.bbox) {
+      map.fitBounds(meta.bbox, { padding:80, duration:1200, pitch:0, bearing:0 });
+    }
+  }
   // 2. Sidebar
   renderSidebar(getCahierData(n));
   // 3. En-tête
@@ -974,16 +1200,6 @@ function loadCahier(n) {
   addCpaMarkersForCahier(n, data.CPA);
   loadedCahiers.add(n);
   updateVueEnsembleBtn();
-
-  // Vue initiale du cahier
-  var iv = data.initialView;
-  map.flyTo({
-    center:   iv.center,
-    zoom:     iv.zoom,
-    pitch:    iv.pitch !== undefined ? iv.pitch : 0,
-    bearing:  0,
-    duration: 1400
-  });
 
   setActiveCahier(n);
 }
@@ -1462,6 +1678,7 @@ var _mapClickForElev = null;
 map.on('style.load', function() {
   try { applyTerrain();       } catch(e){}
   try { applyHillshade();     } catch(e){}
+  try { addCadastre();        } catch(e){}
   // Ré-ajouter les couches de tous les cahiers déjà chargés
   loadedCahiers.forEach(function(n) {
     try { renderLinesForCahier(n, getCahierData(n)); } catch(e){}
@@ -1507,6 +1724,9 @@ function updatePitchInfo(){
 document.getElementById('ck-hillshade').addEventListener('change',function(){
   hillshadeOn=this.checked; applyHillshade();
 });
+document.getElementById('ck-cadastre').addEventListener('change',function(){
+  cadastreOn=this.checked; addCadastre();
+});
 document.getElementById('ck-cpa').addEventListener('change',function(){
   cpaGlobalVisible=this.checked;
   if (cpaGlobalVisible) {
@@ -1532,8 +1752,35 @@ document.getElementById('sbtoggle').addEventListener('click',function(){
   sb.classList.toggle('collapsed');
   this.textContent=sb.classList.contains('collapsed')?'\u25ba':'\u25c4';
   this.style.left=sb.classList.contains('collapsed')?'0':'315px';
-  setTimeout(function(){map.resize();},300);
+  var info=document.getElementById('header-info');
+  if(info) info.style.left=sb.classList.contains('collapsed')?'0':'315px';
+  setTimeout(function(){map.resize();},280);
 });
+
+// =====================================================================
+// CHARGEMENT DE TOUS LES CAHIERS + VUE D'ENSEMBLE
+// =====================================================================
+function loadAllCahiers() {
+  function doLoad() {
+    // Charger les données de chaque cahier sans déclencher flyTo ni setActiveCahier
+    [1, 2, 3].forEach(function(n) {
+      if (!loadedCahiers.has(n)) {
+        var data = getCahierData(n);
+        renderLinesForCahier(n, data);
+        renderMarkersForCahier(n, data);
+        addCpaMarkersForCahier(n, data.CPA);
+        loadedCahiers.add(n);
+      }
+    });
+    updateVueEnsembleBtn();
+    // Activer C1 dans la sidebar sans flyTo
+    setActiveCahier(1, true);
+    // Vue d'ensemble : bbox englobant tous les cahiers (France → Italie)
+    map.fitBounds([[-1.0, 42.0], [16.5, 51.5]], { padding: 40, duration: 800 });
+  }
+  if (map.loaded()) { doLoad(); }
+  else { map.once('load', doLoad); }
+}
 
 // =====================================================================
 // PAGE DE GARDE — showCover / closeCover
@@ -1563,15 +1810,7 @@ window.addEventListener('hashchange', function(){
 // INITIALISATION AU CHARGEMENT
 // =====================================================================
 (function init() {
-  var initHash = location.hash.match(/^#c([1-4])$/);
-  if (initHash) {
-    // Hash présent → sauter la page de garde, charger le bon cahier
-    closeCover();
-    // Attendre que la carte soit prête
-    if (map.loaded()) { loadCahier(parseInt(initHash[1])); }
-    else { map.once('load', function(){ loadCahier(parseInt(initHash[1])); }); }
-  }
-  // Sinon, la page de garde reste affichée (visible par défaut dans le HTML)
+  // La page de garde est toujours affichée à l'ouverture.
   updateExagBtn();
 })();
 
