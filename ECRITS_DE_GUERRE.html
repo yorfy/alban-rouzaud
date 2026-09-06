@@ -797,7 +797,7 @@ function renderMarkersForCahier(n, data) {
     var color  = data.PC[s.p] || CAHIER_META[n].color;
     var small  = false;
     stepN++;
-    var iconSvg = STOP_ICONS[s.type] || makeBadgeSVG(String(stepN));
+    var iconSvg = makeBadgeSVG(String(stepN));
     var el = makePinEl(color, iconSvg, small);
     el.title = s.n;
     var pinH = 46;
@@ -880,15 +880,12 @@ function renderSidebar(data) {
 
     title.addEventListener('click', function(){
       var open = list.style.maxHeight === '' || list.style.maxHeight === '0px';
-      // Replier tous les autres groupes
-      container.querySelectorAll('.grp-s').forEach(function(l){ l.style.maxHeight='0px'; });
       list.style.maxHeight = open ? '2000px' : '0px';
       if (open) {
         var lngs = byPhase[p].map(function(s){return s.lng;});
         var lats = byPhase[p].map(function(s){return s.lat;});
         var dLng = Math.max.apply(null,lngs) - Math.min.apply(null,lngs);
         var dLat = Math.max.apply(null,lats) - Math.min.apply(null,lats);
-        // Zoom adaptatif selon l'étendue
         var maxZ = (dLng < 0.05 && dLat < 0.05) ? 12 : (dLng > 2 || dLat > 2) ? 7 : 11;
         var minZ = (dLng > 2 || dLat > 2) ? 5 : undefined;
         var opts = {padding:80, duration:800, maxZoom:maxZ};
@@ -896,6 +893,11 @@ function renderSidebar(data) {
         map.fitBounds([[Math.min.apply(null,lngs),Math.min.apply(null,lats)],
                        [Math.max.apply(null,lngs),Math.max.apply(null,lats)]],
                       opts);
+        // Après l'animation d'ouverture, scroll pour voir le premier item
+        setTimeout(function(){
+          var firstItem = list.querySelector('.si');
+          if (firstItem) firstItem.scrollIntoView({behavior:'smooth', block:'nearest'});
+        }, 260);
       }
     });
 
@@ -1283,7 +1285,7 @@ function renderElevation(n) {
       var bi=-1,bd=Infinity;
       for(var k=0;k<_elevPts.length;k++){var dd=ha15([st.lat,st.lng],[_elevPts[k].lat,_elevPts[k].lng]);if(dd<bd){bd=dd;bi=k;}}
       if(bi<0||bd>0.0025)return;
-      _elevStepMarks.push({d:_elevPts[bi].d,a:_elevPts[bi].a,p:st.p,id:st.id,label:SYM[st.type]||String(stepN2),sym:!!SYM[st.type]});
+      _elevStepMarks.push({d:_elevPts[bi].d,a:_elevPts[bi].a,p:st.p,id:st.id,label:String(stepN2),sym:false});
     });
   });
   _elevStepMarks.sort(function(a,b){return a.d-b.d;});
