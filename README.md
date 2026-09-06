@@ -17,7 +17,7 @@ Les transcriptions `.txt`, les rapports `.md`, les cartes `.html` et la config K
 ## Structure du repo
 
 ```
-ALBAN_ROUZAUD_GLOBAL.html        ← livrable principal (carte interactive des 4 cahiers, 78 KB)
+ECRITS_DE_GUERRE.html            ← livrable principal (carte interactive des 4 cahiers, 78 KB)
 README.md
 extract_data.py                  ← script de maintenance (extraction données HTML → JS)
 │
@@ -61,7 +61,7 @@ extract_data.py                  ← script de maintenance (extraction données 
     └── ALBAN ROUZAUD_4_CAPTIVITE, RECITS ET REFLEXIONS.pdf
 ```
 
-**ALBAN_ROUZAUD_GLOBAL.html** — Carte interactive des 4 cahiers de guerre d'Alban Rouzaud (MapLibre GL JS 4.7.1). Le HTML ne contient que la structure et le moteur JS (~78 KB) ; les données géographiques sont dans `data/`. Page de garde narrative, onglets par cahier, modèle accumulatif, profil altitude C3, cartes postales, contrôle d'exagération du relief (clic milieu + drag), pill ×1.0 sous la boussole.
+**ECRITS_DE_GUERRE.html** — Carte interactive des 4 cahiers de guerre d'Alban Rouzaud (MapLibre GL JS 4.7.1). Le HTML ne contient que la structure et le moteur JS (~78 KB) ; les données géographiques sont dans `data/`. Page de garde narrative, onglets par cahier, modèle accumulatif, profil altitude C3, cartes postales, contrôle d'exagération du relief (clic milieu + drag), pill ×1.0 sous la boussole.
 
 ## Prérequis
 
