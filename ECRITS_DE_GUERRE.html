@@ -18,11 +18,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 #map{width:100%;height:100%;position:relative;z-index:1}
 /* Onglets style Chrome */
 #header{background:#0a0f1e;padding:0;border-bottom:none;display:flex;align-items:flex-end;gap:0;flex-shrink:0;height:40px;position:relative;z-index:100}
-#header-nav{display:flex;align-items:center;gap:2px;padding:0 6px 0 8px;height:100%;flex-shrink:0;z-index:1}
+#header-nav{display:flex;align-items:center;gap:2px;padding:0 12px 0 8px;height:100%;flex-shrink:0;z-index:1}
 #btn-home,#btn-overview{background:none;border:none;color:#aaa;padding:0 7px;height:32px;font-size:1em;cursor:pointer;flex-shrink:0;transition:background .15s,color .15s;display:flex;align-items:center;border-radius:4px}
 #btn-home:hover,#btn-overview:hover{background:rgba(255,255,255,.1);color:#fff}
-#header-sep{width:1px;background:#1a4a7a;height:20px;margin:0 4px;flex-shrink:0;align-self:center;z-index:1}
-#cahier-tabs{display:flex;align-items:flex-end;gap:0;flex-shrink:0;height:100%;z-index:1;padding:6px 4px 0 4px}
+#cahier-tabs{display:flex;align-items:flex-end;gap:0;flex-shrink:0;height:100%;z-index:1;padding:6px 4px 0 0}
 .ctab{
   position:relative;
   background:#0a1628;
@@ -46,8 +45,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   z-index:1;
 }
 .ctab:hover{background:#1a3a6a;color:#ddd}
+.ctab:hover + .ctab-sep{opacity:0}
+.ctab-sep:has(+ .ctab:hover){opacity:0}
 .ctab.active{background:#16213e;color:#fff;font-weight:500;z-index:3;box-shadow:none}
-.ctab-sep{width:1px;height:55%;background:#1a4a7a;align-self:center;flex-shrink:0;transition:opacity .15s}
+.ctab-sep{width:1px;height:55%;background:#2a3a5a;align-self:center;flex-shrink:0;transition:opacity .15s}
 .ctab-sep.hidden{opacity:0}
 /* Titre à droite */
 #header-info{position:absolute;left:315px;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:0;padding:0 16px;transition:left .25s}
@@ -66,6 +67,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 #sidebar::-webkit-scrollbar-track{background:#0f1628;margin-top:8px}
 #sidebar::-webkit-scrollbar-thumb{background:#1a4a7a;border-radius:3px}
 #sidebar::-webkit-scrollbar-thumb:hover{background:#2a6aaa}
+#sidebar{scrollbar-color:#1a4a7a #0f1628;scrollbar-width:thin}
 #sidebar.collapsed{width:0;min-width:0;padding:0;overflow:hidden;border-right-width:0}
 #map-wrap{flex:1;position:relative}
 #map{width:100%;height:100%}
@@ -76,7 +78,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 .grp-t{font-size:1.05em;font-weight:700;padding:8px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .2s}
 .grp-t:hover{filter:brightness(1.2)}
 .grp-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.3)}
-.grp-s{padding:6px 0 0 24px}
+.grp-s{padding:6px 0 0 24px;overflow:hidden;max-height:0;transition:max-height .25s ease}
 .si{padding:7px 10px;margin:3px 0;border-radius:4px;cursor:pointer;font-size:.95em;transition:background .2s;border-left:3px solid transparent}
 .si:hover{background:rgba(255,255,255,.08)}
 .si .sn{font-weight:600;color:#fff}
@@ -290,7 +292,6 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
       <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
     </button>
   </div>
-  <div id="header-sep"></div>
   <div id="cahier-tabs">
     <button class="ctab" data-n="1" onclick="loadCahier(1)">La Guerre</button>
     <div class="ctab-sep"></div>
@@ -875,17 +876,26 @@ function renderSidebar(data) {
     var title= document.createElement('div'); title.className='grp-t';
     title.style.background = col+'22';
     title.innerHTML = '<span class="grp-dot" style="background:'+col+'"></span>'+(data.PN[p]||'Phase '+p);
-    var list = document.createElement('div'); list.className='grp-s'; list.style.display='none';
+    var list = document.createElement('div'); list.className='grp-s';
 
     title.addEventListener('click', function(){
-      var open = list.style.display==='none';
-      list.style.display = open ? 'block' : 'none';
+      var open = list.style.maxHeight === '' || list.style.maxHeight === '0px';
+      // Replier tous les autres groupes
+      container.querySelectorAll('.grp-s').forEach(function(l){ l.style.maxHeight='0px'; });
+      list.style.maxHeight = open ? '2000px' : '0px';
       if (open) {
         var lngs = byPhase[p].map(function(s){return s.lng;});
         var lats = byPhase[p].map(function(s){return s.lat;});
+        var dLng = Math.max.apply(null,lngs) - Math.min.apply(null,lngs);
+        var dLat = Math.max.apply(null,lats) - Math.min.apply(null,lats);
+        // Zoom adaptatif selon l'étendue
+        var maxZ = (dLng < 0.05 && dLat < 0.05) ? 12 : (dLng > 2 || dLat > 2) ? 7 : 11;
+        var minZ = (dLng > 2 || dLat > 2) ? 5 : undefined;
+        var opts = {padding:80, duration:800, maxZoom:maxZ};
+        if (minZ) opts.minZoom = minZ;
         map.fitBounds([[Math.min.apply(null,lngs),Math.min.apply(null,lats)],
                        [Math.max.apply(null,lngs),Math.max.apply(null,lats)]],
-                      {padding:60,duration:800,maxZoom:13});
+                      opts);
       }
     });
 
@@ -1081,7 +1091,7 @@ function updateHeader(n) {
     sub.textContent = meta.subtitle;
     var body = document.getElementById('legend-body');
     if (body) {
-      body.style.display = 'block';
+      body.style.display = 'none';
       // Mettre à jour ou créer le paragraphe de résumé
       var resumeP = document.getElementById('legend-resume');
       if (!resumeP) {
@@ -1142,13 +1152,12 @@ function setActiveCahier(n, noFit) {
   // Barre de couleur sous les onglets
   var border = document.getElementById('header-border');
   if (border) border.style.background = '';
-  // Visibilité C4 : exclusif (masque C1-3) ; C1-3 : masque C4
+  // Visibilité : afficher uniquement le cahier actif
   if (n === 4) {
     [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, false); });
     if (loadedCahiers.has(4)) setCahierVisibility(4, true);
   } else {
-    [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, true); });
-    if (loadedCahiers.has(4)) setCahierVisibility(4, false);
+    [1, 2, 3, 4].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, c === n); });
   }
   // Zoom sur l'étendue réelle des stops du cahier
   var meta = CAHIER_META[n];
@@ -1763,6 +1772,7 @@ document.getElementById('sbtoggle').addEventListener('click',function(){
 function loadAllCahiers() {
   function doLoad() {
     // Charger les données de chaque cahier sans déclencher flyTo ni setActiveCahier
+    var firstLoad = loadedCahiers.size === 0;
     [1, 2, 3].forEach(function(n) {
       if (!loadedCahiers.has(n)) {
         var data = getCahierData(n);
@@ -1772,9 +1782,12 @@ function loadAllCahiers() {
         loadedCahiers.add(n);
       }
     });
+    // S'assurer que C1-3 sont visibles pour la vue d'ensemble
+    [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, true); });
+    if (loadedCahiers.has(4)) setCahierVisibility(4, false);
     updateVueEnsembleBtn();
-    // Activer C1 dans la sidebar sans flyTo
-    setActiveCahier(1, true);
+    // Activer C1 dans la sidebar seulement au premier chargement
+    if (firstLoad) setActiveCahier(1, true);
     // Vue d'ensemble : bbox englobant tous les cahiers (France → Italie)
     map.fitBounds([[-1.0, 42.0], [16.5, 51.5]], { padding: 40, duration: 800 });
   }
