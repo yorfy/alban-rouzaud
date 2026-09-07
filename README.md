@@ -1,17 +1,19 @@
 # Transcription des manuscrits d'Alban Rouzaud
 
+**Livrable public** : [https://yorfy.github.io/alban-rouzaud/ECRITS_DE_GUERRE.html](https://yorfy.github.io/alban-rouzaud/ECRITS_DE_GUERRE.html)
+
 Transcription automatique de documents manuscrits (PDF ou images) via le skill Kiro `transcribe-manuscript`. Le modèle IA lit directement les images et produit un texte structuré en paragraphes.
 
 ## Manuscrits transcrits
 
-| # | Document | Pages | PDF |
-|---|----------|-------|-----|
-| 1 | La Guerre (1939-1940) | 41 | [Télécharger](https://drive.google.com/file/d/1eEFtKvP_8kEG_qQVTPKMJxi6TKhQs4-I/view?usp=sharing) |
-| 2 | Journal non écrit d'un fantassin en repli stratégique | 92 | [Télécharger](https://drive.google.com/file/d/1JKTnWPOrwgF-Oi9N0_5aGpOe_2UbRlX9/view?usp=sharing) |
-| 3 | L'Évasion | 73 | [Télécharger](https://drive.google.com/file/d/1mRKi9u4zP9oXgVjFl_Fuj4GTTESVpxIA/view?usp=sharing) |
-| 4 | Captivité, récits et réflexions | 82 | [Télécharger](https://drive.google.com/file/d/1ZW2hv8iLNkZE0e73iSyS1fN-bNBj3H_X/view?usp=sharing) |
+| # | Document | Pages | DOCX |
+|---|----------|-------|------|
+| 1 | La Guerre (1939-1940) | 41 | [Ouvrir](https://docs.google.com/document/d/1cuSB04MSC8-Fyp5qBXDpXo0cc8VR9cs4/edit?usp=drive_link) |
+| 2 | Journal non écrit d'un fantassin en repli stratégique | 92 | [Ouvrir](https://docs.google.com/document/d/1CJ_H8KuLxS6C2K5QgyMGPXW4mBOQLGyT/edit?usp=drive_link) |
+| 3 | L'Évasion | 73 | [Ouvrir](https://docs.google.com/document/d/1LlsB4U3KwqlwQ5cNaj8wKaccrTnL7hu0/edit?usp=drive_link) |
+| 4 | Captivité, récits et réflexions | 82 | [Ouvrir](https://docs.google.com/document/d/12HeGY9vhKJKc71NK3ajLXALOVU3sg5kk/edit?usp=drive_link) |
 
-Les fichiers PDF sont hébergés sur Google Drive (trop volumineux pour git).
+Les fichiers DOCX sont hébergés sur Google Drive.
 Les transcriptions `.txt`, les rapports `.md`, les cartes `.html` et la config Kiro sont dans ce repo.
 
 ## Structure du repo
