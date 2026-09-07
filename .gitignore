@@ -4,6 +4,8 @@
 
 # PDF trop volumineux pour GitHub (hébergés sur Google Drive)
 *.pdf
+# Sauf les PDFs des transcriptions dans docs/
+!docs/*.pdf
 
 # Environnement virtuel Python
 venv/
