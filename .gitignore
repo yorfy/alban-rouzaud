@@ -47,3 +47,15 @@ extract_kml.py
 
 # Kiro (specs et skills internes — à exclure du repo public)
 .kiro/
+# Sauf les skills spécifiques au projet
+!.kiro/skills/
+!.kiro/skills/docx-to-pdf/
+!.kiro/skills/docx-to-pdf/**
+!.kiro/skills/format-manuscript/
+!.kiro/skills/format-manuscript/**
+!.kiro/skills/generate-map/
+!.kiro/skills/generate-map/**
+!.kiro/skills/review-transcription/
+!.kiro/skills/review-transcription/**
+!.kiro/skills/transcribe-manuscript/
+!.kiro/skills/transcribe-manuscript/**
