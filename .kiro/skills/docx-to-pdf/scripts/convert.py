@@ -38,7 +38,24 @@ def convert_docx_to_pdf(docx_path: str, output_dir: str) -> str:
             word.Options.PrintComments = False
         except Exception:
             pass
-        doc.SaveAs(pdf_path, FileFormat=17)  # 17 = wdFormatPDF
+        # ExportAsFixedFormat avec CreateBookmarks=1 (wdExportCreateHeadingBookmarks)
+        # pour inclure les signets PDF générés depuis les styles Titre1/Titre2
+        doc.ExportAsFixedFormat(
+            OutputFileName=pdf_path,
+            ExportFormat=17,          # wdExportFormatPDF
+            OpenAfterExport=False,
+            OptimizeFor=0,            # wdExportOptimizeForPrint
+            Range=0,                  # wdExportAllDocument
+            From=1,
+            To=1,
+            Item=0,                   # wdExportDocumentContent
+            IncludeDocProps=True,
+            KeepIRM=True,
+            CreateBookmarks=1,        # wdExportCreateHeadingBookmarks
+            DocStructureTags=True,
+            BitmapMissingFonts=True,
+            UseISO19005_1=False,
+        )
         doc.Close(SaveChanges=False)
     finally:
         word.Quit()
