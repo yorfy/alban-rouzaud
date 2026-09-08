@@ -188,13 +188,121 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 #btn-entrer:hover{background:linear-gradient(135deg,#2a6aaa,#1a4a7a);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.5)}
 
 
-/* Responsive mobile */
-@media(max-width:800px){
+/* =====================================================================
+   RESPONSIVE — tablette & mobile
+   ===================================================================== */
+
+/* --- Tablette (≤ 900px) : sidebar + onglets se rétrécissent --- */
+@media(max-width:900px){
+  .ctab{width:120px;flex:0 0 120px;font-size:.78em;padding:0 10px}
+  #header-info{left:260px}
+}
+
+/* --- Mobile (≤ 768px) : sidebar en tiroir bottom, onglets scrollables --- */
+@media(max-width:768px){
+
+  /* ---- Page de garde ---- */
+  /* align-items:flex-start permet le scroll quand le contenu dépasse */
+  #coverpage{align-items:flex-start;padding:24px 16px 32px}
+  #cover-inner{padding-top:8px}
   #cover-cahiers{flex-direction:column;align-items:center}
-  .cover-card{width:100%;max-width:400px}
-  #header{height:38px}
-  .ctab{padding:0 8px;font-size:.72em;max-width:90px}
+  .cover-card{width:100%;max-width:420px}
+  #cover-inner h1{font-size:1.5em}
+  .cover-bio{font-size:.88em;text-align:left}
+  #btn-entrer{padding:10px 24px;font-size:.95em}
+
+  /* ---- Header ---- */
+  #header{height:44px}
   #header-info{display:none}
+  /* Onglets : scroll horizontal */
+  #cahier-tabs{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-right:0;flex-shrink:1;min-width:0}
+  #cahier-tabs::-webkit-scrollbar{display:none}
+  .ctab{width:auto;flex:0 0 auto;min-width:80px;max-width:none;font-size:.75em;padding:0 12px}
+  .ctab-sep{flex-shrink:0}
+
+  /* ---- sbtoggle desktop : caché ---- */
+  #sbtoggle{display:none}
+
+  /* ---- Sidebar → tiroir bottom ---- */
+  #sidebar{
+    /* Détacher du flux normal */
+    position:fixed;
+    bottom:0;left:0;right:0;
+    width:100%!important;
+    min-width:0!important;
+    max-height:60vh;
+    height:60vh;
+    border-right:none;
+    border-top:2px solid #1a4a7a;
+    border-radius:12px 12px 0 0;
+    box-shadow:0 -4px 24px rgba(0,0,0,.6);
+    z-index:2000;
+    overflow-y:auto;
+    padding:16px 15px 30px!important;
+    /* Fermé par défaut */
+    transform:translateY(100%);
+    transition:transform .3s ease;
+    scrollbar-gutter:auto;
+  }
+  #sidebar.drawer-open{
+    transform:translateY(0);
+  }
+  /* La classe 'collapsed' reste inopérante sur mobile (override) */
+  #sidebar.collapsed{
+    width:100%!important;
+    min-width:0!important;
+    padding:16px 15px 30px!important;
+    overflow-y:auto;
+  }
+
+  /* Poignée visuelle en haut du tiroir */
+  #sidebar::before{
+    content:'';
+    display:block;
+    width:40px;height:4px;
+    background:#3a5a8a;
+    border-radius:2px;
+    margin:0 auto 12px;
+  }
+
+  /* ---- FAB pour ouvrir/fermer le tiroir ---- */
+  #sb-fab{
+    display:flex;
+    position:fixed;
+    bottom:20px;right:16px;
+    z-index:2100;
+    width:44px;height:44px;
+    background:#0f3460;
+    border:1px solid #1a4a7a;
+    border-radius:50%;
+    color:#c0cce0;
+    font-size:1.1em;
+    align-items:center;justify-content:center;
+    cursor:pointer;
+    box-shadow:0 2px 12px rgba(0,0,0,.5);
+    transition:background .2s,transform .2s;
+  }
+  #sb-fab:hover{background:#1a5a9a}
+  #sb-fab.open{transform:rotate(180deg)}
+
+  /* ---- Overlay : supprimé — fermeture via clic sur la carte ---- */
+  #sb-overlay{display:none!important}
+
+  /* ---- Profil altitude réduit ---- */
+  #elevpanel{height:140px}
+  #elevcanvas{height:116px}
+  #elevbar{font-size:.75em}
+
+  /* ---- layerswitch : déplacer pour ne pas masquer le FAB ---- */
+  #layerswitch{top:12px;left:10px;font-size:.78em}
+  #elevtoggle{right:60px;bottom:14px}
+  #exag-pill{right:60px}
+}
+
+/* --- Très petit (≤ 380px) --- */
+@media(max-width:380px){
+  #cover-inner h1{font-size:1.25em}
+  .ctab{min-width:70px;font-size:.7em}
 }
 </style>
 <script src="data/data_c1.js"></script>
@@ -330,6 +438,12 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
       </div>
     </div>
     <button id="sbtoggle">&#9668;</button>
+    <!-- FAB mobile : ouvre le tiroir sidebar -->
+    <button id="sb-fab" aria-label="Ouvrir la liste des étapes" style="display:none">
+      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <!-- Overlay derrière le tiroir -->
+    <div id="sb-overlay"></div>
     <div id="map-wrap">
       <div id="map"></div>
       <div id="layerswitch">
@@ -1758,7 +1872,28 @@ document.querySelectorAll('input[name="basemap"]').forEach(function(r){
     map.setStyle(STYLES[currentBasemap]);
   });
 });
+// ---- Sidebar toggle : desktop (sbtoggle) + mobile (FAB drawer) ----
+function isMobile(){return window.innerWidth<=768;}
+
+function openDrawer(){
+  var sb=document.getElementById('sidebar');
+  var fab=document.getElementById('sb-fab');
+  var ov=document.getElementById('sb-overlay');
+  sb.classList.add('drawer-open');
+  if(fab){fab.classList.add('open');fab.setAttribute('aria-label','Fermer la liste des étapes');}
+  if(ov)ov.classList.add('visible');
+}
+function closeDrawer(){
+  var sb=document.getElementById('sidebar');
+  var fab=document.getElementById('sb-fab');
+  var ov=document.getElementById('sb-overlay');
+  sb.classList.remove('drawer-open');
+  if(fab){fab.classList.remove('open');fab.setAttribute('aria-label','Ouvrir la liste des étapes');}
+  if(ov)ov.classList.remove('visible');
+}
+
 document.getElementById('sbtoggle').addEventListener('click',function(){
+  if(isMobile()) return; // géré par FAB
   var sb=document.getElementById('sidebar');
   sb.classList.toggle('collapsed');
   this.textContent=sb.classList.contains('collapsed')?'\u25ba':'\u25c4';
@@ -1767,6 +1902,47 @@ document.getElementById('sbtoggle').addEventListener('click',function(){
   if(info) info.style.left=sb.classList.contains('collapsed')?'0':'315px';
   setTimeout(function(){map.resize();},280);
 });
+
+var fab=document.getElementById('sb-fab');
+if(fab){
+  fab.addEventListener('click',function(){
+    var sb=document.getElementById('sidebar');
+    if(sb.classList.contains('drawer-open')){closeDrawer();}else{openDrawer();}
+    setTimeout(function(){map.resize();},320);
+  });
+}
+
+var sbOverlay=document.getElementById('sb-overlay');
+if(sbOverlay){sbOverlay.addEventListener('click',function(){closeDrawer();setTimeout(function(){map.resize();},320);});}
+
+// Fermer le tiroir en tapant sur la carte (mobile)
+document.getElementById('map').addEventListener('click',function(){
+  if(isMobile()&&document.getElementById('sidebar').classList.contains('drawer-open')){
+    closeDrawer();
+    setTimeout(function(){map.resize();},320);
+  }
+});
+
+// Afficher/masquer le FAB selon la largeur
+function syncMobileUI(){
+  var fab=document.getElementById('sb-fab');
+  var sbt=document.getElementById('sbtoggle');
+  if(!fab) return;
+  if(isMobile()){
+    fab.style.display='flex';
+    if(sbt) sbt.style.display='none';
+    // S'assurer que le drawer est fermé au resize vers mobile
+    var sb=document.getElementById('sidebar');
+    if(sb&&sb.classList.contains('drawer-open')===false){/*ok*/}
+  } else {
+    fab.style.display='none';
+    if(sbt) sbt.style.display='';
+    // Fermer le drawer si on passe en desktop
+    closeDrawer();
+  }
+}
+syncMobileUI();
+window.addEventListener('resize',syncMobileUI);
 
 // =====================================================================
 // CHARGEMENT DE TOUS LES CAHIERS + VUE D'ENSEMBLE
