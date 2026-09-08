@@ -1,4 +1,5 @@
 // data_c2.js — Données Cahier 2 : Journal non écrit d'un fantassin en repli stratégique (Mai – Juin 1940)
+// Enrichi pour spec carte-responsive-nav : champs p et stopId ajoutés aux lieux CPA (tâche 5.2)
 
 var CAHIER_2_DATA = {
   PC: {
@@ -104,7 +105,7 @@ var CAHIER_2_DATA = {
    type:"capture"}
 ],
   cpa: [
-  { lat:49.23226, lng:5.25198, loc:"Le Mort-Homme (Meuse)", cpa:[
+  { lat:49.23226, lng:5.25198, loc:"Le Mort-Homme (Meuse)", p:1, stopId:102, cpa:[
     { img:"cartes_postales/mort_homme_attaque_1916.jpg",
       title:"Assaut sur le Mort-Homme — mars 1916",
       desc:"Juin 1940. La colonne longe la rive gauche de la Meuse sous les détonations de l'artillerie qui brûle ses réserves d'obus. À un carrefour, une pancarte : <em>« Le Mort-Homme 1 km 500 »</em>. « Ça me rappelle quelque chose », écrit Alban — ce nom de la Grande Guerre, où des milliers d'hommes moururent pour cette butte en 1916. Ici : soldats allemands quittant leurs tranchées à l'assaut du Mort-Homme, 14-15 mars 1916. Photo : Hermann Rex. <a href=\"https://fr.wikipedia.org/wiki/Le_Mort-Homme\" target=\"_blank\" style=\"color:#c8a96e\">↗ Wikipedia : Le Mort-Homme</a>" },

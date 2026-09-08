@@ -1,4 +1,5 @@
 // data_c1.js — Données Cahier 1 : La Guerre (Août 1939 – Juin 1940)
+// Enrichi pour spec carte-responsive-nav : champs p et stopId ajoutés aux lieux CPA (tâche 5.2)
 
 var CAHIER_1_DATA = {
   PC: {
@@ -63,22 +64,22 @@ var CAHIER_1_DATA = {
    type:"capture"}
 ],
   cpa: [
-  { lat:42.9372, lng:1.8478, loc:"Lavelanet (Ariège)", cpa:[
+  { lat:42.83507, lng:1.59988, loc:"Tarascon-sur-Ariège (Ariège)", p:1, stopId:3, cpa:[
     { img:"cartes_postales/tarascon_vicdessos_sabart.jpg",
       title:"Tarascon-sur-Ariège — Sabart et la vallée du Vicdessos",
       desc:"La région ariégeoise d'Alban Rouzaud. La vallée du Vicdessos où il fait une dernière virée en torpedo avec ses amis avant la mobilisation." }
   ]},
-  { lat:43.6047, lng:1.4442, loc:"Toulouse (Haute-Garonne)", cpa:[
+  { lat:43.6047, lng:1.4442, loc:"Toulouse (Haute-Garonne)", p:2, stopId:6, cpa:[
     { img:"cartes_postales/toulouse_matabiau_cpa.jpg",
       title:"Toulouse — Gare Matabiau, CPA",
       desc:"La gare de Toulouse d'où Alban et ses camarades partent rejoindre leurs régiments en septembre 1939. « Le grand troupeau »." }
   ]},
-  { lat:48.8564, lng:7.3192, loc:"La Petite-Pierre (Bas-Rhin)", cpa:[
+  { lat:48.8564, lng:7.3192, loc:"La Petite-Pierre (Bas-Rhin)", p:3, stopId:7, cpa:[
     { img:"cartes_postales/pirmasens_1905.jpg",
       title:"Pirmasens (Allemagne) — CPA 1905",
       desc:"Pirmasens, la ville allemande visible depuis les avant-postes d'Alban Rouzaud. « Les ceux d'en face. » La drôle de guerre vue depuis la ligne Maginot." }
   ]},
-  { lat:49.16, lng:5.3833, loc:"Verdun (Meuse)", cpa:[
+  { lat:49.16, lng:5.3833, loc:"Verdun (Meuse)", p:4, stopId:13, cpa:[
     { img:"cartes_postales/verdun_bombardé_1918.jpg",
       title:"Verdun bombardé — CPA 1918",
       desc:"Verdun, destination finale du Cahier 1. Le régiment doit y prendre position « en bretelle » pour colmater la poche allemande de juin 1940." },
@@ -86,7 +87,7 @@ var CAHIER_1_DATA = {
       title:"Verdun en ruines — CPA 1914",
       desc:"Les ruines de Verdun, symbole de 1914-1918. En juin 1940, l'histoire se répète tragiquement." }
   ]},
-  { lat:48.178, lng:6.451, loc:"Épinal (Vosges)", cpa:[
+  { lat:48.178, lng:6.451, loc:"Épinal (Vosges)", p:4, cpa:[
     { img:"cartes_postales/bundesarchiv_prisonniers_francais_1940.jpg",
       title:"Prisonniers français — juin 1940 (Bundesarchiv)",
       desc:"Photo d'archives allemandes (Bundesarchiv) montrant des prisonniers français en juin 1940. Alban Rouzaud sera capturé à Épinal en juillet 1940." },

@@ -1,4 +1,5 @@
 // data_c3.js — Données Cahier 3 : L'Évasion (Sept.–Oct. 1941)
+// Enrichi pour spec carte-responsive-nav : champs p et stopId ajoutés aux lieux CPA (tâche 1.3)
 
 var CAHIER_3_DATA = {
   PC: {
@@ -350,67 +351,67 @@ var CAHIER_3_DATA = {
     }
 ],
   cpa: [
-  { lat:47.21731, lng:15.62247, loc:'Weiz (Styrie)', cpa:[
+  { lat:47.21731, lng:15.62247, loc:'Weiz (Styrie)', p:2, stopId:2, cpa:[
     { img:'cartes_postales/weiz_hauptplatz_1898.jpg',       title:'Weiz — Place principale, ~1898',             desc:'Weiz, ville du district du Kommando de Hohenilz. Alban et André s\'évadent dans la nuit du 20 septembre.' },
     { img:'cartes_postales/weiz_cpa_autriche_hongrie.jpg',  title:'Weiz — Carte postale Empire austro-hongrois', desc:'Document de la poste impériale de Weiz.' },
     { img:'cartes_postales/weiz_sichelwerk_1898.jpg',       title:'Weiz — Scierie Mooshammer, ~1898',            desc:'Les prisonniers travaillaient dans des fermes et installations locales.' }
   ]},
-  { lat:47.24914, lng:15.59556, loc:'Weiz — Weizklamm (Styrie)', cpa:[
+  { lat:47.24914, lng:15.59556, loc:'Weiz — Weizklamm (Styrie)', p:2, stopId:3, cpa:[
     { img:'cartes_postales/akon_weiz_weizklamm.jpg', title:'Weiz — Ruine Sturmberg dans la Weizklamm', desc:'Le paysage boisé aux portes de Weiz — la gorge que traversent Alban et André dans la nuit du départ.' },
     { img:'cartes_postales/akon_weiz_1.jpg',         title:'Weiz — Ruine Sturmberg, forêt et rivière', desc:'C\'est de ce paysage qu\'ils s\'enfuient dans la nuit du 20 septembre 1941.' }
   ]},
-  { lat:47.19880, lng:15.46776, loc:'Kesselfallklamm / Semriach (Styrie)', cpa:[
+  { lat:47.19880, lng:15.46776, loc:'Kesselfallklamm / Semriach (Styrie)', p:3, stopId:5, cpa:[
     { img:'cartes_postales/akon_schoeckl_1.jpg',    title:'Der Schöckl vom Rosenberg aus, ~1900',        desc:'Le vallon boisé du Schöckl, visible depuis leur itinéraire. Les Alpes styriennes dans toute leur splendeur.' },
     { img:'cartes_postales/akon_schoeckelhaus.jpg', title:'Schöcklhaus — Le refuge alpin',               desc:'Le sommet du Schöckl (1445 m) d\'où descend le Rötschbach.' }
   ]},
-  { lat:47.20499, lng:15.39888, loc:'Kesselfallklamm — La cascade (Styrie)', cpa:[
+  { lat:47.20499, lng:15.39888, loc:'Kesselfallklamm — La cascade (Styrie)', p:3, stopId:23, cpa:[
     { img:'cartes_postales/kasselfalls_vintage.png', title:'Kesselfallklamm — La cascade et les passerelles', desc:'« Ça vaut le coup de s\'évader quand même. Ne serait-ce que pour ça ! » Alban et André s\'arrêtent sur les passerelles de la gorge pour admirer la cascade.' },
     { img:'cartes_postales/pierre_lys_trou_cure.jpg', title:'Gorges de la Pierre Lys — Le Trou du Curé (Aude)', desc:'« La Pierre Lys, St Georges, Galamus… de belles parties de camping… » Devant la cascade autrichienne, Alban et André évoquent les gorges pyrénéennes qu\'ils connaissent bien.' },
     { img:'cartes_postales/gorges_saint_georges_axat.jpg', title:'Gorges Saint-Georges — Axat (Aude)', desc:'Les gorges de Saint-Georges d\'Axat dans l\'Aude — l\'une des gorges pyrénéennes évoquées par les deux évadés devant la Kesselfallklamm.' }
   ]},
-  { lat:47.269, lng:15.325, loc:'Frohnleiten — Pont sur la Mur (Styrie)', cpa:[
+  { lat:47.269, lng:15.325, loc:'Frohnleiten — Pont sur la Mur (Styrie)', p:3, stopId:6, cpa:[
     { img:'cartes_postales/frohnleiten_lithographie_1830.jpg', title:'Frohnleiten — Lithographie J.F. Kaiser, 1830', desc:'« Vier Pfennigo, bitte ! » Un vieux gardien. Ils se font passer pour des Croates.' },
     { img:'cartes_postales/akon_frohnleiten_2.jpg',            title:'Frohnleiten — La Mur et le pont',             desc:'Vue panoramique avec la Mur et le pont bien visible.' },
     { img:'cartes_postales/akon_frohnleiten_3.jpg',            title:'Frohnleiten — Sommerfrische, les vergers',    desc:'Après le pont, un prisonnier français dans une scierie.' },
     { img:'cartes_postales/akon_frohnleiten_4.jpg',            title:'Frohnleiten — Le Stadtturm entre les sapins', desc:'Après le pont, les évadés bivouaquent dans les feuilles sèches.' }
   ]},
-  { lat:47.320, lng:15.360, loc:'Mixnitz / Bärenschützklamm (Styrie)', cpa:[
+  { lat:47.320, lng:15.360, loc:'Mixnitz / Bärenschützklamm (Styrie)', p:3, cpa:[
     { img:'cartes_postales/akon_mixnitz_baerenschutz.jpg', title:'Mixnitz — Bärenschützschlucht et Hochlantsch', desc:'Contexte géographique du parcours sur la Mur.' },
     { img:'cartes_postales/akon_mixnitz_1.jpg',            title:'Mixnitz — Le village',                         desc:'La vallée de la Mur qu\'Alban et André remontent vers l\'ouest.' }
   ]},
-  { lat:47.413, lng:15.287, loc:'Bruck an der Mur (Styrie)', cpa:[
+  { lat:47.413, lng:15.287, loc:'Bruck an der Mur (Styrie)', p:4, cpa:[
     { img:'cartes_postales/bruck_mur_1910.png', title:'Bruck an der Mur — La Mürz et le Schlossberg, 1910', desc:'La confluence de la Mürz et la Mur. Phases 4–5.' }
   ]},
-  { lat:47.6181, lng:15.1422, loc:'Hochschwab — Alpes de Styrie (Styrie)', cpa:[
+  { lat:47.6181, lng:15.1422, loc:'Hochschwab — Alpes de Styrie (Styrie)', p:4, stopId:7, cpa:[
     { img:'cartes_postales/Thomas_Leitner_-_Hochschwab_im_Winter_(1921).jpg', title:'Hochschwab im Winter — Thomas Leitner, 1921', desc:'« Une belle vie, une vraie vie qui éprouve les muscles en lutte constante contre l\'espace et la pesanteur. » Trois jours dans les montagnes entre Mur et Mürz.' }
   ]},
-  { lat:47.19190, lng:14.43702, loc:'Unzmarkt / Vallée de la Mur (Styrie)', cpa:[
+  { lat:47.19190, lng:14.43702, loc:'Unzmarkt / Vallée de la Mur (Styrie)', p:5, stopId:35, cpa:[
     { img:'cartes_postales/murtalbahn_mur_1900.jpg', title:'Murtalbahn — Train sur le pont de la Mur, ~1900', desc:'« Le petit train à voie étroite qui monte vers Murau en poussant des sifflements aigus. » La Murtalbahn part d\'Unzmarkt — c\'est là qu\'ils décident de tenter d\'escalader un wagon.' }
   ]},
-  { lat:47.213, lng:14.827, loc:'Knittelfeld — Vallée de la Mur (Styrie)', cpa:[
+  { lat:47.213, lng:14.827, loc:'Knittelfeld — Vallée de la Mur (Styrie)', p:5, stopId:8, cpa:[
     { img:'cartes_postales/akon_knittelfeld_1.jpg', title:'Knittelfeld — Vue depuis le Dremmelberg',    desc:'« Knittelfeld ? Judenbourg ? — Peu importe. Il n\'y a qu\'à suivre la Mur. »' },
     { img:'cartes_postales/akon_knittelfeld_2.jpg', title:'Knittelfeld — Roseggerstraße et les usines', desc:'« Un gros bourg sur l\'autre rive — Knittelfeld ? Judenbourg ? — Feu de camp au bord de l\'eau, thé au lait, rasage. Ils décident de remonter la rivière vers l\'ouest. »' }
   ]},
-  { lat:47.169, lng:14.662, loc:'Judenburg (Styrie)', cpa:[
+  { lat:47.169, lng:14.662, loc:'Judenburg (Styrie)', p:5, stopId:10, cpa:[
     { img:'cartes_postales/akon_judenburg_1.jpg', title:'Judenburg — Le Stadtturm depuis les sapins',      desc:'Identifiée via une pancarte déchirée : « Juden… »' },
     { img:'cartes_postales/akon_judenburg_2.jpg', title:'Judenburg — Vue panoramique, la Mur et les Alpes',desc:'Judenburg dans son écrin alpin. Puis la gare de marchandises.' }
   ]},
-  { lat:46.768, lng:14.360, loc:'St. Veit an der Glan (Carinthie)', cpa:[
+  { lat:46.768, lng:14.360, loc:'St. Veit an der Glan (Carinthie)', p:7, stopId:13, cpa:[
     { img:'cartes_postales/st_veit_kino_1900.jpg',      title:'St. Veit — Stadt-Kino-Theater, ~1900', desc:'Traversée à deux heures. « Et ce sacré briquet d\'Alban qui ne marchait pas ! »' },
     { img:'cartes_postales/st_veit_friesacher_tor.jpg', title:'St. Veit — Porte de Friesach',         desc:'Un soldat demande du feu. Le briquet est à sec.' },
     { img:'cartes_postales/hochosterwitz_1910.png',     title:'Burg Hochosterwitz — CPA ~1910',       desc:'Le paysage carinthien : routes militarisées, soldats partout.' }
   ]},
-  { lat:46.68890, lng:13.99229, loc:'Lac d\'Ossiach (Carinthie)', cpa:[
+  { lat:46.68890, lng:13.99229, loc:'Lac d\'Ossiach (Carinthie)', p:7, stopId:14, cpa:[
     { img:'cartes_postales/ossiach_gierymski_1886.jpg', title:'Lac d\'Ossiach — Gierymski, 1886', desc:'« Le lac d\'Ossiach ! » — bord marécageux. « Wohin ? — Villach ! »' }
   ]},
-  { lat:46.440, lng:13.310, loc:'Alpes juliennes — Arrestation (Italie)', cpa:[
+  { lat:46.440, lng:13.310, loc:'Alpes juliennes — Arrestation (Italie)', p:9, stopId:19, cpa:[
     { img:'cartes_postales/Gabinio.Carabinieri_In_Servizio_Al_Confine_Alpino._Valli_Di_Lanzo,_Pian_Della_Mussa,_Due_Carabinieri_In_Pattuglia_2A79.jpg', title:'Deux carabiniers en patrouille à la frontière alpine, ~1902', desc:'Photo de Mario Gabinio (~1902). « À la sortie d\'un village qu\'on ne pouvait contourner à cause de la montagne à pic, deux sentinelles relevées de la garde d\'un tunnel leur demandent les papiers. »' }
   ]},
-  { lat:46.53371, lng:13.64296, loc:'Pontafel / Pontebba — Frontière austro-italienne', cpa:[
+  { lat:46.53371, lng:13.64296, loc:'Pontafel / Pontebba — Frontière austro-italienne', p:8, stopId:17, cpa:[
     { img:'cartes_postales/Pontebba1900.JPG', title:'Pontafel/Pontebba — Vue du village, ~1900', desc:'Pontafel (côté autrichien) / Pontebba (côté italien), village frontalier du Kanaltal. C\'est sur la crête à l\'est, au sud de Thörl-Maglern, qu\'Alban et André franchissent la frontière le 3 octobre à 15h30.' },
     { img:'cartes_postales/Pontebba_(UD)_-_vecchia_stazione_ferroviaria_-_cartolina.jpg', title:'Gare de Pontebba — Ancienne station frontière, CPA', desc:'L\'ancienne gare de Pontebba, station frontière vers l\'Autriche jusqu\'à la Première Guerre mondiale. « Elles font une drôle d\'impression, ces ferrailles qui t\'emprisonnent les mains. » Alban et André seront escortés jusqu\'à Tarvisio puis Udine.' }
   ]},
-  { lat:46.610, lng:13.852, loc:'Villach (Carinthie)', cpa:[
+  { lat:46.610, lng:13.852, loc:'Villach (Carinthie)', p:7, stopId:15, cpa:[
     { img:'cartes_postales/villach_1898.jpg',        title:'Villach — Vue de la ville, 1898',       desc:'« Le lendemain Villach est traversée sans encombre. »' },
     { img:'cartes_postales/villach_draubruecke.jpg', title:'Villach — Pont sur la Drau, ca. 1914',  desc:'« Le pont sur la Drau n\'est pas gardé. » Puis : Italien. Grenze 21 Km.' }
   ]}

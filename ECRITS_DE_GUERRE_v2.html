@@ -1,0 +1,3371 @@
+﻿<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Alban Rouzaud — Écrits de Guerre 1939–1945</title>
+<link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"/>
+<script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+<style>
+/* =====================================================================
+   BASE
+   ===================================================================== */
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden;isolation:isolate}
+#layout{display:flex;flex-direction:column;flex:1;min-height:0;position:relative;z-index:1}
+#top-row{display:flex;flex:1;overflow:hidden;min-height:0;position:relative}
+#map-wrap{flex:1;position:relative}
+#map{width:100%;height:100%}
+/* Marqueurs HTML */
+.mlk-pin{display:block}
+/* Profil altitude */
+#elevpanel{height:220px;background:#0f1628;border-top:2px solid #0f3460;flex-shrink:0;box-shadow:0 -4px 16px rgba(0,0,0,.5);display:flex;flex-direction:column}
+#elevpanel.hidden{display:none}
+#elevbar{display:flex;align-items:center;justify-content:space-between;padding:3px 10px;font-size:.82em;color:#a0b4c8}
+#elevbar b{color:#e0e0e0}
+#elevcanvas{display:block;width:100%;height:196px}
+#elevtip{position:fixed;pointer-events:none;background:rgba(22,33,62,.97);color:#e0e0e0;padding:4px 9px;border-radius:4px;font-size:.8em;line-height:1.5;display:none;z-index:900;border:1px solid #1a4a7a}
+#coords{display:none}
+.maplibregl-ctrl-bottom-right{left:50%!important;right:auto!important;transform:translateX(-50%)}
+.maplibregl-ctrl-attrib{background:rgba(10,14,26,0.55)!important;color:#c0c8d8!important;font-size:.68em!important;opacity:.6;transition:opacity .2s}
+.maplibregl-ctrl-attrib:hover{opacity:1}
+.maplibregl-ctrl-attrib a{color:#a0c4e0!important}
+#pitch-info{display:none}
+#exag-pill{position:absolute;top:84px;right:42px;transform:translateX(50%);z-index:600;background:rgba(15,22,40,.78);border:1px solid rgba(80,120,180,.40);border-radius:5px;color:#c8d8f0;font-size:.75em;font-variant-numeric:tabular-nums;padding:3px 8px;cursor:pointer;user-select:none;letter-spacing:.02em;transition:background .2s,color .2s;white-space:nowrap}
+#exag-pill:hover{background:rgba(26,74,122,.85);color:#fff}
+#exag-pill.active{color:#fff;border-color:rgba(100,160,240,.6)}
+
+/* =====================================================================
+   SETTINGS — bouton ⚙ et drawer
+   ===================================================================== */
+#settings-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 600;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #16213e;
+  border: 1px solid #1a4a7a;
+  color: #a0b4c8;
+  font-size: 1.1em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.5);
+}
+#settings-btn:hover { background: #1a4a7a; color: #fff; }
+
+#settings-drawer {
+  position: absolute;
+  top: 60px;
+  left: 16px;
+  z-index: 700;
+  width: 240px;
+  background: #16213e;
+  border: 1px solid #1a4a7a;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.6);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+#settings-drawer.open { display: flex; }
+
+#settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid #1a4a7a;
+  background: #0f1628;
+}
+#settings-header span { font-size: .88em; font-weight: 600; color: #e0e0e0; }
+#settings-close {
+  background: none;
+  border: none;
+  color: #a0b4c8;
+  cursor: pointer;
+  font-size: .9em;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background .15s;
+}
+#settings-close:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+#settings-body { padding: 6px 0; }
+
+.settings-section {
+  padding: 6px 12px 8px;
+  border-bottom: 1px solid rgba(26,74,122,.5);
+}
+.settings-section:last-child { border-bottom: none; }
+
+.settings-section-title {
+  font-size: .72em;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #4a7aaa;
+  margin-bottom: 5px;
+}
+.settings-section label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .82em;
+  color: #a0b4c8;
+  padding: 3px 0;
+  cursor: pointer;
+}
+.settings-section label:hover { color: #e0e0e0; }
+
+.settings-elev-btn {
+  width: 100%;
+  padding: 7px 10px;
+  background: #0f3460;
+  border: 1px solid #1a4a7a;
+  border-radius: 5px;
+  color: #a0b4c8;
+  font-size: .82em;
+  cursor: pointer;
+  text-align: left;
+  transition: background .15s, color .15s;
+}
+.settings-elev-btn:hover { background: #1a5a9a; color: #fff; }
+
+/* Mobile responsive : drawer plus compact */
+@media (max-width: 480px) and (orientation: portrait) {
+  #settings-btn { top: 12px; left: 12px; }
+  #settings-drawer { top: 56px; left: 12px; width: 220px; }
+}
+@media (max-width: 900px) and (orientation: landscape) {
+  #settings-drawer { width: 200px; }
+}
+/* Marqueurs CPA */
+.cpa-inner{width:26px;height:26px;border-radius:50%;background:#c8a96e;border:2px solid rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.5);transition:transform .12s,border-color .12s,background .12s;transform-origin:center center;position:relative}
+.cpa-badge{position:absolute;top:-5px;right:-5px;background:#e94560;color:#fff;font-size:8px;font-weight:700;font-family:Arial,sans-serif;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #fff;pointer-events:none}
+/* Lightbox CPA */
+#cpa-lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.94);z-index:10000;flex-direction:column;align-items:center;justify-content:center;padding:20px}
+#cpa-lb.open{display:flex}
+#cpa-lb > img{max-width:90vw;max-height:76vh;object-fit:contain;border-radius:6px;box-shadow:0 0 40px rgba(0,0,0,.9);cursor:default}
+#cpa-lb-cap{margin-top:10px;text-align:center;max-width:780px}
+#cpa-lb-cap .lt{font-size:.95em;font-weight:600;color:#c8a96e;margin-bottom:3px}
+#cpa-lb-cap .ld{font-size:.82em;color:#a0b4c8;line-height:1.45}
+#cpa-lb-cap .lc{font-size:.72em;color:#556677;margin-top:4px}
+.cpa-lb-arrow{position:fixed;top:50%;transform:translateY(-50%);background:rgba(15,52,96,.75);border:1px solid #1a4a7a;color:#c8a96e;font-size:1.8em;width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10001;transition:background .2s;user-select:none;padding:0;line-height:1;appearance:none;-webkit-appearance:none}
+.cpa-lb-arrow:hover{background:rgba(26,90,154,.9)}
+#cpa-lb-prev{left:16px}
+#cpa-lb-next{right:16px}
+.cpa-lb-arrow.hidden{display:none}
+
+/* =====================================================================
+   PANNEAU — structure principale (task 3.1)
+   ===================================================================== */
+
+/* --- Layout global --- */
+/* Override body flex pour accueillir le panneau latéral */
+#panel {
+  width: 315px;
+  min-width: 315px;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #16213e;
+  border-right: 1px solid #1a4a7a;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 200;
+  transition: width .25s, min-width .25s;
+}
+
+/* Barre compacte — toujours visible */
+#panel-bar {
+  height: 48px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 0 8px;
+  background: #0f1628;
+  border-bottom: 1px solid #1a4a7a;
+  z-index: 10;
+}
+
+#nav-prev, #nav-next {
+  background: #0f3460;
+  border: 1px solid #1a4a7a;
+  color: #a0b4c8;
+  width: 32px;
+  height: 32px;
+  border-radius: 5px;
+  font-size: .95em;
+  cursor: pointer;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s, opacity .15s;
+}
+#nav-prev:hover, #nav-next:hover { background: #1a5a9a; color: #fff; }
+#nav-prev:disabled, #nav-next:disabled { opacity: .3; cursor: default; }
+
+#panel-breadcrumb {
+  flex: 1;
+  min-width: 0;
+  font-size: .82em;
+  color: #c0cce0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+  transition: background .15s;
+  user-select: none;
+}
+#panel-breadcrumb:hover { background: rgba(255,255,255,.08); }
+
+/* Zone de rendu des vues — scrollable */
+#panel-viewport {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  position: relative;
+  /* Scrollbar style */
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #1a4a7a #0f1628;
+}
+#panel-viewport::-webkit-scrollbar { width: 6px; }
+#panel-viewport::-webkit-scrollbar-track { background: #0f1628; }
+#panel-viewport::-webkit-scrollbar-thumb { background: #1a4a7a; border-radius: 3px; }
+
+/* Vues créées dynamiquement par navigateTo() */
+.panel-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100%;
+  padding: 8px 12px 16px;
+  box-sizing: border-box;
+}
+
+/* État compact du panneau */
+#panel.compact {
+  /* Sur desktop : on laisse la largeur mais le viewport se réduit au zéro */
+}
+#panel.compact #panel-viewport {
+  display: none;
+}
+
+/* =====================================================================
+   PANNEAU RESPONSIVE — portrait mobile (≤ 480px ET portrait)
+   ===================================================================== */
+
+@media (max-width: 480px) and (orientation: portrait) {
+  /* Réorienter le body en colonne */
+  body { flex-direction: column !important; }
+
+  /* Le panneau passe en bottombar fixe */
+  #panel {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto;
+    border-right: none;
+    border-top: 2px solid #1a4a7a;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 -4px 24px rgba(0,0,0,.6);
+    z-index: 2000;
+  }
+
+  /* État compact : juste la barre */
+  #panel.compact {
+    height: 48px;
+    overflow: hidden;
+  }
+  #panel.compact #panel-viewport {
+    display: none;
+  }
+
+  /* État expanded : 60vh */
+  #panel.expanded {
+    height: 60vh;
+  }
+  #panel.expanded #panel-viewport {
+    display: block;
+  }
+
+  /* La carte occupe toute la hauteur — le panneau flotte par-dessus */
+  #map-wrap { height: 100vh; }
+
+  /* Masquer le sbtoggle desktop sur mobile — supprimé (tâche 5.1) */
+
+  /* Profil altitude : ne pas afficher dans #elevpanel classique sur mobile
+     (sera intégré dans panel-viewport en vague 3) */
+  #elevpanel { height: 140px; }
+  #elevcanvas { height: 116px; }
+}
+
+/* Tablette (481px–900px) en paysage : réduire la largeur */
+@media (max-width: 900px) and (orientation: landscape) {
+  #panel { width: 260px; min-width: 260px; }
+}
+
+/* =====================================================================
+   RESPONSIVE — tablette & mobile
+   ===================================================================== */
+
+/* --- Mobile (≤ 768px) : ajustements profil altitude --- */
+@media(max-width:768px){
+  /* ---- Profil altitude réduit ---- */
+  #elevpanel{height:140px}
+  #elevcanvas{height:116px}
+  #elevbar{font-size:.75em}
+
+  /* ---- layerswitch / elevtoggle — géré par settings-drawer ---- */
+  #exag-pill{right:16px}
+}
+
+/* --- Très petit (≤ 380px) --- */
+@media(max-width:380px){
+  /* (rien à ce stade) */
+}
+</style>
+<script src="data/data_c1.js"></script>
+<script src="data/data_c2.js"></script>
+<script src="data/data_c3.js"></script>
+<script src="data/data_c4.js"></script>
+</head>
+<body>
+
+<!-- coverpage supprimé (tâche 5.1) — contenu migré dans renderAccueil() -->
+
+<!-- header, header-border, cahier-tabs supprimés (tâche 5.1) -->
+
+<!-- ===================================================================
+     LAYOUT PRINCIPAL
+     =================================================================== -->
+<div id="layout">
+  <div id="top-row">
+
+    <!-- ===================================================================
+         PANNEAU — sidebar desktop / bottombar portrait mobile
+         =================================================================== -->
+    <div id="panel" class="expanded">
+      <!-- Barre compacte — toujours visible -->
+      <div id="panel-bar">
+        <button id="nav-prev" title="Étape précédente" disabled>&#9664;</button>
+        <div id="panel-breadcrumb" title="Cliquer pour réduire / agrandir">Alban Rouzaud — Écrits de Guerre</div>
+        <button id="nav-next" title="Étape suivante" disabled>&#9654;</button>
+      </div>
+      <!-- Zone de rendu des vues (navigateTo) -->
+      <div id="panel-viewport"></div>
+    </div>
+
+    <!-- sidebar, sbtoggle, sb-fab, sb-overlay supprimés (tâche 5.1) -->
+    <div id="map-wrap">
+      <div id="map"></div>
+      <!-- Bouton ⚙ settings flottant -->
+      <button id="settings-btn" title="Paramètres de la carte" aria-label="Paramètres de la carte">&#9881;</button>
+
+      <!-- Drawer settings — s'ouvre au clic sur #settings-btn -->
+      <div id="settings-drawer">
+        <div id="settings-header">
+          <span>Paramètres</span>
+          <button id="settings-close" aria-label="Fermer">&#10005;</button>
+        </div>
+        <div id="settings-body">
+          <div class="settings-section">
+            <div class="settings-section-title">Fond de carte</div>
+            <label><input type="radio" name="basemap" value="ofm" checked> 🗺 OpenFreeMap</label>
+            <label><input type="radio" name="basemap" value="osm"> 🌍 OpenStreetMap</label>
+            <label><input type="radio" name="basemap" value="topo"> ⛰️ OpenTopoMap</label>
+            <label><input type="radio" name="basemap" value="ign1950"> 🗺️ IGN 1:50 000 (1950)</label>
+            <label><input type="radio" name="basemap" value="etatmajor"> 🏰 IGN État-Major (1820-1866)</label>
+            <label><input type="radio" name="basemap" value="basegris"> 🗾 Basemap.at Gris</label>
+            <label><input type="radio" name="basemap" value="terrain"> 🏔️ Basemap.at Terrain</label>
+            <label><input type="radio" name="basemap" value="ortho"> 🎞️ Basemap.at Ortho</label>
+            <label><input type="radio" name="basemap" value="satellite"> 🌐 Satellite Esri</label>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Overlays</div>
+            <label><input type="checkbox" id="ck-cadastre"> 🏛️ Cadastre franciscain (~1830)</label>
+            <label><input type="checkbox" id="ck-hillshade" checked> Ombrage terrain</label>
+            <label><input type="checkbox" id="ck-cpa" checked> 📷 Cartes postales</label>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Profil altitude</div>
+            <button id="elevtoggle" class="settings-elev-btn">&#9650; Afficher le profil</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="pitch-info">pitch: 45° | bear: 0°</div>
+      <div id="coords">lat: &#8212; &nbsp;lng: &#8212;</div>
+      <div id="elevtip"></div>
+    </div>
+  </div><!-- fin #top-row -->
+  <div id="elevpanel" class="hidden">
+    <div id="elevbar"><span>Profil du parcours</span><span id="elevinfo"></span></div>
+    <canvas id="elevcanvas"></canvas>
+  </div>
+</div>
+
+<!-- ===================================================================
+     LIGHTBOX CPA
+     =================================================================== -->
+<div id="cpa-lb" onclick="if(event.target===this)this.classList.remove('open')">
+  <button class="cpa-lb-arrow hidden" id="cpa-lb-prev"
+          onclick="event.stopPropagation();_cpaLbIdx=Math.max(0,_cpaLbIdx-1);_cpaLbRender()">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <polyline points="15,6 9,12 15,18"/>
+    </svg>
+  </button>
+  <img id="cpa-lb-img" src="" alt="">
+  <button class="cpa-lb-arrow hidden" id="cpa-lb-next"
+          onclick="event.stopPropagation();_cpaLbIdx=Math.min(_cpaLbList.length-1,_cpaLbIdx+1);_cpaLbRender()">
+    <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round">
+      <polyline points="9,6 15,12 9,18"/>
+    </svg>
+  </button>
+  <div id="cpa-lb-cap">
+    <div class="lt" id="cpa-lb-title"></div>
+    <div class="ld" id="cpa-lb-desc"></div>
+    <div class="lc" id="cpa-lb-count"></div>
+  </div>
+</div>
+
+<!-- C1 data moved to data_c1.js -->
+
+
+
+
+
+
+
+
+
+<!-- ===================================================================
+     MOTEUR PRINCIPAL
+     =================================================================== -->
+<script>
+/* ========== NAV — état global et séquence plate ========== */
+/* Design : Decision Point 1 — État objet centralisé + callbacks    */
+/* Spec   : carte-responsive-nav / task 1.1                          */
+var NAV = (function() {
+
+  /* État interne — jamais muté directement de l'extérieur */
+  var _state = {
+    cahier:        null,   // 1–4 | null
+    chapitre:      null,   // numéro de phase | null
+    stopId:        null,   // id du stop actif | null
+    cpaLoc:        null,   // loc du lieu CPA actif (si pas de stopId) | null
+    section:       null,   // 'photos' | null — section de niveau 2
+    level:         0,      // 0–3
+    panelExpanded: true,
+    panelMode:     'nav',  // 'nav' | 'elev'
+    direction:     null    // 'forward' | 'back' | null — renseigné par go()
+  };
+
+  /* Listeners enregistrés par on('change', cb) */
+  var _listeners = [];
+
+  /* --- Utilitaire : copie superficielle de l'état --- */
+  function _copy() {
+    return {
+      cahier:        _state.cahier,
+      chapitre:      _state.chapitre,
+      stopId:        _state.stopId,
+      cpaLoc:        _state.cpaLoc,
+      section:       _state.section,
+      level:         _state.level,
+      panelExpanded: _state.panelExpanded,
+      panelMode:     _state.panelMode,
+      direction:     _state.direction
+    };
+  }
+
+  /* --- Émet l'événement 'change' à tous les abonnés --- */
+  function _emit(event) {
+    if (event !== 'change') return;
+    var snapshot = _copy();
+    for (var i = 0; i < _listeners.length; i++) {
+      try { _listeners[i](snapshot); } catch(e) {}
+    }
+  }
+
+  /* --- Abonnement --- */
+  function on(event, cb) {
+    if (event !== 'change') return;
+    if (typeof cb !== 'function') return;
+    _listeners.push(cb);
+  }
+
+  /* --- Désabonnement --- */
+  function off(event, cb) {
+    if (event !== 'change') return;
+    for (var i = _listeners.length - 1; i >= 0; i--) {
+      if (_listeners[i] === cb) { _listeners.splice(i, 1); return; }
+    }
+  }
+
+  /* --- Navigation principale ---
+   * level    : 0–3
+   * ids      : objet optionnel { cahier, chapitre, stopId }
+   * direction: 'forward' | 'back' (défaut : 'forward')
+   * _fromSeq : usage interne — true quand appelé par next()/prev()
+   */
+  function go(level, ids, direction, _fromSeq) {
+    /* Validation : aller au niveau 0 depuis le niveau 0 = no-op */
+    if (level === 0 && _state.level === 0) return;
+
+    /* Normalisation */
+    level     = Math.max(0, Math.min(3, level));
+    ids       = ids || {};
+    direction = (direction === 'back') ? 'back' : 'forward';
+
+    /* Mise à jour de l'état selon le niveau cible */
+    _state.level     = level;
+    _state.direction = direction;
+
+    if (level === 0) {
+      /* Retour accueil : tout remettre à null */
+      _state.cahier   = null;
+      _state.chapitre = null;
+      _state.stopId   = null;
+      _state.cpaLoc   = null;
+      _state.section  = null;
+    } else if (level === 1) {
+      /* Niveau cahier : chapitre et stop effacés */
+      if (ids.cahier != null) _state.cahier = ids.cahier;
+      _state.chapitre = null;
+      _state.stopId   = null;
+      _state.cpaLoc   = null;
+      _state.section  = null;
+    } else if (level === 2) {
+      /* Niveau chapitre / photos : stop effacé */
+      if (ids.cahier   != null) _state.cahier   = ids.cahier;
+      if (ids.chapitre != null) _state.chapitre = ids.chapitre;
+      _state.stopId  = null;
+      _state.cpaLoc  = null;
+      _state.section = ids.section || null;
+    } else if (level === 3) {
+      /* Niveau étape / lieu-photo */
+      if (ids.cahier   != null) _state.cahier   = ids.cahier;
+      if (ids.chapitre != null) _state.chapitre = ids.chapitre;
+      if (ids.stopId   != null) _state.stopId   = ids.stopId;
+      /* Conserver cpaLoc si fourni (pour CPA sans stopId) */
+      _state.cpaLoc = ids.cpaLoc || null;
+      /* section : ne pas effacer (le lieu-photo est dans la section photos) */
+    }
+
+    /* Synchroniser _seqIndex si l'appel vient de l'extérieur */
+    if (!_fromSeq) {
+      _syncSeqIndex(_state.stopId, _state.cahier);
+    }
+
+    _emit('change');
+  }
+
+  /* --- Mode panneau : 'nav' | 'elev' --- */
+  function setMode(mode) {
+    if (mode !== 'nav' && mode !== 'elev') return;
+    _state.panelMode = mode;
+    _emit('change');
+  }
+
+  /* --- Toggle expanded/compact du panneau --- */
+  function setExpanded(expanded) {
+    var next = !!expanded;
+    if (_state.panelExpanded === next) return; /* idempotent — pas d'émission si inchangé */
+    _state.panelExpanded = next;
+    _emit('change');
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* --- Séquence plate et navigation ◀/▶ (task 1.2) --------------- */
+  /* ------------------------------------------------------------------ */
+
+  /* Séquence plate — null jusqu'à initSequence() */
+  var _seq      = null;
+  var _seqIndex = -1;   // -1 = aucun item actif
+
+  /* buildFlatSequence(cahiersData)
+   * cahiersData : [CAHIER_1_DATA, CAHIER_2_DATA, CAHIER_3_DATA, CAHIER_4_DATA]
+   * Retourne Array<{type:'stop'|'cpa', cahier:1-4, data:stopObj|lieuObj}>
+   *
+   * Algorithme par cahier :
+   *   Pour chaque phase N dans l'ordre :
+   *     a) Tous les stops dont stop.p === N (dans l'ordre du tableau)
+   *     b) Lieux CPA dont lieu.stopId correspond à un stop de cette phase
+   *        (groupés et ordonnés selon la position du stop de rattachement)
+   *     c) Lieux CPA dont lieu.p === N et sans stopId
+   *   Après toutes les phases :
+   *     Lieux CPA sans p ni stopId
+   */
+  function buildFlatSequence(cahiersData) {
+    var seq = [];
+
+    for (var ci = 0; ci < cahiersData.length; ci++) {
+      var cahierN = ci + 1;
+      var data    = cahiersData[ci];
+      if (!data) continue;
+
+      var stops  = data.stops  || [];
+      var lieux  = data.cpa    || data.lieux || [];
+      var phases = data.PN     || {};
+
+      /* Collecter les numéros de phases dans l'ordre d'apparition dans PN */
+      var phaseNums = [];
+      var seen = {};
+      /* D'abord les phases définies dans PN */
+      for (var pKey in phases) {
+        if (phases.hasOwnProperty(pKey)) {
+          var n = parseInt(pKey, 10);
+          if (!seen[n]) { seen[n] = true; phaseNums.push(n); }
+        }
+      }
+      /* Ajouter les phases présentes dans les stops mais absentes de PN */
+      for (var si = 0; si < stops.length; si++) {
+        var sp = stops[si].p;
+        if (sp != null && !seen[sp]) { seen[sp] = true; phaseNums.push(sp); }
+      }
+      phaseNums.sort(function(a, b) { return a - b; });
+
+      /* Index des lieux déjà placés */
+      var placedLieux = {};
+
+      for (var pi = 0; pi < phaseNums.length; pi++) {
+        var phaseN = phaseNums[pi];
+
+        /* a) Stops de cette phase dans l'ordre */
+        var phaseStops = [];
+        for (var si2 = 0; si2 < stops.length; si2++) {
+          if (stops[si2].p === phaseN) phaseStops.push(stops[si2]);
+        }
+        for (var si3 = 0; si3 < phaseStops.length; si3++) {
+          seq.push({ type: 'stop', cahier: cahierN, data: phaseStops[si3] });
+
+          /* b) Lieux CPA rattachés à ce stop précis (stopId) */
+          var stopId = phaseStops[si3].id;
+          for (var li = 0; li < lieux.length; li++) {
+            if (lieux[li].stopId === stopId && !placedLieux[li]) {
+              seq.push({ type: 'cpa', cahier: cahierN, data: lieux[li] });
+              placedLieux[li] = true;
+            }
+          }
+        }
+
+        /* c) Lieux CPA dont p === phaseN et sans stopId */
+        for (var li2 = 0; li2 < lieux.length; li2++) {
+          if (lieux[li2].p === phaseN &&
+              (lieux[li2].stopId == null) &&
+              !placedLieux[li2]) {
+            seq.push({ type: 'cpa', cahier: cahierN, data: lieux[li2] });
+            placedLieux[li2] = true;
+          }
+        }
+      }
+
+      /* Après toutes les phases : lieux sans p ni stopId */
+      for (var li3 = 0; li3 < lieux.length; li3++) {
+        if (!placedLieux[li3] &&
+            (lieux[li3].p     == null) &&
+            (lieux[li3].stopId == null)) {
+          seq.push({ type: 'cpa', cahier: cahierN, data: lieux[li3] });
+          placedLieux[li3] = true;
+        }
+      }
+    }
+
+    return seq;
+  }
+
+  /* --- Initialisation de la séquence (appelé après chargement des data) --- */
+  function initSequence(cahiersData) {
+    _seq      = buildFlatSequence(cahiersData);
+    _seqIndex = -1;
+  }
+
+  /* --- Synchronise _seqIndex quand NAV.go() est appelé manuellement --- */
+  function _syncSeqIndex(newStopId, newCahier) {
+    if (!_seq) return;
+    if (newStopId == null) { _seqIndex = -1; return; }
+    for (var i = 0; i < _seq.length; i++) {
+      var item = _seq[i];
+      if (item.cahier === newCahier &&
+          item.type === 'stop' &&
+          item.data.id === newStopId) {
+        _seqIndex = i;
+        return;
+      }
+    }
+    /* stopId non trouvé — laisser _seqIndex à -1 */
+    _seqIndex = -1;
+  }
+
+  /* --- Construit les ids à passer à go() depuis un item de la séquence --- */
+  function _itemToGoArgs(item) {
+    if (item.type === 'stop') {
+      var stop = item.data;
+      return {
+        level: 3,
+        ids:   { cahier: item.cahier, chapitre: stop.p, stopId: stop.id }
+      };
+    } else {
+      /* CPA : niveau 3, on utilise l'id du lieu (lat/lng identifier) —
+         NAV.state.stopId portera null pour CPA pur ; on l'identifie
+         via state.cahier + state.cpaLoc */
+      var lieu = item.data;
+      return {
+        level: 3,
+        ids:   { cahier: item.cahier, chapitre: lieu.p || null, stopId: null, cpaLoc: lieu.loc }
+      };
+    }
+  }
+
+  /* --- Navigation ▶ --- */
+  function next() {
+    if (!_seq || _seq.length === 0) return;
+    if (_seqIndex >= _seq.length - 1) return;   /* dernier item — no-op */
+    _seqIndex++;
+    var args = _itemToGoArgs(_seq[_seqIndex]);
+    go(args.level, args.ids, 'forward', true);
+  }
+
+  /* --- Navigation ◀ --- */
+  function prev() {
+    if (!_seq || _seq.length === 0) return;
+    if (_seqIndex <= 0) return;                  /* premier item — no-op */
+    _seqIndex--;
+    var args = _itemToGoArgs(_seq[_seqIndex]);
+    go(args.level, args.ids, 'back', true);
+  }
+
+  /* --- Prédicats pour désactiver les boutons ◀/▶ --- */
+  function isFirst() {
+    return !_seq || _seq.length === 0 || _seqIndex <= 0;
+  }
+
+  function isLast() {
+    return !_seq || _seq.length === 0 || _seqIndex >= _seq.length - 1;
+  }
+
+  /* Interface publique */
+  return {
+    /* Propriété en lecture seule — retourne une copie de l'état */
+    get state() { return _copy(); },
+
+    on:             on,
+    off:            off,
+    go:             go,
+    setMode:        setMode,
+    setExpanded:    setExpanded,
+    next:           next,
+    prev:           prev,
+    initSequence:   initSequence,
+    isFirst:        isFirst,
+    isLast:         isLast,
+
+    /* Exposé pour tests et débogage */
+    _emit:               _emit,
+    _syncSeqIndex:       _syncSeqIndex,
+    _buildFlatSequence:  buildFlatSequence,
+    get _seqIndex()      { return _seqIndex; },
+    get _seq()           { return _seq; }
+  };
+})();
+/* ========== /NAV ========== */
+
+/* ========== MapAdapter ========== */
+/* Design : Decision Point 3 — Module MapAdapter (seam carte)       */
+/* Spec   : carte-responsive-nav / task 2.1                          */
+var MapAdapter = (function() {
+
+  /* stopId actuellement actif — null si aucun */
+  var _activeStopId = null;
+
+  /* --- Utilitaire : récupère les stops d'un cahier --- */
+  function _getStops(cahierN) {
+    var cd = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
+    return cd.stops || [];
+  }
+
+  /* --- fitCahier(n) — fitBounds sur tous les stops du cahier, padding 60 --- */
+  function fitCahier(n) {
+    var stops = _getStops(n);
+    if (!stops.length) return;
+    var lngs = stops.map(function(s){return s.lng;});
+    var lats = stops.map(function(s){return s.lat;});
+    map.fitBounds(
+      [[Math.min.apply(null,lngs), Math.min.apply(null,lats)],
+       [Math.max.apply(null,lngs), Math.max.apply(null,lats)]],
+      { padding:60, duration:1200 }
+    );
+  }
+
+  /* --- fitChapitre(n, phaseN) — fitBounds sur les stops de la phase, padding 80 --- */
+  function fitChapitre(n, phaseN) {
+    var stops = _getStops(n).filter(function(s){ return s.p === phaseN; });
+    if (!stops.length) { fitCahier(n); return; }
+    var lngs = stops.map(function(s){return s.lng;});
+    var lats = stops.map(function(s){return s.lat;});
+    map.fitBounds(
+      [[Math.min.apply(null,lngs), Math.min.apply(null,lats)],
+       [Math.max.apply(null,lngs), Math.max.apply(null,lats)]],
+      { padding:80, duration:1200 }
+    );
+  }
+
+  /* --- flyToStop(stop) — zoom max(actuel, 13), durée 1200ms --- */
+  function flyToStop(stop) {
+    map.flyTo({
+      center:   [stop.lng, stop.lat],
+      zoom:     Math.max(map.getZoom(), 13),
+      duration: 1200
+    });
+  }
+
+  /* --- flyToCPA(lieu) — zoom max(actuel, 12) --- */
+  function flyToCPA(lieu) {
+    map.flyTo({
+      center:   [lieu.lng, lieu.lat],
+      zoom:     Math.max(map.getZoom(), 12),
+      duration: 900
+    });
+  }
+
+  /* --- setActiveMarker(stopId) — met à jour le visuel du marqueur actif ---
+   * stopId = null → désactive le marqueur précédent uniquement
+   * Utilise stopMarkerIndex pour retrouver l'élément DOM du marker.
+   * L'élément inner (premier enfant de .mlk-pin) a transition:transform .15s.
+   * État actif   = scale(1.35) translateY(-4px) + drop-shadow renforcé
+   * État normal  = '' (reset)
+   */
+  function setActiveMarker(stopId) {
+    /* Réinitialiser le précédent marqueur actif */
+    if (_activeStopId != null && stopMarkerIndex[_activeStopId]) {
+      var prev = stopMarkerIndex[_activeStopId].marker;
+      var prevEl = prev.getElement();
+      if (prevEl && prevEl.firstChild) {
+        prevEl.firstChild.style.transform = '';
+        prevEl.firstChild.style.filter    = 'drop-shadow(0 2px 4px rgba(0,0,0,0.55))';
+      }
+    }
+    _activeStopId = stopId || null;
+    /* Activer le nouveau marqueur */
+    if (_activeStopId != null && stopMarkerIndex[_activeStopId]) {
+      var curr = stopMarkerIndex[_activeStopId].marker;
+      var currEl = curr.getElement();
+      if (currEl && currEl.firstChild) {
+        currEl.firstChild.style.transform = 'scale(1.35) translateY(-4px)';
+        currEl.firstChild.style.filter    = 'drop-shadow(0 6px 14px rgba(0,0,0,0.75))';
+      }
+    }
+  }
+
+  /* --- showTracksOnly(n) — tracés visibles, marqueurs PIN masqués ---
+   * Utilisé pour C2 et C3 au niveau 0 (FR-5.3)
+   */
+  function showTracksOnly(n) {
+    /* Masquer les marqueurs PIN */
+    if (htmlMarkers[n]) {
+      htmlMarkers[n].forEach(function(m){ try { m.remove(); } catch(e){} });
+    }
+    /* Afficher les tracés */
+    ['route-c'+n+'-solid', 'route-c'+n+'-dashed'].forEach(function(id) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'visible');
+    });
+  }
+
+  /* --- showMarkersOnly(n) — marqueurs PIN visibles, tracés masqués ---
+   * Utilisé pour C1 et C4 au niveau 0 (FR-5.3)
+   */
+  function showMarkersOnly(n) {
+    /* Afficher les marqueurs PIN */
+    if (htmlMarkers[n]) {
+      htmlMarkers[n].forEach(function(m){ try { m.addTo(map); } catch(e){} });
+    }
+    /* Masquer les tracés */
+    ['route-c'+n+'-solid', 'route-c'+n+'-dashed'].forEach(function(id) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
+    });
+  }
+
+  /* --- _fitAllLoaded() — fitBounds sur l'ensemble des cahiers chargés --- */
+  function _fitAllLoaded() {
+    if (!loadedCahiers || loadedCahiers.size === 0) return;
+    var allLngs = [], allLats = [];
+    loadedCahiers.forEach(function(n) {
+      _getStops(n).forEach(function(s){ allLngs.push(s.lng); allLats.push(s.lat); });
+    });
+    if (!allLngs.length) return;
+    map.fitBounds(
+      [[Math.min.apply(null,allLngs), Math.min.apply(null,allLats)],
+       [Math.max.apply(null,allLngs), Math.max.apply(null,allLats)]],
+      { padding:60, duration:1200 }
+    );
+  }
+
+  /* --- syncToState(state) — handler principal branché sur NAV.on('change') ---
+   * Applique le bon zoom + met à jour le marqueur actif selon l'état NAV.
+   */
+  function syncToState(state) {
+    if (!map || !map.loaded()) return;
+
+    var level = state.level;
+
+    if (level === 0) {
+      /* FR-5.3 : C2/C3 tracés seuls, C1/C4 marqueurs seuls */
+      loadedCahiers.forEach(function(n) {
+        if (n === 2 || n === 3) {
+          showTracksOnly(n);
+        } else {
+          showMarkersOnly(n);
+        }
+      });
+      /* Désactiver le marqueur actif */
+      setActiveMarker(null);
+      /* FR-5.2 niveau 0 : fitBounds sur tout */
+      _fitAllLoaded();
+
+    } else if (level === 1) {
+      /* FR-5.3 : au niveau cahier, tous les marqueurs + tracés du cahier */
+      if (state.cahier != null) {
+        /* Rétablir la visibilité normale du cahier actif */
+        setCahierVisibility(state.cahier, true);
+        /* Zoom FR-5.2 niveau 1 */
+        fitCahier(state.cahier);
+      }
+
+    } else if (level === 2) {
+      /* FR-5.2 niveau 2 : fitBounds sur le chapitre */
+      if (state.cahier != null && state.chapitre != null) {
+        fitChapitre(state.cahier, state.chapitre);
+      }
+
+    } else if (level === 3) {
+      if (state.stopId != null) {
+        /* FR-5.2 niveau 3 étape */
+        var entry = stopMarkerIndex[state.stopId];
+        if (entry) {
+          flyToStop(entry.marker.getLngLat());
+        }
+        setActiveMarker(state.stopId);
+      } else if (state.cpaLoc != null) {
+        /* FR-5.2 niveau 3 lieu-photo : chercher le lieu dans les data */
+        var cahierN = state.cahier;
+        var cd = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
+        var lieux = cd.cpa || cd.lieux || [];
+        var found = null;
+        for (var i = 0; i < lieux.length; i++) {
+          if (lieux[i].loc === state.cpaLoc) { found = lieux[i]; break; }
+        }
+        if (found) flyToCPA(found);
+        setActiveMarker(null);
+      }
+    }
+  }
+
+  /* Interface publique */
+  return {
+    fitCahier:      fitCahier,
+    fitChapitre:    fitChapitre,
+    flyToStop:      flyToStop,
+    flyToCPA:       flyToCPA,
+    setActiveMarker:setActiveMarker,
+    showTracksOnly: showTracksOnly,
+    showMarkersOnly:showMarkersOnly,
+    syncToState:    syncToState
+  };
+})();
+/* ========== /MapAdapter ========== */
+
+// =====================================================================
+// ÉTAT GLOBAL — modèle accumulatif
+// =====================================================================
+var loadedCahiers = new Set();  // cahiers dont les données sont sur la carte
+var activeCahier  = null;       // cahier actif (pour l'élévation)
+var htmlMarkers   = {1:[],2:[],3:[],4:[]};
+var cpaMarkers    = {1:[],2:[],3:[],4:[]};
+var terrainOn           = true;
+var terrainExaggeration = 1.0;
+var hillshadeOn         = true;
+var currentBasemap = 'ofm';
+var cpaGlobalVisible = true;
+
+// =====================================================================
+// CADASTRE FRANCISCAIN (~1820-1860) — overlay transparent
+// WMS ArcGIS du Land Steiermark, superposé au-dessus du fond
+// =====================================================================
+var cadastreOn = false;
+
+function addCadastre() {
+  if (map.getLayer('cadastre')) map.removeLayer('cadastre');
+  if (map.getSource('cadastre-src')) map.removeSource('cadastre-src');
+  if (!cadastreOn) return;
+  map.addSource('cadastre-src', {
+    type: 'raster',
+    tiles: ['https://gis.stmk.gv.at/arcgis/rest/services/OGD/FranziszeischerKataster/MapServer/export'
+      + '?dpi=96&transparent=true&format=png32&layers=show:2'
+      + '&bbox={bbox-epsg-3857}&bboxSR=3857&imageSR=3857&size=256,256&f=image'],
+    tileSize: 256,
+    minzoom: 10, maxzoom: 18,
+    attribution: '&copy; Land Steiermark — Cadastre franciscain (~1820-1860)'
+  });
+  map.addLayer({
+    id: 'cadastre',
+    type: 'raster',
+    source: 'cadastre-src',
+    paint: { 'raster-opacity': 0.75 }
+  });
+}
+
+// Index stopId → { marker, cahier } — alimenté par renderMarkersForCahier
+var stopMarkerIndex = {};
+
+// =====================================================================
+// MÉTADONNÉES PAR CAHIER
+// =====================================================================
+var CAHIER_META = {
+  1: {
+    title:       'La Guerre',
+    subtitle:    'Août 1939 \u2013 Juin 1940 \u2014 Mobilisation en Ariège, vers Verdun',
+    resume:      'Mobilisé le 3\u00a0septembre\u00a01939 depuis Lavelanet (Ariège), Alban Rouzaud rejoint le 11\u00b0\u00a0Régiment d\u2019Infanterie en Alsace. Il vit la \u00ab\u00a0drôle de guerre\u00a0\u00bb dans les avant-postes face à Pirmasens, entre faction, poker et pernod, avant que la débâcle de mai\u2013juin\u00a01940 ne l\u2019entraîne vers Verdun et la capture.',
+    pdfTranscript: 'https://docs.google.com/document/d/1cuSB04MSC8-Fyp5qBXDpXo0cc8VR9cs4/edit?usp=drive_link',
+    pdfOriginal:   'https://drive.google.com/file/d/1eEFtKvP_8kEG_qQVTPKMJxi6TKhQs4-I/view?usp=sharing',
+    color:       '#f5a623',
+    bbox:        [[-0.5,42.5],[6.5,50.0]],
+    initialView: {center:[3,46.5],zoom:6,pitch:0},
+    noElevation: true
+  },
+  2: {
+    title:       'Journal non écrit',
+    subtitle:    'Mai \u2013 Juin 1940 \u2014 Repli stratégique et capture',
+    resume:      'Mai\u2013juin\u00a01940\u00a0: la France s\u2019effondre. Alban Rouzaud retrace le repli chaotique de son unité à travers la Lorraine et la Champagne \u2014 routes embouteillées de civils, ordres contradictoires, villages en flammes \u2014 jusqu\u2019à la capture et le début de la captivité.',
+    pdfTranscript: 'https://docs.google.com/document/d/1CJ_H8KuLxS6C2K5QgyMGPXW4mBOQLGyT/edit?usp=drive_link',
+    pdfOriginal:   'https://drive.google.com/file/d/1JKTnWPOrwgF-Oi9N0_5aGpOe_2UbRlX9/view?usp=sharing',
+    color:       '#e94560',
+    bbox:        [[-0.5,46.5],[7.0,51.0]],
+    initialView: {center:[3.5,48.5],zoom:6,pitch:0},
+    noElevation: true
+  },
+  3: {
+    title:       'L\u2019\u00c9vasion',
+    subtitle:    'Sept.\u2013Oct. 1941 \u2014 Weiz (Styrie) \u2192 arrestation en Italie',
+    resume:      'Reconstitution du parcours d\u2019Alban Rouzaud et de son compagnon André depuis leur Arbeitskommando près de Weiz (Styrie) jusqu\u2019à leur arrestation par des carabiniers en Italie, en septembre\u2013octobre\u00a01941. Après environ deux semaines de marche à travers les Alpes autrichiennes, guidés par une boussole et une carte copiée à la main, ils franchissent la frontière italienne avant d\u2019être arrêtés et renvoyés au Stalag XVIII\u00a0D de Marburg.',
+    pdfTranscript: 'https://docs.google.com/document/d/1LlsB4U3KwqlwQ5cNaj8wKaccrTnL7hu0/edit?usp=drive_link',
+    pdfOriginal:   'https://drive.google.com/file/d/1mRKi9u4zP9oXgVjFl_Fuj4GTTESVpxIA/view?usp=sharing',
+    color:       '#2ecc71',
+    bbox:        [[13.3,46.3],[15.8,47.4]],
+    initialView: {center:[14.5,47.0],zoom:7,pitch:45}
+  },
+  4: {
+    title:       'Captivit\u00e9',
+    subtitle:    '1940\u20131945 \u2014 R\u00e9flexions depuis le Stalag XVIII D',
+    resume:      'Écrites depuis le Stalag XVIII\u00a0D de Marburg an der Drau (Slovénie) et les Kommandos de Styrie, les réflexions d\u2019un instituteur ariégeois prisonnier de guerre\u00a0: ses souvenirs, ses lectures, ses pensées sur la guerre, la liberté et le retour. Un témoignage intérieur sur cinq années de captivité.',
+    pdfTranscript: 'https://docs.google.com/document/d/12HeGY9vhKJKc71NK3ajLXALOVU3sg5kk/edit?usp=drive_link',
+    pdfOriginal:   'https://drive.google.com/file/d/1ZW2hv8iLNkZE0e73iSyS1fN-bNBj3H_X/view?usp=sharing',
+    color:       '#3498db',
+    bbox:        [[7.0,46.0],[16.0,52.0]],
+    initialView: {center:[12,48.5],zoom:5,pitch:0},
+    noElevation: true
+  }
+};
+
+// =====================================================================
+// getCahierData(n)
+// =====================================================================
+function getCahierData(n) {
+  var meta = CAHIER_META[n];
+  // Prefer external CAHIER_N_DATA if loaded, fall back to inline vars for large data (routes/elevProfile)
+  var cd = (n===1?CAHIER_1_DATA : n===2?CAHIER_2_DATA : n===3?CAHIER_3_DATA : CAHIER_4_DATA) || {};
+  // Routes: use CAHIER_N_DATA.staticRoutes if non-empty, else fall back to inline var
+  var inlineRoutes = (n===1?(typeof staticRoutes_C1!=='undefined'?staticRoutes_C1:[])
+                    : n===2?(typeof staticRoutes_C2!=='undefined'?staticRoutes_C2:[])
+                    : n===3?(typeof staticRoutes_C3!=='undefined'?staticRoutes_C3:[])
+                    : (typeof staticRoutes_C4!=='undefined'?staticRoutes_C4:[]));
+  var inlineElev   = (n===1?(typeof elevProfile_C1!=='undefined'?elevProfile_C1:[])
+                    : n===2?(typeof elevProfile_C2!=='undefined'?elevProfile_C2:[])
+                    : n===3?(typeof elevProfile_C3!=='undefined'?elevProfile_C3:[])
+                    : (typeof elevProfile_C4!=='undefined'?elevProfile_C4:[]));
+  return {
+    S:           (cd.stops)         || [],
+    PC:          (cd.PC)            || {},
+    PN:          (cd.PN)            || {},
+    CPA:         (cd.cpa)           || [],
+    routes:      (cd.staticRoutes && cd.staticRoutes.length > 0 ? cd.staticRoutes : inlineRoutes) || [],
+    elevProfile: (cd.elevProfile && cd.elevProfile.length > 0   ? cd.elevProfile  : inlineElev)   || [],
+    bbox:        meta.bbox,
+    initialView: meta.initialView,
+    noElevation: !!meta.noElevation,
+    color:       meta.color,
+    title:       meta.title,
+    subtitle:    meta.subtitle
+  };
+}
+
+// =====================================================================
+// STYLES DE FOND DE CARTE
+// =====================================================================
+function makeRasterStyle(tiles, attribution) {
+  return {
+    version: 8,
+    sources: { base: { type:'raster', tiles:tiles, tileSize:256, attribution:attribution } },
+    layers: [
+      { id:'bg',   type:'background', paint:{'background-color':'#1a1a2e'} },
+      { id:'base', type:'raster',     source:'base' }
+    ]
+  };
+}
+var STYLES = {
+  ofm:       'https://tiles.openfreemap.org/styles/liberty',
+  osm:       makeRasterStyle(['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],       '&copy; OpenStreetMap contributors'),
+  topo:      makeRasterStyle(['https://tile.opentopomap.org/{z}/{x}/{y}.png'],         '&copy; OpenTopoMap contributors (CC-BY-SA)'),
+  ign1950:   makeRasterStyle(['https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN50.1950&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'], '&copy; IGN — Carte 1:50 000 (1950)'),
+  etatmajor: makeRasterStyle(['https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'], '&copy; IGN — État-Major (1820-1866)'),
+  basegris:  makeRasterStyle(['https://maps.wien.gv.at/basemap/bmapgrau/normal/google3857/{z}/{y}/{x}.png'],     '&copy; <a href="https://basemap.at">basemap.at</a> (CC-BY 4.0)'),
+  terrain:   makeRasterStyle(['https://maps.wien.gv.at/basemap/bmapgelaende/grau/google3857/{z}/{y}/{x}.jpeg'], '&copy; <a href="https://basemap.at">basemap.at</a> Terrain (CC-BY 4.0)'),
+  ortho:     makeRasterStyle(['https://maps.wien.gv.at/basemap/bmaporthofoto30cm/normal/google3857/{z}/{y}/{x}.jpeg'], '&copy; <a href="https://basemap.at">basemap.at</a> Orthofoto (CC-BY 4.0)'),
+  satellite: makeRasterStyle(['https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'], 'Esri World Imagery')
+};
+
+// =====================================================================
+// INITIALISATION DE LA CARTE
+// =====================================================================
+var map = new maplibregl.Map({
+  container: 'map',
+  style:     STYLES.ofm,
+  center:    [8, 47.5],
+  zoom:      5,
+  pitch:     0,
+  bearing:   0,
+  maxPitch:  85,
+  attributionControl: { compact: true }
+});
+
+map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
+
+// =====================================================================
+// ROSE DES VENTS (compass widget) — copié depuis MARKERS.html
+// =====================================================================
+(function() {
+  var el = document.createElement('div');
+  el.id = 'compass-widget';
+  el.style.cssText = 'position:absolute;top:18px;right:10px;z-index:600;cursor:pointer;'
+    + 'width:64px;height:64px;'
+    + 'filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));';
+  el.title = 'Cliquer pour remettre nord';
+
+  var ring = document.createElement('div');
+  ring.id = 'compass-ring';
+  ring.style.cssText = 'width:64px;height:64px;transition:transform .1s;transform-origin:center center;';
+  ring.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">'
+    + '<circle cx="32" cy="32" r="30" fill="rgba(15,22,40,0.85)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>'
+    + [0,45,90,135,180,225,270,315].map(function(a) {
+        var rad = a * Math.PI / 180;
+        var x1 = 32 + 25 * Math.sin(rad), y1 = 32 - 25 * Math.cos(rad);
+        var x2 = 32 + 28 * Math.sin(rad), y2 = 32 - 28 * Math.cos(rad);
+        return '<line x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'" stroke="rgba(255,255,255,0.3)" stroke-width="1"/>';
+      }).join('')
+    + '<polygon points="32,8 29,32 32,28 35,32" fill="#e94560"/>'
+    + '<polygon points="32,56 29,32 32,36 35,32" fill="rgba(255,255,255,0.7)"/>'
+    + '<polygon points="56,32 32,29 36,32 32,35" fill="rgba(255,255,255,0.45)"/>'
+    + '<polygon points="8,32 32,29 28,32 32,35" fill="rgba(255,255,255,0.45)"/>'
+    + '<circle cx="32" cy="32" r="3" fill="white" opacity="0.9"/>'
+    + '<text x="32" y="7" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" font-weight="bold" fill="#e94560">N</text>'
+    + '<text x="32" y="63" text-anchor="middle" font-family="Arial,sans-serif" font-size="7" fill="rgba(255,255,255,0.6)">S</text>'
+    + '</svg>';
+
+  el.appendChild(ring);
+  document.getElementById('map-wrap').appendChild(el);
+
+  function updateCompass() { ring.style.transform = 'rotateZ(' + map.getBearing() + 'deg)'; }
+  map.on('rotate', updateCompass);
+  updateCompass();
+  el.addEventListener('click', function() { map.easeTo({ bearing:0, pitch:45, duration:600 }); });
+
+  // Pill exagération — positionné sous la boussole
+  var pill = document.createElement('button');
+  pill.id = 'exag-pill';
+  pill.title = 'Clic : activer/désactiver terrain\nDouble-clic : reset ×1.0\nBouton molette + glisser sur la carte : ajuster';
+  document.getElementById('map-wrap').appendChild(pill);
+
+  pill.addEventListener('click', function() {
+    terrainOn = !terrainOn;
+    applyTerrain();
+    updateExagBtn();
+  });
+})();
+
+// =====================================================================
+// TERRAIN & HILLSHADE
+// =====================================================================
+function addTerrainSource() {
+  if (!map.getSource('dem')) {
+    map.addSource('dem', {
+      type:      'raster-dem',
+      url:       'https://terrain.reearth.land/mapbox/elevation/tilejson.json',
+      tileSize:  256,
+      maxzoom:   15,
+      attribution:'Re:Earth Terrain &middot; Mapterhorn (CC BY 4.0)'
+    });
+  }
+}
+function applyTerrain() {
+  addTerrainSource();
+  map.setTerrain(terrainOn ? { source:'dem', exaggeration:terrainExaggeration } : null);
+}
+function updateExagBtn() {
+  var btn = document.getElementById('exag-pill');
+  if (!btn) return;
+  var svgMtn = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><polygon points="3 20 9 8 13 14 17 9 21 20"/></svg>';
+  btn.innerHTML = svgMtn + terrainExaggeration.toFixed(1);
+  btn.classList.toggle('active', terrainOn);
+}
+function applyHillshade() {
+  addTerrainSource();
+  if (map.getLayer('hillshade')) map.removeLayer('hillshade');
+  if (!hillshadeOn) return;
+  var firstSym = null;
+  map.getStyle().layers.forEach(function(l) { if (!firstSym && l.type==='symbol') firstSym = l.id; });
+  map.addLayer({
+    id:'hillshade', type:'hillshade', source:'dem',
+    paint:{
+      'hillshade-exaggeration':0.45,
+      'hillshade-shadow-color':   'rgba(0,0,0,0.4)',
+      'hillshade-highlight-color':'rgba(255,255,255,0.3)',
+      'hillshade-illumination-direction':335
+    }
+  }, firstSym || undefined);
+}
+
+// =====================================================================
+// ICÔNES THÉMATIQUES SVG
+// =====================================================================
+var STOP_ICONS = {
+  bivouac:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'
+    +'<polygon points="12,3 1,21 23,21" fill="none" stroke="white" stroke-width="2" stroke-linejoin="round"/>'
+    +'<line x1="12" y1="3" x2="12" y2="21" stroke="white" stroke-width="1.5"/>'
+    +'<line x1="6.5" y1="21" x2="6.5" y2="15" stroke="white" stroke-width="1.2"/>'
+    +'</svg>',
+  frontiere:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'
+    +'<line x1="6" y1="2" x2="6" y2="22" stroke="white" stroke-width="2" stroke-linecap="round"/>'
+    +'<polygon points="6,3 20,9 6,15" fill="white"/>'
+    +'</svg>',
+  capture:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">'
+    +'<rect x="5" y="11" width="14" height="10" rx="2" fill="none"/>'
+    +'<path d="M8 11V7a4 4 0 0 1 8 0v4" stroke-linecap="round"/>'
+    +'<circle cx="12" cy="16" r="1.5" fill="white" stroke="none"/>'
+    +'<line x1="12" y1="16" x2="12" y2="18" stroke-width="1.5"/>'
+    +'</svg>',
+  kommando:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">'
+    +'<rect x="2" y="2" width="20" height="20" rx="3"/>'
+    +'<line x1="2" y1="9" x2="22" y2="9"/><line x1="2" y1="15" x2="22" y2="15"/>'
+    +'<line x1="9" y1="2" x2="9" y2="22"/><line x1="15" y1="2" x2="15" y2="22"/>'
+    +'</svg>',
+  ferme:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">'
+    +'<path d="M3 12L12 4l9 8" stroke-linecap="round" stroke-linejoin="round"/>'
+    +'<rect x="6" y="12" width="12" height="9" fill="none"/>'
+    +'<rect x="10" y="16" width="4" height="5" fill="white" stroke="none"/>'
+    +'</svg>',
+  retour:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">'
+    +'<rect x="3" y="5" width="18" height="12" rx="3"/>'
+    +'<line x1="3" y1="11" x2="21" y2="11"/>'
+    +'<circle cx="7.5" cy="19" r="2" fill="white" stroke="none"/>'
+    +'<circle cx="16.5" cy="19" r="2" fill="white" stroke="none"/>'
+    +'<line x1="7.5" y1="17" x2="7.5" y2="19"/><line x1="16.5" y1="17" x2="16.5" y2="19"/>'
+    +'</svg>',
+  mention:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">'
+    +'<circle cx="12" cy="12" r="10"/>'
+    +'<line x1="12" y1="8" x2="12" y2="8" stroke-linecap="round" stroke-width="3"/>'
+    +'<line x1="12" y1="12" x2="12" y2="17" stroke-linecap="round"/>'
+    +'</svg>',
+  gare:
+    '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.8">'
+    +'<rect x="3" y="4" width="18" height="13" rx="2"/>'
+    +'<line x1="3" y1="10" x2="21" y2="10"/><line x1="9" y1="4" x2="9" y2="17"/>'
+    +'<circle cx="7" cy="20" r="2" fill="white" stroke="none"/>'
+    +'<circle cx="17" cy="20" r="2" fill="white" stroke="none"/>'
+    +'<line x1="7" y1="17" x2="7" y2="20"/><line x1="17" y1="17" x2="17" y2="20"/>'
+    +'</svg>'
+};
+
+function makeBadgeSVG(label) {
+  var fs = label.length > 1 ? 10 : 13;
+  return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">'
+    +'<circle cx="12" cy="12" r="11" fill="white" opacity="0.93"/>'
+    +'<text x="12" y="12" font-family="Arial,sans-serif" font-size="'+fs+'"'
+    +' font-weight="bold" fill="#222" text-anchor="middle" dominant-baseline="central">'+label+'</text>'
+    +'</svg>';
+}
+
+function makePinEl(color, iconSvg, small) {
+  var w  = small ? 26 : 36;
+  var h  = small ? 32 : 46;
+  var cr = small ? 10 : 15;
+  var cx = w / 2, cy = cr + 2, tipY = h - 2;
+  var path = [
+    'M',cx,tipY,
+    'C',cx-cr*0.5,cy+cr, cx-cr-1,cy+cr*0.3, cx-cr-1,cy,
+    'A',cr+1,cr+1,0,1,1, cx+cr+1,cy,
+    'C',cx+cr+1,cy+cr*0.3, cx+cr*0.5,cy+cr, cx,tipY,'Z'
+  ].join(' ');
+  var iconSize = Math.round(cr*1.3);
+  var iconX = cx - iconSize/2, iconY = cy - iconSize/2;
+  var svgStr = '<svg xmlns="http://www.w3.org/2000/svg" width="'+w+'" height="'+h+'" style="display:block">'
+    +'<ellipse cx="'+cx+'" cy="'+(tipY+2)+'" rx="'+(cr*0.45)+'" ry="2.5" fill="rgba(0,0,0,0.3)"/>'
+    +'<path d="'+path+'" fill="'+color+'" stroke="rgba(255,255,255,0.85)" stroke-width="1.5"/>'
+    +'<path d="M '+(cx-cr*0.45)+','+(cy-cr*0.55)+' A '+(cr*0.65)+','+(cr*0.65)+' 0 0,1 '+(cx+cr*0.25)+','+(cy-cr*0.65)+'"'
+    +' fill="none" stroke="rgba(255,255,255,0.35)" stroke-width="2" stroke-linecap="round"/>'
+    +'<svg x="'+iconX+'" y="'+iconY+'" width="'+iconSize+'" height="'+iconSize+'">'+iconSvg+'</svg>'
+    +'</svg>';
+  var el = document.createElement('div');
+  el.className = 'mlk-pin';
+  el.style.cssText = 'width:'+w+'px;height:'+h+'px;display:block;cursor:pointer;';
+  var inner = document.createElement('div');
+  inner.style.cssText = 'width:'+w+'px;height:'+h+'px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.55));'
+    +'transition:transform .15s,filter .15s;transform-origin:bottom center;';
+  inner.innerHTML = svgStr;
+  el.appendChild(inner);
+  el.addEventListener('mouseenter', function() {
+    inner.style.transform = 'scale(1.2) translateY(-3px)';
+    inner.style.filter = 'drop-shadow(0 5px 10px rgba(0,0,0,0.7))';
+  });
+  el.addEventListener('mouseleave', function() {
+    inner.style.transform = '';
+    inner.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.55))';
+  });
+  return el;
+}
+
+// =====================================================================
+// renderMarkersForCahier(n, data)
+// =====================================================================
+function renderMarkersForCahier(n, data) {
+  var stepN = 0;
+  data.S.forEach(function(s) {
+    var color  = data.PC[s.p] || CAHIER_META[n].color;
+    var small  = false;
+    stepN++;
+    var iconSvg = makeBadgeSVG(String(stepN));
+    var el = makePinEl(color, iconSvg, small);
+    el.title = s.n;
+    var pinH = 46;
+    var marker = new maplibregl.Marker({ element:el, anchor:'bottom' })
+      .setLngLat([s.lng, s.lat])
+      .addTo(map);
+    (function(stop, ph, cahierN) {
+      // Indexer le marker par stopId pour MapAdapter.setActiveMarker
+      stopMarkerIndex[stop.id] = { marker:marker, cahier:cahierN };
+      el.addEventListener('click', function(e) {
+        e.stopPropagation();
+        /* FR-7 : plus de Popup — naviguer vers la vue-étape dans le Panneau */
+        NAV.go(3, { cahier: cahierN, chapitre: stop.p, stopId: stop.id });
+        Panel.setExpanded(true);
+      });
+    })(s, pinH, n);
+    htmlMarkers[n].push(marker);
+  });
+}
+
+// =====================================================================
+// renderLinesForCahier(n, data)
+// =====================================================================
+function renderLinesForCahier(n, data) {
+  var solidId  = 'route-c'+n+'-solid';
+  var dashedId = 'route-c'+n+'-dashed';
+  if (map.getSource(solidId)) return; // déjà présent (re-add après style change géré séparément)
+
+  var solidFeats = [], dashedFeats = [];
+  data.routes.forEach(function(r) {
+    var coords = r.coords.map(function(c) { return [c[1], c[0]]; });
+    var feat = {
+      type: 'Feature',
+      geometry: { type:'LineString', coordinates:coords },
+      properties: { p:r.p, color:data.PC[r.p] || CAHIER_META[n].color }
+    };
+    if (r.da === 1) dashedFeats.push(feat);
+    else            solidFeats.push(feat);
+  });
+
+  var solidGJ  = { type:'FeatureCollection', features:solidFeats  };
+  var dashedGJ = { type:'FeatureCollection', features:dashedFeats };
+
+  map.addSource(solidId,  { type:'geojson', data:solidGJ  });
+  map.addSource(dashedId, { type:'geojson', data:dashedGJ });
+
+  map.addLayer({
+    id:solidId, type:'line', source:solidId,
+    layout:{ 'line-join':'round','line-cap':'round' },
+    paint:{ 'line-color':['get','color'], 'line-width':4, 'line-opacity':0.85 }
+  });
+  map.addLayer({
+    id:dashedId, type:'line', source:dashedId,
+    layout:{ 'line-join':'round','line-cap':'round' },
+    paint:{ 'line-color':['get','color'], 'line-width':2.5, 'line-opacity':0.75, 'line-dasharray':[3,3] }
+  });
+}
+
+// =====================================================================
+// addCpaMarkersForCahier(n, cpaList)
+// =====================================================================
+function addCpaMarkersForCahier(n, cpaList) {
+  if (!cpaList || !cpaList.length) return;
+  if (!cpaGlobalVisible) return;
+
+  cpaList.forEach(function(stop, stopIdx) {
+    var count = stop.cpa.length;
+    var W = 26, H = 26;
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'width:'+W+'px;height:'+H+'px;display:block;cursor:pointer;';
+    var inner = document.createElement('div');
+    inner.style.cssText = 'width:'+W+'px;height:'+H+'px;background:none;border:none;'
+      +'display:flex;align-items:center;justify-content:center;'
+      +'font-size:20px;line-height:1;'
+      +'filter:drop-shadow(0 1px 3px rgba(0,0,0,0.8));'
+      +'transition:transform .12s,filter .12s;transform-origin:center center;position:relative;';
+    inner.textContent = '\uD83D\uDCF7';
+    inner.addEventListener('mouseenter', function(){inner.style.transform='scale(1.2)';inner.style.filter='drop-shadow(0 2px 5px rgba(0,0,0,0.9))';});
+    inner.addEventListener('mouseleave', function(){inner.style.transform='';inner.style.filter='drop-shadow(0 1px 3px rgba(0,0,0,0.8))';});
+    if (count > 1) {
+      var badge = document.createElement('span');
+      badge.style.cssText = 'position:absolute;top:-5px;right:-5px;background:#e94560;color:#fff;font-size:8px;font-weight:700;'
+        +'font-family:Arial,sans-serif;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;'
+        +'justify-content:center;border:1px solid #fff;pointer-events:none;';
+      badge.textContent = count;
+      inner.appendChild(badge);
+    }
+    wrap.appendChild(inner);
+
+    // Registre global par clé cahier_stopIdx
+    var regKey = 'c'+n+'_'+stopIdx;
+    if (!window._CPA_REGISTRY) window._CPA_REGISTRY = {};
+    window._CPA_REGISTRY[regKey] = stop.cpa;
+
+    /* Clic sur le marqueur 📷 → naviguer vers la vue-lieu-photo (FR-3.5) */
+    (function(s, cN) {
+      wrap.addEventListener('click', function(e) {
+        e.stopPropagation();
+        NAV.go(3, { cahier: cN, section: 'photos', cpaLoc: s.loc });
+        Panel.setExpanded(true);
+      });
+    })(stop, n);
+
+    var m = new maplibregl.Marker({element:wrap,anchor:'center'})
+      .setLngLat([stop.lng,stop.lat])
+      .addTo(map);
+    cpaMarkers[n].push(m);
+  });
+}
+
+// =====================================================================
+// LIGHTBOX CPA — fonctions globales
+// =====================================================================
+var _cpaLbList = [], _cpaLbIdx = 0;
+
+function cpaLbOpenItem(regKey, imgIdx) {
+  if (!window._CPA_REGISTRY) return;
+  _cpaLbList = window._CPA_REGISTRY[regKey] || [];
+  _cpaLbIdx  = imgIdx || 0;
+  _cpaLbRender();
+  document.getElementById('cpa-lb').classList.add('open');
+}
+function _cpaLbRender() {
+  var it = _cpaLbList[_cpaLbIdx];
+  if (!it) return;
+  document.getElementById('cpa-lb-img').src   = it.img;
+  document.getElementById('cpa-lb-title').textContent = it.title;
+  document.getElementById('cpa-lb-desc').innerHTML    = it.desc;
+  document.getElementById('cpa-lb-count').textContent =
+    _cpaLbList.length > 1 ? (_cpaLbIdx+1)+' / '+_cpaLbList.length : '';
+  var prev = document.getElementById('cpa-lb-prev');
+  var next = document.getElementById('cpa-lb-next');
+  if (_cpaLbList.length > 1) {
+    prev.classList.toggle('hidden', _cpaLbIdx===0);
+    next.classList.toggle('hidden', _cpaLbIdx===_cpaLbList.length-1);
+  } else {
+    prev.classList.add('hidden');
+    next.classList.add('hidden');
+  }
+}
+document.addEventListener('keydown', function(e) {
+  var lb = document.getElementById('cpa-lb');
+  if (!lb.classList.contains('open')) return;
+  if (e.key==='Escape')     lb.classList.remove('open');
+  if (e.key==='ArrowRight') { _cpaLbIdx=Math.min(_cpaLbList.length-1,_cpaLbIdx+1); _cpaLbRender(); }
+  if (e.key==='ArrowLeft')  { _cpaLbIdx=Math.max(0,_cpaLbIdx-1); _cpaLbRender(); }
+});
+
+// =====================================================================
+// fitAllLoaded() — Vue ensemble
+// =====================================================================
+function fitAllLoaded() {
+  if (loadedCahiers.size < 2) return;
+  var bboxes = Array.from(loadedCahiers).map(function(n){ return getCahierData(n).bbox; });
+  var union  = bboxes.reduce(function(acc, bb) {
+    return [
+      [Math.min(acc[0][0],bb[0][0]), Math.min(acc[0][1],bb[0][1])],
+      [Math.max(acc[1][0],bb[1][0]), Math.max(acc[1][1],bb[1][1])]
+    ];
+  });
+  map.fitBounds(union, {padding:80, duration:1200});
+}
+
+function updateVueEnsembleBtn() {
+  /* bouton supprimé du header — no-op */
+}
+
+// =====================================================================
+// setCahierVisibility(n, visible) — affiche ou masque marqueurs + lignes d'un cahier
+// =====================================================================
+function setCahierVisibility(n, visible) {
+  // Marqueurs stops
+  htmlMarkers[n].forEach(function(m) {
+    if (visible) { try { m.addTo(map); } catch(e){} }
+    else         { try { m.remove();   } catch(e){} }
+  });
+  // Marqueurs CPA (si visibles globalement)
+  if (cpaGlobalVisible) {
+    cpaMarkers[n].forEach(function(m) {
+      if (visible) { try { m.addTo(map); } catch(e){} }
+      else         { try { m.remove();   } catch(e){} }
+    });
+  }
+  // Lignes
+  var vis = visible ? 'visible' : 'none';
+  ['route-c'+n+'-solid', 'route-c'+n+'-dashed'].forEach(function(id) {
+    if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', vis);
+  });
+}
+
+// =====================================================================
+// setActiveCahier(n)
+// Maintient la compatibilité avec loadAllCahiers et loadCahier.
+// Sans sidebar ni header, seules les fonctions essentielles restent.
+// =====================================================================
+function setActiveCahier(n, noFit) {
+  // Visibilité : afficher uniquement le cahier actif
+  if (n === 4) {
+    [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, false); });
+    if (loadedCahiers.has(4)) setCahierVisibility(4, true);
+  } else {
+    [1, 2, 3, 4].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, c === n); });
+  }
+  // Zoom sur l'étendue réelle des stops du cahier
+  var meta = CAHIER_META[n];
+  if (!noFit && meta) {
+    var data = getCahierData(n);
+    var stops = data.S || [];
+    if (stops.length >= 2) {
+      var lngs = stops.map(function(s){ return s.lng; });
+      var lats = stops.map(function(s){ return s.lat; });
+      var sw = [Math.min.apply(null,lngs), Math.min.apply(null,lats)];
+      var ne = [Math.max.apply(null,lngs), Math.max.apply(null,lats)];
+      map.fitBounds([sw, ne], {
+        padding: 80,
+        duration: 1200,
+        pitch:   meta.initialView && meta.initialView.pitch ? meta.initialView.pitch : 0,
+        bearing: 0
+      });
+    } else if (meta.bbox) {
+      map.fitBounds(meta.bbox, { padding:80, duration:1200, pitch:0, bearing:0 });
+    }
+  }
+  // Profil altitude
+  renderElevation(n);
+  // Hash URL
+  updateHash(n);
+  // État
+  activeCahier = n;
+}
+
+// =====================================================================
+// loadCahier(n) — fonction centrale
+// =====================================================================
+function loadCahier(n) {
+  if (!map.loaded()) {
+    map.once('load', function(){ loadCahier(n); });
+    return;
+  }
+  if (loadedCahiers.has(n)) {
+    setActiveCahier(n);
+    return;
+  }
+  var data = getCahierData(n);
+  renderLinesForCahier(n, data);
+  renderMarkersForCahier(n, data);
+  addCpaMarkersForCahier(n, data.CPA);
+  loadedCahiers.add(n);
+  updateVueEnsembleBtn();
+
+  setActiveCahier(n);
+}
+
+// =====================================================================
+// PROFIL D'ALTITUDE — renderElevation(n)
+// =====================================================================
+// Variables de contexte du profil
+var _elevPts          = [];
+var _elevStepMarks    = [];
+var _elevHoverMarker  = null;
+var _elevHoverVisible = false;
+var _elevHighlightId  = null;
+var _elevPC           = {};
+var _elevResizeOff    = null;
+var _elevPanelVisible = false;
+/* Référence vers drawElev() — mise à jour par renderElevation() pour
+   permettre à ElevPanel.setHighlight() de déclencher un redessin */
+var _elevDrawFn       = null;
+/* Cahier actuellement chargé dans le profil */
+var _elevCurrentCahierN = null;
+
+function renderElevation(n) {
+  _elevCurrentCahierN = n;
+  var data        = getCahierData(n);
+  var elevPanel   = document.getElementById('elevpanel');
+  var elevToggle  = document.getElementById('elevtoggle');
+  var elevInfo    = document.getElementById('elevinfo');
+  var canvas      = document.getElementById('elevcanvas');
+  var tip         = document.getElementById('elevtip');
+
+  // Reset state
+  _elevPts         = [];
+  _elevStepMarks   = [];
+  _elevHighlightId = null;
+  _elevPC          = data.PC;
+
+  if (data.noElevation || !data.elevProfile || !data.elevProfile.length) {
+    elevPanel.classList.add('hidden');
+    elevToggle.style.opacity = '0.35';
+    elevToggle.style.cursor  = 'default';
+    elevToggle.disabled = true;
+    elevInfo.textContent = '';
+    var ctx2 = canvas.getContext('2d');
+    ctx2.clearRect(0, 0, canvas.width, canvas.height);
+    _elevPanelVisible = false;
+    return;
+  }
+
+  elevToggle.style.opacity = '';
+  elevToggle.style.cursor  = 'pointer';
+  elevToggle.disabled = false;
+
+  // Flatten elevation points
+  data.elevProfile.forEach(function(seg) {
+    seg.pts.forEach(function(q) {
+      if (q[1] == null) return;
+      _elevPts.push({ d:q[0], a:q[1], lat:q[2], lng:q[3], p:seg.p });
+    });
+  });
+
+  if (!_elevPts.length) { elevPanel.classList.add('hidden'); _elevPanelVisible = false; return; }
+
+  var maxD = _elevPts[_elevPts.length-1].d;
+  var minA = Infinity, maxA = -Infinity;
+  _elevPts.forEach(function(q){ if(q.a<minA)minA=q.a; if(q.a>maxA)maxA=q.a; });
+  var padA = Math.max(30,(maxA-minA)*0.08);
+  var minAd = minA - padA, maxAd = maxA + padA;
+
+  // --- Step marks ---
+  function ha15(a,b){ var dx=a[0]-b[0],dy=a[1]-b[1]; return dx*dx+dy*dy; }
+  var stepN2=0;
+  var SYM={depart:'\u2605',capture:'\u25a0',frontiere:'\u2691',retour:'\u21ba',bivouac:'\u26fa',kommando:'\u2302',ferme:'\u2691'};
+  var sortedPhases = Object.keys(data.PC).sort(function(a,b){return+a-+b;});
+  sortedPhases.forEach(function(p){
+    data.S.filter(function(x){return x.p==p;}).forEach(function(st){
+      stepN2++;
+      var bi=-1,bd=Infinity;
+      for(var k=0;k<_elevPts.length;k++){var dd=ha15([st.lat,st.lng],[_elevPts[k].lat,_elevPts[k].lng]);if(dd<bd){bd=dd;bi=k;}}
+      if(bi<0||bd>0.0025)return;
+      _elevStepMarks.push({d:_elevPts[bi].d,a:_elevPts[bi].a,p:st.p,id:st.id,label:String(stepN2),sym:false});
+    });
+  });
+  _elevStepMarks.sort(function(a,b){return a.d-b.d;});
+
+  // --- Time / weather engine (C3 only) ---
+  var STEP_TIME = n===3 ? {
+    32:{a:[1941,9,20,22,0]},1:{a:[1941,9,20,22,45]},2:{a:[1941,9,21,1,0]},
+    3:{a:[1941,9,21,1,20]},27:{a:[1941,9,21,2,30]},
+    25:{a:[1941,9,21,3,0],d:[1941,9,21,7,30]},4:{a:[1941,9,21,9,0]},
+    5:{a:[1941,9,21,20,0],d:[1941,9,22,6,30]},23:{a:[1941,9,22,10,0]},
+    28:{a:[1941,9,22,13,0]},29:{a:[1941,9,22,15,0],d:[1941,9,22,16,0]},
+    6:{a:[1941,9,22,17,0]},26:{a:[1941,9,22,19,30],d:[1941,9,23,6,30]},
+    7:{a:[1941,9,24,13,0]},30:{a:[1941,9,25,19,0],d:[1941,9,26,5,30]},
+    31:{a:[1941,9,26,6,0]},8:{a:[1941,9,26,8,0]},9:{a:[1941,9,26,16,0]},
+    10:{a:[1941,9,26,21,0]},43:{a:[1941,9,26,23,30],d:[1941,9,27,7,0]},
+    35:{a:[1941,9,27,18,0]},34:{a:[1941,9,27,20,0],d:[1941,9,28,17,0]},
+    11:{a:[1941,9,28,22,30]},12:{a:[1941,9,29,2,30]},13:{a:[1941,9,30,14,0]},
+    14:{a:[1941,10,1,18,0],d:[1941,10,2,6,30]},15:{a:[1941,10,2,11,0]},
+    16:{a:[1941,10,2,19,30],d:[1941,10,3,6,30]},17:{a:[1941,10,3,15,30]},
+    33:{a:[1941,10,3,15,35]},18:{a:[1941,10,3,19,0],d:[1941,10,4,20,0]},
+    19:{a:[1941,10,5,8,0]}
+  } : {};
+
+  var NIGHT_STOPS_C3 = n===3 ? [
+    {dist:61.0, a:[1941,9,23,18,30],d:[1941,9,24,6,30]},
+    {dist:73.0, a:[1941,9,24,18,30],d:[1941,9,25,6,30]},
+    {dist:173.0,a:[1941,9,29,3,0],  d:[1941,9,30,7,30]},
+    {dist:205.0,a:[1941,9,30,19,0], d:[1941,10,1,6,30]}
+  ] : [];
+
+  var WEATHER = n===3 ? {
+    '9-20':{night:'clearNight'},'9-21':{day:'sun',night:'clearNight'},
+    '9-22':{day:'sun',night:''},'9-23':{},'9-24':{},'9-25':{},
+    '9-26':{day:'fogSun',night:'fog'},'9-27':{day:'dry'},
+    '9-28':{night:'clearNight'},'9-29':{day:''},'9-30':{day:''},
+    '10-1':{day:'storm',night:'damp'},'10-2':{day:'dry',night:''},
+    '10-3':{day:'sun',night:''},'10-4':{day:'sun',night:''},'10-5':{day:''}
+  } : {};
+
+  function weatherAt(dt, night) {
+    if (!dt) return '';
+    var w = WEATHER[(dt.getMonth()+1)+'-'+dt.getDate()];
+    if (!w) return '';
+    return (night ? w.night : w.day) || '';
+  }
+
+  var SYNODIC = 29.530588853;
+  function moonAge(dt) {
+    var y=dt.getFullYear(),m=dt.getMonth()+1,d=dt.getDate(),h=dt.getHours()-2;
+    if(m<=2){y-=1;m+=12;}
+    var A=Math.floor(y/100),B=2-A+Math.floor(A/4);
+    var jd=Math.floor(365.25*(y+4716))+Math.floor(30.6001*(m+1))+d+(h/24)+B-1524.5;
+    var ref=2451550.259722;
+    var age=(jd-ref)%SYNODIC;
+    return age<0?age+SYNODIC:age;
+  }
+  function moonEmoji(age) {
+    var f=age/SYNODIC;
+    var icons=['\ud83c\udf11','\ud83c\udf12','\ud83c\udf13','\ud83c\udf14',
+               '\ud83c\udf15','\ud83c\udf16','\ud83c\udf17','\ud83c\udf18'];
+    return icons[Math.round(f*8)%8];
+  }
+
+  function sunTimes(year,month,day,lat,lng) {
+    var tzOff=2;
+    function dayOfYear(y,m,d){
+      var N1=Math.floor(275*m/9),N2=Math.floor((m+9)/12);
+      var N3=(1+Math.floor((y-4*Math.floor(y/4)+2)/3));
+      return N1-(N2*N3)+d-30;
+    }
+    var N=dayOfYear(year,month,day);
+    var rad=Math.PI/180,deg=180/Math.PI;
+    var gamma=2*Math.PI/365*(N-1);
+    var decl=0.006918-0.399912*Math.cos(gamma)+0.070257*Math.sin(gamma)
+             -0.006758*Math.cos(2*gamma)+0.000907*Math.sin(2*gamma)
+             -0.002697*Math.cos(3*gamma)+0.00148*Math.sin(3*gamma);
+    var eqt=229.18*(0.000075+0.001868*Math.cos(gamma)-0.032077*Math.sin(gamma)
+             -0.014615*Math.cos(2*gamma)-0.040849*Math.sin(2*gamma));
+    var latr=lat*rad;
+    var cosH=(Math.cos(90.833*rad)-Math.sin(latr)*Math.sin(decl))/(Math.cos(latr)*Math.cos(decl));
+    if(cosH>1)return{sunrise:25,sunset:25};
+    if(cosH<-1)return{sunrise:-1,sunset:25};
+    var Ha=Math.acos(cosH)*deg;
+    var solarNoon=720-4*lng-eqt+tzOff*60;
+    return{sunrise:(solarNoon-4*Ha)/60,sunset:(solarNoon+4*Ha)/60};
+  }
+
+  function isNightAt(dt,lat,lng) {
+    if(!dt)return false;
+    var st=sunTimes(dt.getFullYear(),dt.getMonth()+1,dt.getDate(),lat,lng);
+    var h=dt.getHours()+dt.getMinutes()/60;
+    return h<st.sunrise||h>st.sunset;
+  }
+
+  function drawWeather(g,cx,cy,s,code) {
+    if(!code)return;
+    g.save();
+    g.lineWidth=1.2;g.lineCap='round';g.lineJoin='round';
+    var SUN='#e8c15a',CLOUD='#9fb0c8',RAIN='#7fa8d8',FOGC='#8a9ab0';
+    function sun(x,y,r,col){
+      g.strokeStyle=col;g.fillStyle=col;
+      g.beginPath();g.arc(x,y,r,0,2*Math.PI);g.fill();
+      for(var i=0;i<8;i++){var a=i*Math.PI/4;
+        g.beginPath();g.moveTo(x+Math.cos(a)*(r+1.2),y+Math.sin(a)*(r+1.2));
+        g.lineTo(x+Math.cos(a)*(r+s*0.5),y+Math.sin(a)*(r+s*0.5));g.stroke();}
+    }
+    function cloud(x,y,col){
+      g.fillStyle=col;g.beginPath();
+      g.arc(x-s*0.4,y,s*0.38,0,2*Math.PI);g.arc(x+s*0.1,y-s*0.18,s*0.48,0,2*Math.PI);
+      g.arc(x+s*0.55,y,s*0.36,0,2*Math.PI);g.rect(x-s*0.4,y,s*0.95,s*0.4);g.fill();
+    }
+    if(code==='sun'||code==='dry'){sun(cx,cy,s*0.5,SUN);}
+    else if(code==='clearNight'){
+      g.fillStyle='#cdd8ee';
+      [[0,-s*0.2,1.1],[s*0.5,s*0.15,0.8],[-s*0.5,s*0.2,0.8]].forEach(function(p){
+        g.beginPath();g.arc(cx+p[0],cy+p[1],p[2],0,2*Math.PI);g.fill();});
+    }
+    else if(code==='fog'){
+      g.strokeStyle=FOGC;
+      for(var i=0;i<3;i++){var yy=cy-s*0.35+i*s*0.4;
+        g.beginPath();g.moveTo(cx-s*0.6,yy);g.lineTo(cx+s*0.6,yy);g.stroke();}
+    }
+    else if(code==='fogSun'){
+      sun(cx-s*0.15,cy-s*0.15,s*0.38,SUN);
+      g.strokeStyle=FOGC;
+      for(var i=0;i<2;i++){var yy=cy+s*0.25+i*s*0.35;
+        g.beginPath();g.moveTo(cx-s*0.6,yy);g.lineTo(cx+s*0.6,yy);g.stroke();}
+    }
+    else if(code==='storm'){
+      cloud(cx,cy-s*0.15,CLOUD);g.strokeStyle=RAIN;
+      for(var i=0;i<3;i++){var x0=cx-s*0.35+i*s*0.35;
+        g.beginPath();g.moveTo(x0,cy+s*0.45);g.lineTo(x0-s*0.15,cy+s*0.85);g.stroke();}
+    }
+    else if(code==='damp'){cloud(cx,cy,CLOUD);}
+    g.restore();
+  }
+
+  function drawMoon(g,cx,cy,r,age) {
+    var phase=age/SYNODIC,pa=2*Math.PI*phase,waxing=phase<0.5,k=Math.cos(pa);
+    g.save();
+    g.beginPath();g.arc(cx,cy,r,0,2*Math.PI);g.clip();
+    g.fillStyle='#f5ecc4';g.beginPath();g.arc(cx,cy,r,0,2*Math.PI);g.fill();
+    g.fillStyle='#182238';
+    var step=0.4;
+    for(var dy=-r;dy<=r;dy+=step){
+      var yr=dy/r,w=Math.sqrt(Math.max(0,1-yr*yr)),xt=k*w,x0,x1;
+      if(waxing){x0=-w;x1=xt;}else{x0=-xt;x1=w;}
+      if(x1>x0)g.fillRect(cx+x0*r,cy+dy,(x1-x0)*r+0.6,step+0.6);
+    }
+    g.restore();
+  }
+
+  // Build timed array for C3 (empty for other cahiers)
+  var timed = [];
+  if (n===3) {
+    data.S.forEach(function(st) {
+      var tt = STEP_TIME[st.id]; if(!tt) return;
+      var bi=-1,bd=Infinity;
+      for(var k=0;k<_elevPts.length;k++){var dd=ha15([st.lat,st.lng],[_elevPts[k].lat,_elevPts[k].lng]);if(dd<bd){bd=dd;bi=k;}}
+      if(bi<0||bd>0.0025)return;
+      function toDate(arr){return new Date(arr[0],arr[1]-1,arr[2],arr[3],arr[4]);}
+      timed.push({d:_elevPts[bi].d,arr:toDate(tt.a),dep:tt.d?toDate(tt.d):toDate(tt.a)});
+    });
+    NIGHT_STOPS_C3.forEach(function(ns){
+      function toDateArr(arr){return new Date(arr[0],arr[1]-1,arr[2],arr[3],arr[4]);}
+      timed.push({d:ns.dist,arr:toDateArr(ns.a),dep:toDateArr(ns.d)});
+    });
+    timed.sort(function(a,b){return a.d-b.d;});
+  }
+
+  function timeAt(dist) {
+    if(!timed.length)return null;
+    if(dist<=timed[0].d)return timed[0].arr;
+    for(var i=0;i<timed.length-1;i++){
+      var A=timed[i],B=timed[i+1];
+      if(dist<=B.d){var span=B.d-A.d;if(span<=0)return B.arr;
+        var f=(dist-A.d)/span,t0=A.dep.getTime(),t1=B.arr.getTime();
+        return new Date(t0+f*(t1-t0));}
+    }
+    return timed[timed.length-1].arr;
+  }
+
+  // Build day/night tranches
+  var tranches=[], nightMarks=[];
+  var prevNight=null,prevDayKey=null,curStart=0,jDay=0,seenDays={};
+  for(var pi=0;pi<_elevPts.length;pi++){
+    var q=_elevPts[pi];
+    var dt=timeAt(q.d);
+    var night=isNightAt(dt,q.lat,q.lng);
+    var dayKey=dt?(dt.getMonth()+1)+'-'+dt.getDate():'?';
+    if(prevNight===null){prevNight=night;prevDayKey=dayKey;curStart=q.d;}
+    else if(night!==prevNight||(!night&&dayKey!==prevDayKey)){
+      if(!prevNight){if(!seenDays[prevDayKey]){jDay++;seenDays[prevDayKey]=jDay;}}
+      tranches.push({d0:curStart,d1:q.d,night:prevNight,j:prevNight?0:seenDays[prevDayKey],t:timeAt((curStart+q.d)/2)});
+      if(night!==prevNight)nightMarks.push(q.d);
+      curStart=q.d;prevNight=night;prevDayKey=dayKey;
+    }
+  }
+  if(curStart<maxD){
+    if(!prevNight&&!seenDays[prevDayKey]){jDay++;seenDays[prevDayKey]=jDay;}
+    tranches.push({d0:curStart,d1:maxD,night:prevNight,j:prevNight?0:seenDays[prevDayKey],t:timeAt((curStart+maxD)/2)});
+  }
+
+  elevInfo.textContent = maxD.toFixed(0)+' km \u2022 '+Math.round(minA)+'\u2013'+Math.round(maxA)+' m';
+
+  // Hover marker
+  if (!_elevHoverMarker) {
+    var hEl = document.createElement('div');
+    hEl.style.cssText = 'width:14px;height:14px;border-radius:50%;background:#e94560;border:2px solid #fff;box-shadow:0 1px 4px rgba(0,0,0,.6);';
+    _elevHoverMarker = new maplibregl.Marker({element:hEl}).setLngLat([_elevPts[0].lng,_elevPts[0].lat]);
+  }
+
+  var dpr = window.devicePixelRatio || 1;
+  var PADL=44,PADR=12,PADT=40,PADB=52;
+
+  function xForD(d,W){ return PADL+(d/maxD)*(W-PADL-PADR); }
+  function yForA(a,H){ return PADT+(1-(a-minAd)/(maxAd-minAd))*(H-PADT-PADB); }
+
+  function drawElev(hi) {
+    var W=canvas.clientWidth,H=canvas.clientHeight;
+    canvas.width=W*dpr;canvas.height=H*dpr;
+    var g=canvas.getContext('2d');
+    g.setTransform(dpr,0,0,dpr,0,0);
+    g.clearRect(0,0,W,H);
+
+    // Day/night band + weather strip
+    var bandH=14,bandY=H-bandH-20;
+    g.textAlign='center';
+    for(var t=0;t<tranches.length;t++){
+      var tr=tranches[t];
+      var bx0=xForD(tr.d0,W),bx1=xForD(tr.d1,W);
+      if(tr.night){
+        g.fillStyle='rgba(40,55,95,.9)';g.fillRect(bx0,bandY,bx1-bx0,bandH);
+        if(bx1-bx0>14&&tr.t){drawMoon(g,(bx0+bx1)/2,bandY+bandH/2,5,moonAge(tr.t));}
+      } else {
+        g.fillStyle='rgba(245,215,110,.28)';g.fillRect(bx0,bandY,bx1-bx0,bandH);
+        if(bx1-bx0>20){g.fillStyle='#c9b16a';g.font='9px sans-serif';
+          g.fillText('J'+tr.j,(bx0+bx1)/2,bandY+9);}
+      }
+      var wcode=weatherAt(tr.t,tr.night);
+      if(wcode&&bx1-bx0>18){drawWeather(g,(bx0+bx1)/2,bandY+bandH+8,4.5,wcode);}
+    }
+    // Sleep separators
+    for(var ni=0;ni<nightMarks.length;ni++){
+      var nx=xForD(nightMarks[ni],W);
+      g.fillStyle='#0f1628';g.fillRect(nx-0.5,bandY,1,bandH);
+    }
+    // Altitude grid
+    g.strokeStyle='rgba(255,255,255,.07)';g.fillStyle='#667788';g.font='10px monospace';
+    g.textAlign='right';g.lineWidth=1;
+    var step=(maxA-minA>1500)?500:(maxA-minA>600?200:100);
+    for(var a=Math.ceil(minAd/step)*step;a<maxAd;a+=step){
+      var ya=yForA(a,H);
+      g.beginPath();g.moveTo(PADL,ya);g.lineTo(W-PADR,ya);g.stroke();
+      g.fillText(a+'m',PADL-5,ya+3);
+    }
+    g.textAlign='center';
+    var dstep=maxD>200?50:(maxD>80?25:10);
+    for(var di=0;di<=maxD;di+=dstep){g.fillText(di+'km',xForD(di,W),H-40);}
+    // Area + line per phase
+    for(var i=1;i<_elevPts.length;i++){
+      var p0=_elevPts[i-1],p1=_elevPts[i];
+      var col=_elevPC[p1.p]||'#888';
+      g.beginPath();
+      g.moveTo(xForD(p0.d,W),yForA(p0.a,H));g.lineTo(xForD(p1.d,W),yForA(p1.a,H));
+      g.lineTo(xForD(p1.d,W),H-PADB);g.lineTo(xForD(p0.d,W),H-PADB);g.closePath();
+      g.fillStyle=col;g.globalAlpha=0.18;g.fill();g.globalAlpha=1;
+      g.beginPath();
+      g.moveTo(xForD(p0.d,W),yForA(p0.a,H));g.lineTo(xForD(p1.d,W),yForA(p1.a,H));
+      g.strokeStyle=col;g.lineWidth=2;g.stroke();
+    }
+    // Step marks
+    var lastXm=-1e9;
+    for(var m=0;m<_elevStepMarks.length;m++){
+      var sm=_elevStepMarks[m];
+      var mx=xForD(sm.d,W),my=yForA(sm.a,H);
+      var col2=_elevPC[sm.p]||'#888';
+      g.strokeStyle=col2;g.globalAlpha=0.45;g.lineWidth=1;
+      g.beginPath();g.moveTo(mx,my);g.lineTo(mx,PADT-2);g.stroke();g.globalAlpha=1;
+      var cy2=PADT-12;if(mx-lastXm<16)cy2=PADT-24;lastXm=mx;
+      var on=(sm.id===_elevHighlightId),rr=(sm.sym?9:8)+(on?4:0);
+      sm._x=mx;sm._y=cy2;sm._r=rr;
+      if(on){g.beginPath();g.arc(mx,cy2,rr+4,0,2*Math.PI);g.fillStyle=col2;g.globalAlpha=0.3;g.fill();g.globalAlpha=1;}
+      g.beginPath();g.arc(mx,cy2,rr,0,2*Math.PI);g.fillStyle=col2;g.fill();
+      g.strokeStyle='#fff';g.lineWidth=on?2.5:1.5;g.stroke();
+      g.fillStyle='#fff';
+      g.font=(on?'bold ':'')+((sm.sym?(on?14:11):(on?13:10)))+'px sans-serif';
+      g.textAlign='center';g.textBaseline='middle';
+      g.fillText(sm.label,mx,cy2+0.5);g.textBaseline='alphabetic';
+    }
+    // Cursor
+    if(hi!=null){
+      var q2=_elevPts[hi];
+      var x2=xForD(q2.d,W),y2=yForA(q2.a,H);
+      g.strokeStyle='rgba(255,255,255,.5)';g.lineWidth=1;
+      g.beginPath();g.moveTo(x2,PADT);g.lineTo(x2,H-PADB);g.stroke();
+      g.beginPath();g.arc(x2,y2,4,0,2*Math.PI);
+      g.fillStyle='#fff';g.fill();
+      g.strokeStyle=_elevPC[q2.p]||'#888';g.lineWidth=2;g.stroke();
+    }
+  }
+  /* Exposer drawElev pour ElevPanel.setHighlight() */
+  _elevDrawFn = drawElev;
+
+  function nearestByX(clientX){
+    var rect=canvas.getBoundingClientRect(),px=clientX-rect.left,W=canvas.clientWidth;
+    var d=((px-PADL)/(W-PADL-PADR))*maxD,best=0,bd2=Infinity;
+    for(var i2=0;i2<_elevPts.length;i2++){var dd2=Math.abs(_elevPts[i2].d-d);if(dd2<bd2){bd2=dd2;best=i2;}}
+    return best;
+  }
+
+  function showHover(i,clientX){
+    var q=_elevPts[i];
+    drawElev(i);
+    if(_elevHoverMarker){
+      _elevHoverMarker.setLngLat([q.lng,q.lat]);
+      if(!_elevHoverVisible){_elevHoverMarker.addTo(map);_elevHoverVisible=true;}
+    }
+    var cur=null;
+    for(var m2=0;m2<_elevStepMarks.length;m2++){if(_elevStepMarks[m2].d<=q.d+1e-6)cur=_elevStepMarks[m2];else break;}
+    var sinceStep=cur?(q.d-cur.d):q.d;
+    var etapeLbl=cur?('\u00e9tape '+cur.label):'d\u00e9part';
+    var dt=timeAt(q.d);
+    var when='';
+    if(dt){
+      var jours=['dim','lun','mar','mer','jeu','ven','sam'];
+      var night2=isNightAt(dt,q.lat,q.lng);
+      var wcode=weatherAt(dt,night2);
+      var wEmoji={fog:' \ud83c\udf2b\ufe0f',fogSun:' \ud83c\udf24\ufe0f',storm:' \u26c8\ufe0f',damp:' \u2601\ufe0f'}[wcode]||'';
+      when='<br><span style="color:'+(night2?'#8ea3d8':'#c9b16a')+'">'
+           +(night2?moonEmoji(moonAge(dt))+' ':'\u2600 ')
+           +jours[dt.getDay()]+' '+dt.getDate()+'/'+(dt.getMonth()+1)
+           +' \u2014 '+dt.getHours()+'h'+('0'+dt.getMinutes()).slice(-2)
+           +wEmoji+'</span>';
+    }
+    tip.style.display='block';
+    tip.innerHTML='<b>'+Math.round(q.a)+' m</b>'
+      +'  \u2022  +'+sinceStep.toFixed(1)+' km ('+etapeLbl+')'
+      +'  \u2022  '+q.d.toFixed(1)+' km total'
+      +when
+      +'<br><span style="color:#8899aa">'+(_elevPC[q.p]||'')+'</span>';
+    var rect2=canvas.getBoundingClientRect();
+    var tx=(clientX!=null)?clientX:(rect2.left+xForD(q.d,canvas.clientWidth));
+    tip.style.left=Math.min(window.innerWidth-240,Math.max(4,tx))+'px';
+    tip.style.top=(rect2.top+4)+'px';
+  }
+
+  // Replace canvas to remove old listeners
+  var newCanvas=canvas.cloneNode(false);
+  canvas.parentNode.replaceChild(newCanvas,canvas);
+  var canvas=document.getElementById('elevcanvas');
+
+  canvas.addEventListener('mousemove',function(e){showHover(nearestByX(e.clientX),e.clientX);});
+  canvas.addEventListener('mouseleave',function(){
+    tip.style.display='none';drawElev();
+    if(_elevHoverVisible&&_elevHoverMarker){_elevHoverMarker.remove();_elevHoverVisible=false;}
+  });
+  canvas.addEventListener('click',function(e){
+    var rect3=canvas.getBoundingClientRect(),px3=e.clientX-rect3.left,py3=e.clientY-rect3.top;
+    for(var m3=0;m3<_elevStepMarks.length;m3++){
+      var sm3=_elevStepMarks[m3];if(sm3._x==null)continue;
+      var dx3=px3-sm3._x,dy3=py3-sm3._y;
+      if(dx3*dx3+dy3*dy3<=(sm3._r+3)*(sm3._r+3)){
+        var stFound=null;
+        data.S.forEach(function(x){if(x.id===sm3.id)stFound=x;});
+        if(stFound) {
+          /* FR-6.2 — clic profil → NAV.go → synchronisation bidirectionnelle */
+          NAV.go(3, { cahier: n, chapitre: stFound.p, stopId: stFound.id }, 'forward');
+        } else {
+          /* point sans stop associé : juste highlight local */
+          _elevHighlightId=sm3.id; drawElev();
+        }
+        return;
+      }
+    }
+    var ii=nearestByX(e.clientX);
+    map.flyTo({center:[_elevPts[ii].lng,_elevPts[ii].lat],zoom:Math.max(map.getZoom(),12),duration:600});
+    showHover(ii,e.clientX);
+  });
+
+  map.off('click',_mapClickForElev);
+  _mapClickForElev=function(e){
+    var ll=e.lngLat,best2=0,bd3=Infinity;
+    for(var i3=0;i3<_elevPts.length;i3++){var dx4=ll.lat-_elevPts[i3].lat,dy4=ll.lng-_elevPts[i3].lng;var dd4=dx4*dx4+dy4*dy4;if(dd4<bd3){bd3=dd4;best2=i3;}}
+    if(bd3<0.0009&&_elevPanelVisible){showHover(best2,null);}
+  };
+  map.on('click',_mapClickForElev);
+
+  elevToggle.onclick=function(){
+    _elevPanelVisible=!_elevPanelVisible;
+    elevPanel.classList.toggle('hidden',!_elevPanelVisible);
+    elevToggle.innerHTML=(_elevPanelVisible?'\u25bc':'\u25b2')+' Profil altitude';
+    if(_elevPanelVisible){setTimeout(function(){drawElev();map.resize();},50);}
+    else{map.resize();}
+  };
+
+  if(_elevPanelVisible&&!elevPanel.classList.contains('hidden')){setTimeout(drawElev,50);}
+
+  if(_elevResizeOff)window.removeEventListener('resize',_elevResizeOff);
+  _elevResizeOff=function(){if(_elevPanelVisible)drawElev();};
+  window.addEventListener('resize',_elevResizeOff);
+}
+
+var _mapClickForElev = null;
+
+/* ========== ElevPanel — profil altitude ========== */
+/* Design : § Decision Point 3 / § Profil altitude          */
+/* Spec   : carte-responsive-nav / task 2.2                  */
+var ElevPanel = (function() {
+
+  /* Cahier actuellement affiché dans ElevPanel (null si caché) */
+  var _currentCahierData = null;
+
+  /* show(cahierData | cahierN) — charge et affiche le profil altitude
+   * Accepte soit un entier (numéro de cahier) soit un objet data déjà
+   * extrait par getCahierData().  Délègue à renderElevation() existant. */
+  function show(cahierOrData) {
+    var cahierN;
+    if (typeof cahierOrData === 'number') {
+      cahierN = cahierOrData;
+    } else if (cahierOrData && typeof cahierOrData._cahierN === 'number') {
+      cahierN = cahierOrData._cahierN;
+    } else {
+      /* Essai de déduction depuis _elevCurrentCahierN */
+      cahierN = _elevCurrentCahierN || 1;
+    }
+
+    /* Éviter un rendu inutile si on est déjà sur ce cahier */
+    var alreadyVisible = _elevPanelVisible && _elevCurrentCahierN === cahierN;
+
+    /* Charger (ou recharger) le profil pour ce cahier */
+    renderElevation(cahierN);
+
+    var elevPanel = document.getElementById('elevpanel');
+    var elevToggle = document.getElementById('elevtoggle');
+
+    /* Si renderElevation a déterminé qu'il n'y a pas de données d'altitude
+       (cahiers 1, 2, 4 = noElevation), on n'affiche rien */
+    if (!_elevPts.length) {
+      _currentCahierData = null;
+      return;
+    }
+
+    /* Afficher le panneau */
+    _elevPanelVisible = true;
+    elevPanel.classList.remove('hidden');
+    if (elevToggle) {
+      elevToggle.innerHTML = '\u25bc Profil altitude';
+    }
+
+    /* Forcer le redessin si le panneau vient de s'ouvrir */
+    if (!alreadyVisible) {
+      setTimeout(function() {
+        if (_elevDrawFn) _elevDrawFn();
+        map.resize();
+      }, 50);
+    }
+
+    _currentCahierData = cahierN;
+  }
+
+  /* hide() — masque le profil sans détruire les données */
+  function hide() {
+    var elevPanel = document.getElementById('elevpanel');
+    var elevToggle = document.getElementById('elevtoggle');
+
+    _elevPanelVisible = false;
+    if (elevPanel) elevPanel.classList.add('hidden');
+    if (elevToggle) {
+      elevToggle.innerHTML = '\u25b2 Profil altitude';
+    }
+    map.resize();
+
+    _currentCahierData = null;
+  }
+
+  /* setHighlight(stopId | null) — met en surbrillance le point correspondant.
+   * Contrat identique à MapAdapter.setActiveMarker :
+   *   - le point précédemment surligné revient à la normale
+   *   - null = aucun highlight
+   * N'a d'effet visible que si le panneau est ouvert (_elevPanelVisible) */
+  function setHighlight(stopId) {
+    if (_elevHighlightId === stopId) return;   /* idempotent */
+    _elevHighlightId = (stopId != null) ? stopId : null;
+    if (_elevPanelVisible && _elevDrawFn) {
+      _elevDrawFn();
+    }
+  }
+
+  return {
+    show:         show,
+    hide:         hide,
+    setHighlight: setHighlight,
+    /* Lecture seule — utile pour débogage */
+    get currentCahier() { return _currentCahierData; }
+  };
+})();
+/* ========== /ElevPanel ========== */
+
+/* ========== Panel ========== */
+/* Design : Decision Point 2 — Vue unique + navigateTo()             */
+/* Spec   : carte-responsive-nav / task 3.1                          */
+var Panel = (function() {
+
+  /* État interne */
+  var _expanded     = true;
+  var _transitioning = false; /* guard anti-appels concurrents */
+  var _pendingNav    = null;  /* last-write-wins : nav en attente pendant une transition */
+
+  /* --- navigateTo(renderFn, direction) ---
+   * renderFn : function() → HTML string
+   * direction : 'forward' | 'back'
+   * Crée une nouvelle vue, l'anime en entrée, supprime l'ancienne.
+   */
+  function navigateTo(renderFn, direction) {
+    var viewport = document.getElementById('panel-viewport');
+    if (!viewport) return;
+
+    /* Si une transition est en cours, mémoriser le dernier appel
+       et l'exécuter dès que la transition se termine (last-write-wins). */
+    if (_transitioning) {
+      _pendingNav = { renderFn: renderFn, direction: direction };
+      return;
+    }
+
+    _pendingNav    = null;
+    _transitioning = true;
+
+    var outgoing = viewport.firstChild;
+    var incoming = document.createElement('div');
+    incoming.className = 'panel-view';
+    incoming.innerHTML = renderFn();
+
+    /* Figer la hauteur du viewport pendant l'animation */
+    var viewH = viewport.offsetHeight || 400;
+    viewport.style.height = viewH + 'px';
+    viewport.style.overflowX = 'hidden';
+
+    /* Rendre la vue sortante absolue pour l'animer */
+    if (outgoing) {
+      outgoing.style.position = 'absolute';
+      outgoing.style.top = '0';
+      outgoing.style.left = '0';
+      outgoing.style.width = '100%';
+    }
+
+    /* Position initiale de la vue entrante hors écran */
+    incoming.style.transform = direction === 'forward'
+      ? 'translateX(100%)' : 'translateX(-100%)';
+    viewport.appendChild(incoming);
+
+    /* Double rAF pour garantir le reflow avant l'animation */
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        incoming.style.transition = 'transform 200ms ease-in-out';
+        incoming.style.transform = 'translateX(0)';
+        if (outgoing) {
+          outgoing.style.transition = 'transform 200ms ease-in-out';
+          outgoing.style.transform = direction === 'forward'
+            ? 'translateX(-100%)' : 'translateX(100%)';
+        }
+        setTimeout(function() {
+          if (outgoing && outgoing.parentNode) {
+            outgoing.parentNode.removeChild(outgoing);
+          }
+          if (incoming.parentNode) {
+            incoming.style.transition = '';
+            incoming.style.transform = '';
+            incoming.style.position = 'relative';
+          }
+          viewport.style.height = '';
+          viewport.style.overflowX = '';
+          viewport.scrollTop = 0;
+          /* FR-1.4 */
+          var activeEl = viewport.querySelector('.pv-item.active');
+          if (activeEl) {
+            activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          /* Libérer et exécuter la nav en attente si présente */
+          _transitioning = false;
+          if (_pendingNav) {
+            var pending = _pendingNav;
+            _pendingNav = null;
+            navigateTo(pending.renderFn, pending.direction);
+          }
+        }, 210);
+      });
+    });
+  }
+
+  /* --- Manipulation DOM pure du panel (sans re-émettre vers NAV) --- */
+  function _applyExpandedDOM(expanded) {
+    var panel = document.getElementById('panel');
+    if (!panel) return;
+    if (expanded) {
+      panel.classList.add('expanded');
+      panel.classList.remove('compact');
+    } else {
+      panel.classList.add('compact');
+      panel.classList.remove('expanded');
+    }
+  }
+
+  /* Expand depuis l'intérieur d'un handler NAV.on('change') — PAS de re-émission */
+  function _expandDirect() {
+    _expanded = true;
+    _applyExpandedDOM(true);
+    /* PAS d'appel à NAV.setExpanded ici — on est déjà dans un handler change */
+  }
+
+  /* --- setExpanded(bool) --- */
+  function setExpanded(expanded) {
+    _expanded = !!expanded;
+    _applyExpandedDOM(_expanded);
+    /* Synchroniser l'état NAV — seulement depuis un appel utilisateur (breadcrumb, swipe) */
+    NAV.setExpanded(_expanded);
+  }
+
+  /* --- toggleExpanded() --- */
+  function toggleExpanded() {
+    setExpanded(!_expanded);
+  }
+
+  /* --- updateBreadcrumb(state) ---
+   * Met à jour le fil d'Ariane selon le niveau et les ids actifs.
+   * Format FR-1.3 :
+   *   0 → 'Alban Rouzaud — Écrits de Guerre'
+   *   1 → 'Cahier N — [titre]'
+   *   2 → 'Cahier N › Ch. N — [titre]'
+   *   3 → 'Cahier N › Ch. N › [nom stop]'
+   */
+  function updateBreadcrumb(state) {
+    var el = document.getElementById('panel-breadcrumb');
+    if (!el) return;
+
+    var level = state.level;
+    var text = '';
+
+    if (level === 0) {
+      text = 'Alban Rouzaud — Écrits de Guerre';
+
+    } else if (level === 1) {
+      var meta1 = CAHIER_META[state.cahier];
+      text = 'Cahier ' + state.cahier + '\u00a0— ' + (meta1 ? meta1.title : '');
+
+    } else if (level === 2) {
+      var meta2 = CAHIER_META[state.cahier];
+      var cd2 = (state.cahier===1?CAHIER_1_DATA:state.cahier===2?CAHIER_2_DATA:state.cahier===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
+      var pnTitle;
+      if (state.section === 'photos') {
+        pnTitle = 'Photos';
+      } else {
+        pnTitle = state.chapitre != null ? (cd2.PN && cd2.PN[state.chapitre]) || ('Ch.\u00a0' + state.chapitre) : '';
+      }
+      text = 'Cahier\u00a0' + state.cahier
+        + '\u00a0\u203a ' + pnTitle;
+
+    } else if (level === 3) {
+      var meta3 = CAHIER_META[state.cahier];
+      var cd3 = (state.cahier===1?CAHIER_1_DATA:state.cahier===2?CAHIER_2_DATA:state.cahier===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
+      /* Nom de l'étape ou du lieu CPA */
+      var itemName = '';
+      var sectionLabel = '';
+      if (state.cpaLoc) {
+        /* Lieu-photo : section "Photos" */
+        sectionLabel = 'Photos';
+        itemName = state.cpaLoc;
+      } else {
+        var pnTitle3 = state.chapitre != null ? (cd3.PN && cd3.PN[state.chapitre]) || ('Ch.\u00a0' + state.chapitre) : '';
+        sectionLabel = pnTitle3;
+        if (state.stopId != null) {
+          var stops3 = cd3.stops || [];
+          for (var i = 0; i < stops3.length; i++) {
+            if (stops3[i].id === state.stopId) { itemName = stops3[i].n; break; }
+          }
+        }
+      }
+      text = 'Cahier\u00a0' + state.cahier
+        + '\u00a0\u203a ' + sectionLabel
+        + '\u00a0\u203a ' + itemName;
+    }
+
+    el.textContent = text;
+    el.title = text + ' \u2014 Cliquer pour r\u00e9duire / agrandir';
+
+    /* Mettre à jour l'état disabled des boutons ◀/▶ */
+    var prev = document.getElementById('nav-prev');
+    var next = document.getElementById('nav-next');
+    if (prev) prev.disabled = NAV.isFirst();
+    if (next) next.disabled = NAV.isLast();
+  }
+
+  /* --- init() --- appel unique au Bootstrap --- */
+  function init() {
+    /* Breadcrumb click → toggle expanded/compact */
+    var bc = document.getElementById('panel-breadcrumb');
+    if (bc) {
+      bc.addEventListener('click', function() { toggleExpanded(); });
+    }
+
+    /* Abonnement NAV → breadcrumb + boutons */
+    NAV.on('change', function(state) {
+      updateBreadcrumb(state);
+    });
+  }
+
+  return {
+    navigateTo:       navigateTo,
+    setExpanded:      setExpanded,
+    toggleExpanded:   toggleExpanded,
+    _expandDirect:    _expandDirect,
+    updateBreadcrumb: updateBreadcrumb,
+    init:             init,
+    get expanded()      { return _expanded; },
+    get _transitioning(){ return _transitioning; }
+  };
+})();
+/* ========== /Panel ========== */
+
+/* ========== Views ========== */
+/* Fonctions de rendu : data → HTML string                           */
+/* Spec   : carte-responsive-nav / tâches 3.2–3.6                    */
+
+/* --- Styles partagés entre les vues (injectés une seule fois) ---  */
+(function() {
+  var styleId = 'panel-views-css';
+  if (document.getElementById(styleId)) return;
+  var s = document.createElement('style');
+  s.id = styleId;
+  s.textContent = [
+    /* Bouton retour */
+    '.pv-back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;'
+    + 'color:#7a9ec8;font-size:.85em;cursor:pointer;padding:4px 0 10px;transition:color .15s}',
+    '.pv-back:hover{color:#fff}',
+    /* Titre de vue */
+    '.pv-title{font-size:1.1em;font-weight:700;color:#e0e0e0;margin-bottom:2px;line-height:1.3}',
+    '.pv-period{font-size:.82em;color:#8899aa;margin-bottom:14px}',
+    /* Liste générique d'items cliquables */
+    '.pv-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}',
+    '.pv-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:6px;'
+    + 'border-left:3px solid transparent;cursor:pointer;transition:background .15s;'
+    + 'background:rgba(255,255,255,.03)}',
+    '.pv-item:hover{background:rgba(255,255,255,.09)}',
+    '.pv-item-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}',
+    '.pv-item-body{flex:1;min-width:0}',
+    '.pv-item-name{font-size:.93em;font-weight:600;color:#e0e0e0;'
+    + 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.pv-item-meta{font-size:.78em;color:#667788;margin-top:2px}',
+    '.pv-item-arrow{color:#3a5a8a;font-size:.8em;flex-shrink:0}',
+    /* Section photos */
+    '.pv-photos-item{border-left-color:#c8a96e!important}',
+    '.pv-photos-icon{font-size:1.2em;flex-shrink:0}',
+    /* Vue-chapitre — liste d'étapes (task 3.4) */
+    '.pv-stop-num{font-size:.75em;font-weight:700;min-width:22px;text-align:right;flex-shrink:0;opacity:.7}',
+    '.pv-stop-date{font-size:.75em;color:#8899aa;margin-top:1px}',
+    '.pv-item.active{background:rgba(255,255,255,.12)!important;border-left-width:4px}',
+    /* Vue-étape (task 3.4) */
+    '.pv-etape-phase{font-size:.8em;font-weight:600;letter-spacing:.04em;margin-bottom:10px;opacity:.85}',
+    '.pv-etape-date{font-size:.85em;color:#e94560;margin-bottom:10px;display:flex;align-items:center;gap:5px}',
+    '.pv-etape-desc{font-size:.9em;color:#a0b4c8;line-height:1.65;margin-bottom:12px}',
+    '.pv-etape-citation{border-left:3px solid #e94560;margin:10px 0;padding:8px 12px;'
+    + 'font-style:italic;color:#8899aa;font-size:.9em;line-height:1.55;background:rgba(233,69,96,.07);border-radius:0 4px 4px 0}',
+    '.pv-etape-ref{font-size:.8em;color:#667788;font-style:italic;margin-top:8px;'
+    + 'padding:6px 10px;background:rgba(255,255,255,.03);border-radius:4px;border:1px solid rgba(255,255,255,.06)}',
+
+    /* Vue-photos (task 3.5) */
+    '.pv-photos-grid{display:flex;flex-direction:column;gap:8px;margin-top:4px}',
+    '.pv-lieu-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;'
+    + 'cursor:pointer;transition:background .15s;background:rgba(255,255,255,.03);'
+    + 'border:1px solid rgba(255,255,255,.05)}',
+    '.pv-lieu-item:hover{background:rgba(255,255,255,.09)}',
+    '.pv-lieu-thumb{width:52px;height:40px;object-fit:cover;border-radius:4px;'
+    + 'flex-shrink:0;border:1px solid rgba(255,255,255,.1)}',
+    '.pv-lieu-thumb-empty{width:52px;height:40px;border-radius:4px;flex-shrink:0;'
+    + 'background:#1a3055;border:1px solid rgba(255,255,255,.08);display:flex;'
+    + 'align-items:center;justify-content:center;font-size:1.2em;color:#4a6a8a}',
+    '.pv-lieu-body{flex:1;min-width:0}',
+    '.pv-lieu-name{font-size:.9em;font-weight:600;color:#e0e0e0;'
+    + 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.pv-lieu-count{font-size:.75em;color:#c8a96e;margin-top:2px}',
+
+    /* Vue-lieu-photo (task 3.5) */
+    '.pv-lieu-header{margin-bottom:12px}',
+    '.pv-lieu-title{font-size:1.05em;font-weight:700;color:#c8a96e;margin-bottom:4px}',
+    '.pv-lieu-locname{font-size:.8em;color:#667788}',
+    '.pv-photo-wrap{position:relative;margin-bottom:10px;border-radius:6px;overflow:hidden;'
+    + 'background:#0a1020;cursor:zoom-in;text-align:center}',
+    '.pv-photo-img{max-width:100%;max-height:240px;object-fit:contain;display:block;'
+    + 'margin:0 auto;border-radius:4px}',
+    '.pv-photo-nav{display:flex;align-items:center;justify-content:space-between;'
+    + 'padding:4px 0 8px;gap:6px}',
+    '.pv-photo-nav-btn{background:#0f3460;border:1px solid #1a4a7a;color:#a0b4c8;'
+    + 'width:30px;height:30px;border-radius:5px;font-size:.9em;cursor:pointer;flex-shrink:0;'
+    + 'display:flex;align-items:center;justify-content:center;transition:background .15s}',
+    '.pv-photo-nav-btn:hover{background:#1a5a9a;color:#fff}',
+    '.pv-photo-nav-btn:disabled{opacity:.3;cursor:default}',
+    '.pv-photo-counter{flex:1;text-align:center;font-size:.75em;color:#667788}',
+    '.pv-photo-title{font-size:.95em;font-weight:600;color:#e0e0e0;margin-bottom:4px}',
+    '.pv-photo-desc{font-size:.85em;color:#8899aa;line-height:1.55}'
+  ].join('\n');
+  document.head.appendChild(s);
+})();
+
+/* --- renderCahier(cahierN) ---
+ * Vue-cahier (niveau 1) :
+ *   - Bouton ← → accueil (niveau 0)
+ *   - Titre + période du cahier
+ *   - Liste des chapitres (phases) avec numéro, titre, nb d'étapes
+ *   - Section "Photos" avec nb de lieux-CPA
+ * Référence : FR-3.2
+ */
+function renderCahier(cahierN) {
+  var meta = CAHIER_META[cahierN] || {};
+  var cd   = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var PC   = cd.PC    || {};
+  var PN   = cd.PN    || {};
+  var stops = cd.stops || [];
+  var cpa   = cd.cpa   || [];
+
+  /* Compter les stops par phase */
+  var stopsPerPhase = {};
+  stops.forEach(function(s) {
+    if (s.p != null) {
+      stopsPerPhase[s.p] = (stopsPerPhase[s.p] || 0) + 1;
+    }
+  });
+
+  /* Phases triées dans l'ordre */
+  var phaseNums = Object.keys(PN).map(Number).sort(function(a,b){return a-b;});
+  /* Ajouter les phases présentes dans les stops mais absentes de PN */
+  stops.forEach(function(s) {
+    if (s.p != null && phaseNums.indexOf(s.p) === -1) phaseNums.push(s.p);
+  });
+  phaseNums.sort(function(a,b){return a-b;});
+
+  /* FR-1.4 — État actif pour la surbrillance au retour */
+  var navState       = NAV.state;
+  var activePhase    = navState.chapitre;
+  var activeSection  = navState.section;
+
+  /* HTML — chapitres */
+  var chapitresHTML = phaseNums.map(function(p, idx) {
+    var color     = PC[p] || meta.color || '#888';
+    var phaseName = PN[p] || ('Chapitre\u00a0' + (idx + 1));
+    var nbStops   = stopsPerPhase[p] || 0;
+    var metaStr   = nbStops + '\u00a0étape' + (nbStops > 1 ? 's' : '');
+    /* Marquer le chapitre actif pour le scroll-to-active au retour (FR-1.4) */
+    var isActive  = (activePhase === p && activeSection !== 'photos');
+    return '<li class="pv-item' + (isActive ? ' active' : '') + '" style="border-left-color:' + color + '"'
+      + ' onclick="NAV.go(2,{cahier:' + cahierN + ',chapitre:' + p + '})"'
+      + ' title="Voir les étapes — ' + phaseName.replace(/"/g, '&quot;') + '">'
+      + '<span class="pv-item-dot" style="background:' + color + '"></span>'
+      + '<span class="pv-item-body">'
+      + '<span class="pv-item-name">' + phaseName + '</span>'
+      + '<span class="pv-item-meta">' + metaStr + '</span>'
+      + '</span>'
+      + '<span class="pv-item-arrow">&#9658;</span>'
+      + '</li>';
+  }).join('');
+
+  /* HTML — section Photos */
+  var nbLieux   = cpa.length;
+  /* Marquer la section Photos active si on revient de la vue-photos (FR-1.4) */
+  var photosActive = (activeSection === 'photos');
+  var photosHTML = nbLieux > 0
+    ? '<li class="pv-item pv-photos-item' + (photosActive ? ' active' : '') + '" style="margin-top:10px"'
+      + ' onclick="NAV.go(2,{cahier:' + cahierN + ',section:\'photos\'})"'
+      + ' title="Voir les photos anciennes">'
+      + '<span class="pv-photos-icon">&#128247;</span>'
+      + '<span class="pv-item-body">'
+      + '<span class="pv-item-name">Photos</span>'
+      + '<span class="pv-item-meta">' + nbLieux + '\u00a0lieu' + (nbLieux > 1 ? 'x' : '') + '</span>'
+      + '</span>'
+      + '<span class="pv-item-arrow">&#9658;</span>'
+      + '</li>'
+    : '';
+
+  return '<button class="pv-back" onclick="NAV.go(0,null,\'back\')">'
+    + '&#8592; Accueil'
+    + '</button>'
+    + '<div class="pv-title">Cahier\u00a0' + cahierN + '\u00a0\u2014 ' + (meta.title || '') + '</div>'
+    + '<div class="pv-period">' + (meta.subtitle || '') + '</div>'
+    + '<ul class="pv-list">'
+    + chapitresHTML
+    + photosHTML
+    + '</ul>';
+}
+
+/* --- findStop(cahierData, stopId) ---
+ * Retourne l'objet stop dont id === stopId, ou null.
+ * Spec : carte-responsive-nav / task 3.4
+ */
+function findStop(cahierData, stopId) {
+  var stops = (cahierData && (cahierData.S || cahierData.stops)) || [];
+  for (var i = 0; i < stops.length; i++) {
+    if (stops[i].id === stopId) return stops[i];
+  }
+  return null;
+}
+
+/* --- getStopSeqNum(cahierN, stopId) ---
+ * Retourne le numéro séquentiel (1-based) d'un stop dans le cahier.
+ * Même ordre que renderMarkersForCahier (parcours linéaire de data.S).
+ */
+function getStopSeqNum(cahierN, stopId) {
+  var cd = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var stops = cd.stops || [];
+  for (var i = 0; i < stops.length; i++) {
+    if (stops[i].id === stopId) return i + 1;
+  }
+  return null;
+}
+
+/* --- renderChapitre(cahierN, phaseN) ---
+ * Vue-chapitre (niveau 2) :
+ *   - Bouton ← → vue-cahier (niveau 1)
+ *   - Titre du chapitre avec couleur de phase
+ *   - Liste des étapes : numéro séquentiel, nom, date
+ *   - L'étape active (NAV.state.stopId) est mise en surbrillance
+ * Référence : FR-3.3, FR-1.4
+ */
+function renderChapitre(cahierN, phaseN) {
+  var cd   = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var PC   = cd.PC    || {};
+  var PN   = cd.PN    || {};
+  var stops = cd.stops || [];
+  var color = PC[phaseN] || CAHIER_META[cahierN].color || '#888';
+  var phaseName = PN[phaseN] || ('Chapitre\u00a0' + phaseN);
+  var activeStopId = NAV.state.stopId;
+
+  /* Stops de cette phase dans l'ordre */
+  var phaseStops = stops.filter(function(s) { return s.p === phaseN; });
+
+  var itemsHTML = phaseStops.map(function(s) {
+    var seqNum = getStopSeqNum(cahierN, s.id);
+    var numStr = seqNum !== null ? String(seqNum) : '';
+    var isActive = (s.id === activeStopId);
+    return '<li class="pv-item' + (isActive ? ' active' : '') + '"'
+      + ' style="border-left-color:' + color + '"'
+      + ' onclick="NAV.go(3,{cahier:' + cahierN + ',chapitre:' + phaseN + ',stopId:' + s.id + '})">'
+      + '<span class="pv-stop-num" style="color:' + color + '">' + numStr + '</span>'
+      + '<span class="pv-item-body">'
+      + '<span class="pv-item-name">' + s.n + '</span>'
+      + (s.date ? '<div class="pv-stop-date">' + s.date + '</div>' : '')
+      + '</span>'
+      + '<span class="pv-item-arrow">&#9658;</span>'
+      + '</li>';
+  }).join('');
+
+  return '<button class="pv-back"'
+    + ' onclick="NAV.go(1,{cahier:' + cahierN + '},\'back\')">'
+    + '&#8592; Cahier\u00a0' + cahierN
+    + '</button>'
+    + '<div class="pv-title" style="color:' + color + '">' + phaseName + '</div>'
+    + '<div class="pv-period">' + phaseStops.length + '\u00a0étape' + (phaseStops.length > 1 ? 's' : '') + '</div>'
+    + '<ul class="pv-list">' + itemsHTML + '</ul>';
+}
+
+/* --- renderEtape(stop, PC, PN, cahierN) ---
+ * Vue-étape (niveau 3) :
+ *   - Bouton ← → vue-chapitre (niveau 2)
+ *   - Nom complet de l'étape (h2)
+ *   - Titre du chapitre avec couleur de phase
+ *   - Date narrative
+ *   - Description complète
+ *   - Citation (blockquote si présente)
+ *   - Référence/note historique (si présente)
+ * Référence : FR-3.4, FR-1.4
+ */
+function renderEtape(stop, PC, PN, cahierN) {
+  if (!stop) return '<div class="pv-period">Étape introuvable.</div>';
+  var color     = PC[stop.p] || CAHIER_META[cahierN].color || '#888';
+  var phaseName = PN[stop.p] || ('Chapitre\u00a0' + stop.p);
+
+  var citationHTML = stop.q
+    ? '<blockquote class="pv-etape-citation">\u00ab\u00a0' + stop.q + '\u00a0\u00bb</blockquote>'
+    : '';
+
+  var refHTML = stop.r
+    ? '<aside class="pv-etape-ref">&#9432;\u00a0' + stop.r + '</aside>'
+    : '';
+
+  var descHTML = stop.d
+    ? '<div class="pv-etape-desc">' + stop.d + '</div>'
+    : '';
+
+  var dateHTML = stop.date
+    ? '<div class="pv-etape-date">&#128197;\u00a0' + stop.date + '</div>'
+    : '';
+
+  return '<button class="pv-back"'
+    + ' onclick="NAV.go(2,{cahier:' + cahierN + ',chapitre:' + stop.p + '},\'back\')">'
+    + '&#8592; ' + phaseName
+    + '</button>'
+    + '<h2 style="font-size:1em;font-weight:700;color:#e0e0e0;margin-bottom:6px;line-height:1.35;">'
+    + stop.n
+    + '</h2>'
+    + '<div class="pv-etape-phase" style="color:' + color + '">' + phaseName + '</div>'
+    + dateHTML
+    + descHTML
+    + citationHTML
+    + refHTML;
+}
+
+/* --- renderPhotos(cahierN) — FR-3.5 (task 3.5) ---
+ * Vue-photos (niveau 2, section='photos') :
+ *   - Bouton ← → vue-cahier (niveau 1)
+ *   - Titre "Photos — [Nom du cahier]"
+ *   - Liste des lieux-CPA avec vignette, nom, compteur de photos
+ * Retourne un HTML string.
+ */
+function renderPhotos(cahierN) {
+  var meta = CAHIER_META[cahierN] || {};
+  var cd   = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var lieux = cd.cpa || [];
+
+  var lieux_html = lieux.map(function(lieu) {
+    var nbPhotos = (lieu.cpa && lieu.cpa.length) ? lieu.cpa.length : 0;
+    var firstImg  = (nbPhotos > 0) ? lieu.cpa[0].img : '';
+    var thumbHTML = firstImg
+      ? '<img class="pv-lieu-thumb" src="' + firstImg + '" alt="" loading="lazy">'
+      : '<div class="pv-lieu-thumb-empty">&#128247;</div>';
+    var countLabel = nbPhotos + '\u00a0photo' + (nbPhotos > 1 ? 's' : '');
+    /* Échapper les guillemets dans loc pour usage inline onclick */
+    var locEsc = lieu.loc.replace(/'/g, '\\\'').replace(/"/g, '&quot;');
+    return '<div class="pv-lieu-item"'
+      + ' onclick="NAV.go(3,{cahier:' + cahierN + ',section:\'photos\',cpaLoc:\'' + locEsc + '\'})">'
+      + thumbHTML
+      + '<div class="pv-lieu-body">'
+      + '<div class="pv-lieu-name">' + lieu.loc + '</div>'
+      + '<div class="pv-lieu-count">&#128247; ' + countLabel + '</div>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+
+  var emptyHTML = lieux.length === 0
+    ? '<p style="color:#667788;font-size:.88em;padding:8px 4px;">Aucune photo disponible pour ce cahier.</p>'
+    : '';
+
+  return '<button class="pv-back" onclick="NAV.go(1,{cahier:' + cahierN + '},\'back\')">'
+    + '&#8592; Cahier\u00a0' + cahierN + '\u00a0\u2014 ' + (meta.title || '')
+    + '</button>'
+    + '<div class="pv-title">Photos \u2014 ' + (meta.title || ('Cahier\u00a0' + cahierN)) + '</div>'
+    + '<div class="pv-photos-grid">'
+    + lieux_html
+    + emptyHTML
+    + '</div>';
+}
+
+/* --- _cpaLbOpenDirect(cpaList, idx) ---
+ * Ouvre la lightbox en chargeant directement la liste CPA sans passer par _CPA_REGISTRY.
+ * Exposé globalement pour les onclick inline de renderLieuPhoto.
+ */
+function _cpaLbOpenDirect(cpaList, idx) {
+  _cpaLbList = cpaList || [];
+  _cpaLbIdx  = idx || 0;
+  _cpaLbRender();
+  document.getElementById('cpa-lb').classList.add('open');
+}
+
+/* --- _updateLieuPhotoView(lieu, cahierN, idx) ---
+ * Met à jour le contenu de la vue-lieu-photo in situ (sans transition NAV) pour
+ * la navigation interne ◀/▶ entre les photos d'un lieu.
+ * Appelé par les boutons de navigation dans renderLieuPhoto.
+ */
+function _updateLieuPhotoView(lieu, cahierN, idx) {
+  var viewport = document.getElementById('panel-viewport');
+  if (!viewport || !viewport.firstChild) return;
+  viewport.firstChild.innerHTML = _renderLieuPhotoContent(lieu, cahierN, idx);
+}
+
+/* --- _renderLieuPhotoContent(lieu, cahierN, idx) ---
+ * Retourne le HTML interne de la vue-lieu-photo pour l'index idx.
+ * Utilisé à la fois par renderLieuPhoto et _updateLieuPhotoView.
+ */
+function _renderLieuPhotoContent(lieu, cahierN, idx) {
+  var meta     = CAHIER_META[cahierN] || {};
+  var cpaList  = lieu.cpa || [];
+  var nbPhotos = cpaList.length;
+  idx = Math.max(0, Math.min(nbPhotos - 1, idx || 0));
+  var photo    = cpaList[idx] || {};
+
+  /* Construire un objet sérialisable pour le onclick inline */
+  /* On passe par un identifiant dans un registre temporaire plutôt que
+     sérialiser le tableau complet en inline (problème d'échappement). */
+  var regKey = '_lieu_' + cahierN + '_' + idx;
+  if (!window._CPA_REGISTRY) window._CPA_REGISTRY = {};
+  window._CPA_REGISTRY[regKey] = cpaList;
+
+  var imgHTML = photo.img
+    ? '<img class="pv-photo-img" src="' + photo.img + '" alt="'
+        + (photo.title || '').replace(/"/g, '&quot;') + '"'
+        + ' onclick="event.stopPropagation();_cpaLbOpenDirect(window._CPA_REGISTRY[\'' + regKey + '\'],' + idx + ')">'
+    : '<div style="height:120px;background:#0a1020;display:flex;align-items:center;'
+        + 'justify-content:center;color:#4a6a8a;font-size:2em;">&#128247;</div>';
+
+  /* Boutons de navigation ◀/▶ internes */
+  var prevDisabled = idx === 0 ? ' disabled' : '';
+  var nextDisabled = idx === nbPhotos - 1 ? ' disabled' : '';
+
+  /* Construire une représentation sérialisée de lieu pour les boutons nav */
+  /* On passe par un registre global pour éviter l'échappement JSON inline */
+  var lieuRegKey = '_lieu_nav_' + cahierN + '_' + lieu.loc.replace(/[^a-zA-Z0-9]/g, '_');
+  window._LIEU_REGISTRY = window._LIEU_REGISTRY || {};
+  window._LIEU_REGISTRY[lieuRegKey] = lieu;
+
+  var navHTML = nbPhotos > 1
+    ? '<div class="pv-photo-nav">'
+        + '<button class="pv-photo-nav-btn"' + prevDisabled
+        + ' onclick="_updateLieuPhotoView(window._LIEU_REGISTRY[\'' + lieuRegKey + '\'],' + cahierN + ',' + (idx - 1) + ')">'
+        + '&#9664;</button>'
+        + '<span class="pv-photo-counter">' + (idx + 1) + '\u00a0/\u00a0' + nbPhotos + '</span>'
+        + '<button class="pv-photo-nav-btn"' + nextDisabled
+        + ' onclick="_updateLieuPhotoView(window._LIEU_REGISTRY[\'' + lieuRegKey + '\'],' + cahierN + ',' + (idx + 1) + ')">'
+        + '&#9654;</button>'
+        + '</div>'
+    : '';
+
+  return '<button class="pv-back"'
+    + ' onclick="NAV.go(2,{cahier:' + cahierN + ',section:\'photos\'},\'back\')">'
+    + '&#8592; Photos \u2014 ' + (meta.title || ('Cahier\u00a0' + cahierN))
+    + '</button>'
+    + '<div class="pv-lieu-header">'
+    + '<div class="pv-lieu-title">' + lieu.loc + '</div>'
+    + '</div>'
+    + '<div class="pv-photo-wrap">'
+    + imgHTML
+    + '</div>'
+    + navHTML
+    + (photo.title ? '<div class="pv-photo-title">' + photo.title + '</div>' : '')
+    + (photo.desc  ? '<div class="pv-photo-desc">'  + photo.desc  + '</div>' : '');
+}
+
+/* --- renderLieuPhoto(lieu, cahierN, initialIdx) — FR-3.6 (task 3.5) ---
+ * Vue-lieu-photo (niveau 3, cpaLoc) :
+ *   - Bouton ← → vue-photos (niveau 2, section='photos')
+ *   - Photo en grand format avec clic → lightbox
+ *   - Navigation interne ◀/▶ entre photos du lieu (état local, pas NAV.go)
+ *   - Titre et description de la photo active
+ * Retourne un HTML string.
+ */
+function renderLieuPhoto(lieu, cahierN, initialIdx) {
+  return _renderLieuPhotoContent(lieu, cahierN, initialIdx || 0);
+}
+
+/* --- findLieuByCpaLoc(cahierN, cpaLoc) ---
+ * Retourne l'objet lieu dans CAHIER_N_DATA.cpa dont loc === cpaLoc.
+ */
+function findLieuByCpaLoc(cahierN, cpaLoc) {
+  var cd   = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var lieux = cd.cpa || [];
+  for (var i = 0; i < lieux.length; i++) {
+    if (lieux[i].loc === cpaLoc) return lieux[i];
+  }
+  return null;
+}
+
+/* --- renderAccueil() — FR-3.1, FR-8 (task 3.2) ---
+ * Vue-accueil (niveau 0) : biographie + liste des 4 cahiers avec liens PDF.
+ * Retourne un HTML string.
+ */
+(function() {
+  /* Injecter les styles une seule fois */
+  if (document.getElementById('panel-va-css')) return;
+  var s = document.createElement('style');
+  s.id = 'panel-va-css';
+  s.textContent = [
+    '.va-title{font-size:1.05em;font-weight:700;color:#e0e0e0;margin:0 0 2px}',
+    '.va-subtitle{font-size:.75em;color:#e94560;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}',
+    '.va-bio{font-size:.82em;color:#a0b4c8;line-height:1.6;margin-bottom:14px;text-align:justify}',
+    '.va-cards{display:flex;flex-direction:column;gap:8px}',
+    '.va-card{background:rgba(15,52,96,.45);border:1px solid #1a4a7a;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;overflow:hidden}',
+    '.va-card:hover{background:rgba(26,74,122,.6);transform:translateY(-1px)}',
+    '.va-card-top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 4px}',
+    '.va-card-num{font-size:.72em;font-weight:700;letter-spacing:.1em;opacity:.8}',
+    '.va-card-pdf{color:#a0b4c8;opacity:.6;display:flex;align-items:center;transition:opacity .15s;text-decoration:none;flex-shrink:0}',
+    '.va-card-pdf:hover{opacity:1}',
+    '.va-card-body{padding:0 12px 12px}',
+    '.va-card-title{font-size:.92em;font-weight:600;color:#fff;margin:0 0 2px}',
+    '.va-card-period{font-size:.75em;color:#8899aa;margin-bottom:4px}',
+    '.va-card-desc{font-size:.78em;color:#8899aa;line-height:1.45}'
+  ].join('');
+  document.head.appendChild(s);
+})();
+
+var _svgManuscrit = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"'
+  + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+  + '<path d="M12 19l7-7 3 3-7 7-3-3z"/>'
+  + '<path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>'
+  + '<path d="M2 2l7.586 7.586"/>'
+  + '<circle cx="11" cy="11" r="2"/>'
+  + '</svg>';
+
+function renderAccueil() {
+  var CAHIER_COLORS  = { 1:'#f5a623', 2:'#e94560', 3:'#2ecc71', 4:'#3498db' };
+  var CAHIER_TITLES  = { 1:'La Guerre', 2:'Journal non \u00e9crit d\u2019un fantassin en repli strat\u00e9gique', 3:'L\u2019\u00c9vasion', 4:'Captivit\u00e9, r\u00e9cits et r\u00e9flexions' };
+  var CAHIER_PERIODS = { 1:'Ao\u00fbt 1939 \u2013 Juin 1940', 2:'Mai \u2013 Juin 1940', 3:'Sept. \u2013 Oct. 1941', 4:'1940 \u2013 1945' };
+  var CAHIER_DESCS   = {
+    1: 'De la mobilisation dans les Pyr\u00e9n\u00e9es ari\u00e9geoises jusqu\u2019aux avant-postes face \u00e0 Pirmasens, puis la d\u00e9b\u00e2cle vers Verdun. La \u00ab\u00a0dr\u00f4le de guerre\u00a0\u00bb vue d\u2019en bas.',
+    2: 'Mai\u2013juin\u00a01940\u00a0: le repli \u00e0 travers la France en d\u00e9route, les routes embouteill\u00e9es, les ordres contradictoires, et finalement la capture.',
+    3: 'Nuit du 20\u00a0septembre\u00a01941\u00a0: Alban et Andr\u00e9 sautent dans le noir depuis leur Kommando. Deux semaines \u00e0 pied dans les Alpes autrichiennes, boussole et carte copi\u00e9e \u00e0 la main.',
+    4: 'R\u00e9flexions d\u2019un instituteur ari\u00e9geois prisonnier de guerre depuis le Stalag XVIII\u00a0D\u00a0: souvenirs, lectures, pens\u00e9es sur la guerre et la libert\u00e9.'
+  };
+
+  var cardsHtml = '';
+  for (var n = 1; n <= 4; n++) {
+    var meta = CAHIER_META[n];
+    var col  = CAHIER_COLORS[n];
+    cardsHtml += '<div class="va-card" style="border-top:3px solid ' + col + '"'
+      + ' onclick="NAV.go(1,{cahier:' + n + '})">'
+      + '<div class="va-card-top">'
+      + '<div class="va-card-num" style="color:' + col + '">CAHIER ' + n + '</div>'
+      + '<a class="va-card-pdf" href="' + meta.pdfOriginal + '" target="_blank"'
+      + ' title="Manuscrit original (Google Drive)"'
+      + ' onclick="event.stopPropagation()">' + _svgManuscrit + '</a>'
+      + '</div>'
+      + '<div class="va-card-body">'
+      + '<div class="va-card-title">' + CAHIER_TITLES[n] + '</div>'
+      + '<div class="va-card-period">' + CAHIER_PERIODS[n] + '</div>'
+      + '<div class="va-card-desc">' + CAHIER_DESCS[n] + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  return '<div style="padding:12px 12px 16px">'
+    + '<div class="va-title">Alban Rouzaud</div>'
+    + '<div class="va-subtitle">\u00c9crits de Guerre \u2014 1939\u20131945</div>'
+    + '<p class="va-bio">Instituteur \u00e0 Lavelanet (Ari\u00e8ge), Alban Rouzaud est mobilis\u00e9 en ao\u00fbt\u00a01939.'
+    + ' Il vit la \u00ab\u00a0dr\u00f4le de guerre\u00a0\u00bb en Alsace face \u00e0 Pirmasens, puis la d\u00e9b\u00e2cle de juin\u00a01940'
+    + ' jusqu\u2019\u00e0 sa capture. Prisonnier au Stalag XVIII\u00a0D de Marburg an der Drau (Slov\u00e9nie),'
+    + ' il s\u2019\u00e9vade en septembre\u00a01941 avec son camarade Andr\u00e9 depuis leur Arbeitskommando pr\u00e8s'
+    + ' de Weiz (Styrie), traversant les Alpes autrichiennes \u00e0 pied avant d\u2019\u00eatre arr\u00eat\u00e9 par des'
+    + ' carabiniers en Italie. Reconduit \u00e0 Marburg, il purge 21\u00a0jours de cachot, puis reprend son'
+    + ' existence de prisonnier jusqu\u2019\u00e0 la Lib\u00e9ration en\u00a01945.'
+    + ' Ces quatre cahiers en sont le t\u00e9moignage.</p>'
+    + '<div class="va-cards">' + cardsHtml + '</div>'
+    + '</div>';
+}
+/* ========== /Views ========== */
+
+/* --- Abonnement NAV → Views : dispatch vers les fonctions de rendu ---
+ * Vagues 3+4 : niveaux 0–3 gérés (tâches 3.2, 3.3, 3.4, 3.5).
+ */
+NAV.on('change', function(state) {
+  /* Guard anti-récursion : éviter que setExpanded→NAV.setExpanded→change
+     re-déclenche le dispatcher pendant une transition en cours */
+  if (Panel._transitioning) return;
+  var dir = state.direction || 'forward';
+  if (state.level === 0) {
+    Panel.navigateTo(renderAccueil, dir);
+  } else if (state.level === 1 && state.cahier != null && !state.section) {
+    Panel.navigateTo(function() { return renderCahier(state.cahier); }, dir);
+  } else if (state.level === 2 && state.cahier != null && state.section === 'photos') {
+    /* Vue-photos — FR-3.5 */
+    (function(cN) {
+      Panel.navigateTo(function() { return renderPhotos(cN); }, dir);
+    })(state.cahier);
+  } else if (state.level === 2 && state.cahier != null && state.chapitre != null && !state.section) {
+    /* Closure stable pour éviter la capture de la variable de boucle */
+    (function(cN, pN) {
+      Panel.navigateTo(function() { return renderChapitre(cN, pN); }, dir);
+    })(state.cahier, state.chapitre);
+  } else if (state.level === 3 && state.cpaLoc != null) {
+    /* Vue-lieu-photo — FR-3.6 */
+    (function(cN, loc) {
+      var lieu = findLieuByCpaLoc(cN, loc);
+      if (lieu) {
+        Panel.navigateTo(function() { return renderLieuPhoto(lieu, cN, 0); }, dir);
+        MapAdapter.flyToCPA(lieu);
+        Panel._expandDirect();
+      }
+    })(state.cahier, state.cpaLoc);
+  } else if (state.level === 3 && state.stopId != null) {
+    /* Closure stable */
+    (function(cN, sId) {
+      var cd   = getCahierData(cN);
+      var stop = findStop(cd, sId);
+      Panel.navigateTo(function() { return renderEtape(stop, cd.PC || {}, cd.PN || {}, cN); }, dir);
+      Panel._expandDirect();
+    })(state.cahier, state.stopId);
+  }
+});
+/* ========== /NAV → Views ========== */
+
+/* ========== Interactions ========== */
+/* Design : § Détection swipe, requirements FR-2.1, FR-2.2            */
+/* Spec   : carte-responsive-nav / task 4.1                            */
+
+/* --- attachSwipe(el, onLeft, onRight, onUp, onDown) ---
+ * Seuil : déplacement horizontal ≥ 50px ET ratio h/v ≥ 2 (FR-2.2).
+ * Les callbacks absents sont ignorés silencieusement.
+ */
+function attachSwipe(el, onLeft, onRight, onUp, onDown) {
+  var startX, startY;
+  el.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  el.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - startX;
+    var dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) >= 50 && Math.abs(dx) / Math.abs(dy) >= 2) {
+      /* Swipe horizontal */
+      if (dx < 0 && onLeft)  onLeft();
+      if (dx > 0 && onRight) onRight();
+    } else if (Math.abs(dy) >= 50 && Math.abs(dy) / Math.abs(dx) >= 2) {
+      /* Swipe vertical */
+      if (dy < 0 && onUp)   onUp();
+      if (dy > 0 && onDown) onDown();
+    }
+  }, { passive: true });
+}
+
+var Interactions = (function() {
+
+  function init() {
+    /* --- Boutons ◀/▶ (FR-2.1) --- */
+    var btnPrev = document.getElementById('nav-prev');
+    var btnNext = document.getElementById('nav-next');
+
+    if (btnPrev) {
+      btnPrev.addEventListener('click', function() {
+        if (!btnPrev.disabled) NAV.prev();
+      });
+    }
+    if (btnNext) {
+      btnNext.addEventListener('click', function() {
+        if (!btnNext.disabled) NAV.next();
+      });
+    }
+
+    /* --- Swipe sur #panel-viewport (FR-2.2) ---
+     * gauche → NAV.next(), droite → NAV.prev()
+     * haut   → expand,    bas    → compact
+     */
+    var viewport = document.getElementById('panel-viewport');
+    if (viewport) {
+      attachSwipe(
+        viewport,
+        function() { NAV.next(); },              /* gauche */
+        function() { NAV.prev(); },              /* droite */
+        function() { Panel.setExpanded(true);  }, /* haut   */
+        function() { Panel.setExpanded(false); }  /* bas    */
+      );
+    }
+
+    /* --- Swipe sur #panel-bar (barre compacte — FR-2.2) ---
+     * haut → expand, bas → compact
+     */
+    var panelBar = document.getElementById('panel-bar');
+    if (panelBar) {
+      attachSwipe(
+        panelBar,
+        null,                                    /* gauche : ignoré */
+        null,                                    /* droite : ignoré */
+        function() { Panel.setExpanded(true);  }, /* haut  */
+        function() { Panel.setExpanded(false); }  /* bas   */
+      );
+    }
+  }
+
+  return { init: init };
+})();
+/* ========== /Interactions ========== */
+
+/* --- Abonnement NAV → ElevPanel ---
+ * Synchronise le profil altitude avec l'état NAV :
+ *   panelMode === 'elev'  → ElevPanel.show(cahier actif)
+ *   autre mode            → ElevPanel.hide()
+ *   stopId change         → ElevPanel.setHighlight(stopId)
+ */
+NAV.on('change', function(state) {
+  if (state.panelMode === 'elev') {
+    ElevPanel.show(state.cahier || 1);
+  } else {
+    /* Ne masquer que si le profil était visible — évite des map.resize() inutiles */
+    if (_elevPanelVisible) {
+      ElevPanel.hide();
+    }
+  }
+  /* Synchronisation highlight (FR-5.1 / FR-6.2) */
+  ElevPanel.setHighlight(state.stopId);
+});
+/* ========== /NAV → ElevPanel ========== */
+
+// =====================================================================
+// GESTION DU STYLE.LOAD (changements de fond de carte)
+// =====================================================================
+map.on('style.load', function() {
+  try { applyTerrain();       } catch(e){}
+  try { applyHillshade();     } catch(e){}
+  try { addCadastre();        } catch(e){}
+  // Ré-ajouter les couches de tous les cahiers déjà chargés
+  loadedCahiers.forEach(function(n) {
+    try { renderLinesForCahier(n, getCahierData(n)); } catch(e){}
+  });
+  updatePitchInfo();
+});
+
+// =====================================================================
+// CONTRÔLES CARTE
+// =====================================================================
+map.on('move', updatePitchInfo);
+map.on('mousemove', function(e){
+  document.getElementById('coords').textContent = 'lat: '+e.lngLat.lat.toFixed(5)+'   lng: '+e.lngLat.lng.toFixed(5);
+});
+map.on('dblclick', function(e){
+  e.preventDefault();
+  var text = e.lngLat.lat.toFixed(5)+', '+e.lngLat.lng.toFixed(5);
+  if (navigator.clipboard) navigator.clipboard.writeText(text).catch(function(){});
+  var toast = document.getElementById('dblclick-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'dblclick-toast';
+    toast.style.cssText = 'position:fixed;bottom:50px;left:50%;transform:translateX(-50%);'
+      +'background:rgba(15,52,96,.97);color:#f5a623;border:1px solid #1a4a7a;border-radius:6px;'
+      +'padding:7px 16px;font-size:.88em;font-family:monospace;z-index:5000;pointer-events:none;'
+      +'transition:opacity .4s;white-space:nowrap;';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = '📋 '+text;
+  toast.style.opacity = '1';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(function(){ toast.style.opacity='0'; },2200);
+});
+function updatePitchInfo(){
+  document.getElementById('pitch-info').textContent =
+    'pitch: '+Math.round(map.getPitch())+'° | bear: '+Math.round(map.getBearing())+'°';
+}
+
+document.getElementById('ck-hillshade').addEventListener('change',function(){
+  hillshadeOn=this.checked; applyHillshade();
+});
+document.getElementById('ck-cadastre').addEventListener('change',function(){
+  cadastreOn=this.checked; addCadastre();
+});
+document.getElementById('ck-cpa').addEventListener('change',function(){
+  cpaGlobalVisible=this.checked;
+  if (cpaGlobalVisible) {
+    // Ré-afficher les marqueurs CPA déjà créés
+    loadedCahiers.forEach(function(n){
+      cpaMarkers[n].forEach(function(m){m.addTo(map);});
+    });
+  } else {
+    // Masquer tous les marqueurs CPA
+    for(var cn=1;cn<=4;cn++){
+      cpaMarkers[cn].forEach(function(m){m.remove();});
+    }
+  }
+});
+document.querySelectorAll('input[name="basemap"]').forEach(function(r){
+  r.addEventListener('change',function(){
+    currentBasemap=this.value;
+    map.setStyle(STYLES[currentBasemap]);
+  });
+});
+// =====================================================================
+// SETTINGS DRAWER — ouverture/fermeture
+// =====================================================================
+(function() {
+  var btn      = document.getElementById('settings-btn');
+  var drawer   = document.getElementById('settings-drawer');
+  var closeBtn = document.getElementById('settings-close');
+
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    drawer.classList.toggle('open');
+  });
+  closeBtn.addEventListener('click', function() {
+    drawer.classList.remove('open');
+  });
+  /* Fermer en cliquant ailleurs */
+  document.addEventListener('click', function(e) {
+    if (!drawer.contains(e.target) && e.target !== btn) {
+      drawer.classList.remove('open');
+    }
+  });
+})();
+// =====================================================================
+// CHARGEMENT DE TOUS LES CAHIERS + VUE D'ENSEMBLE
+// =====================================================================
+function loadAllCahiers() {
+  function doLoad() {
+    // Charger les données de chaque cahier sans déclencher flyTo ni setActiveCahier
+    var firstLoad = loadedCahiers.size === 0;
+    [1, 2, 3].forEach(function(n) {
+      if (!loadedCahiers.has(n)) {
+        var data = getCahierData(n);
+        renderLinesForCahier(n, data);
+        renderMarkersForCahier(n, data);
+        addCpaMarkersForCahier(n, data.CPA);
+        loadedCahiers.add(n);
+      }
+    });
+    // S'assurer que C1-3 sont visibles pour la vue d'ensemble
+    [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, true); });
+    if (loadedCahiers.has(4)) setCahierVisibility(4, false);
+    updateVueEnsembleBtn();
+    // Activer C1 au premier chargement (pour le profil altitude et le hash URL)
+    if (firstLoad) setActiveCahier(1, true);
+    // Vue d'ensemble : bbox englobant tous les cahiers (France → Italie)
+    map.fitBounds([[-1.0, 42.0], [16.5, 51.5]], { padding: 40, duration: 800 });
+  }
+  if (map.loaded()) { doLoad(); }
+  else { map.once('load', doLoad); }
+}
+
+// =====================================================================
+// HASH URL
+// =====================================================================
+function updateHash(n) {
+  history.replaceState(null, '', '#c'+n);
+}
+
+window.addEventListener('hashchange', function(){
+  var m = location.hash.match(/^#c([1-4])$/);
+  if (m) loadCahier(parseInt(m[1]));
+});
+
+// =====================================================================
+// INITIALISATION AU CHARGEMENT
+// =====================================================================
+(function init() {
+  updateExagBtn();
+  // Initialiser la séquence plate ◀/▶ traversante (task 5.3 — FR-2.1)
+  // Les 4 data files sont chargés synchroniquement via <script src>, donc
+  // CAHIER_N_DATA sont disponibles immédiatement ici.
+  NAV.initSequence([CAHIER_1_DATA, CAHIER_2_DATA, CAHIER_3_DATA, CAHIER_4_DATA]);
+  // Brancher MapAdapter sur NAV
+  NAV.on('change', function(state) { MapAdapter.syncToState(state); });
+  // Initialiser le Panneau (task 3.1) : breadcrumb click + NAV wiring
+  Panel.init();
+  // Initialiser les interactions ◀/▶ et swipe (task 4.1)
+  Interactions.init();
+  // Charger tous les cahiers sur la carte (marqueurs + tracés + CPA)
+  loadAllCahiers();
+
+  /* FR-3.1 / FR-8 — Afficher la vue-accueil au chargement, panneau expanded.
+   * NAV.go(0) retourne no-op si déjà au niveau 0 (état initial),
+   * donc on appelle navigateTo directement pour le rendu initial. */
+  Panel.setExpanded(true);
+  Panel.navigateTo(renderAccueil, 'forward');
+
+  // Afficher le fil d'Ariane initial (niveau 0)
+  Panel.updateBreadcrumb(NAV.state);
+
+  /* FR-1.4 / NFR-5 — Semer l'entrée initiale dans l'historique.
+   * Sans cet appel, le premier popstate déclencherait une sortie de page. */
+  history.pushState({ level: 0 }, '');
+})();
+
+// =====================================================================
+// BOUTON RETOUR ANDROID — history.pushState + popstate (task 4.2)
+// FR-1.4 : le bouton retour OS remonte d'un niveau dans NAV.
+// NFR-5  : depuis le niveau 0, aucune sortie de page.
+// =====================================================================
+
+/* Pousser une entrée dans l'historique à chaque navigation forward > 0 */
+NAV.on('change', function(state) {
+  if (state.direction === 'forward' && state.level > 0) {
+    history.pushState({ level: state.level }, '');
+  }
+});
+
+/* Intercepter le bouton retour OS / Android */
+window.addEventListener('popstate', function(e) {
+  var targetLevel = Math.max(0, NAV.state.level - 1);
+  if (NAV.state.level === 0) {
+    /* Déjà au niveau 0 — ré-injecter une entrée pour empêcher la sortie */
+    history.pushState({ level: 0 }, '');
+    return;
+  }
+  NAV.go(targetLevel, null, 'back');
+});
+
+// =====================================================================
+// CONTRÔLE D'EXAGÉRATION DU RELIEF — drag vertical sur btn-exag
+// =====================================================================
+// CONTRÔLE D'EXAGÉRATION — clic milieu + drag vertical sur la carte
+// =====================================================================
+(function() {
+  var active    = false;
+  var startY    = 0;
+  var startExag = 1.0;
+  var indicator = null; // label flottant pendant le drag
+
+  var mapCanvas = document.getElementById('map');
+
+  function showIndicator(y) {
+    if (!indicator) {
+      indicator = document.createElement('div');
+      indicator.style.cssText =
+        'position:fixed;z-index:9000;background:rgba(15,22,40,.92);color:#f5a623;'
+        +'border:1px solid #1a4a7a;border-radius:5px;padding:4px 10px;font-size:.9em;'
+        +'font-family:monospace;pointer-events:none;white-space:nowrap;'
+        +'transform:translateX(-50%);';
+      document.body.appendChild(indicator);
+    }
+    indicator.textContent = '\u26f0 \xd7' + terrainExaggeration.toFixed(1);
+    indicator.style.left = (window.innerWidth / 2) + 'px';
+    indicator.style.top  = Math.max(60, y - 30) + 'px';
+    indicator.style.display = 'block';
+  }
+
+  function hideIndicator() {
+    if (indicator) indicator.style.display = 'none';
+  }
+
+  // Bloquer le comportement natif du clic milieu (autoscroll Windows)
+  // sur le canvas MapLibre ET sur toute la zone carte
+  document.getElementById('map-wrap').addEventListener('mousedown', function(e) {
+    if (e.button === 1) { e.preventDefault(); }
+  });
+  document.getElementById('map-wrap').addEventListener('auxclick', function(e) {
+    e.preventDefault();
+  });
+
+  // Démarrer le drag sur clic milieu
+  mapCanvas.addEventListener('mousedown', function(e) {
+    if (e.button !== 1) return;       // uniquement bouton milieu
+    if (!terrainOn) return;
+    e.preventDefault();
+    e.stopPropagation();
+    active    = true;
+    startY    = e.clientY;
+    startExag = terrainExaggeration;
+    document.body.style.cursor = 'ns-resize';
+    showIndicator(e.clientY);
+  });
+
+  document.addEventListener('mousemove', function(e) {
+    if (!active) return;
+    var dy    = startY - e.clientY;   // haut = positif = augmenter
+    var v = Math.min(5.0, Math.max(0.2, startExag + dy * 0.025));
+    v = Math.round(v * 10) / 10;
+    if (v !== terrainExaggeration) {
+      terrainExaggeration = v;
+      applyTerrain();
+      updateExagBtn();
+    }
+    showIndicator(e.clientY);
+  });
+
+  document.addEventListener('mouseup', function(e) {
+    if (!active) return;
+    if (e.button !== 1) return;
+    active = false;
+    document.body.style.cursor = '';
+    hideIndicator();
+  });
+
+  // Sécurité : relâchement si la fenêtre perd le focus
+  window.addEventListener('blur', function() {
+    if (active) {
+      active = false;
+      document.body.style.cursor = '';
+      hideIndicator();
+    }
+  });
+
+  // Double-clic sur exag-pill pour remettre l'exagération à ×1.0
+  document.getElementById('exag-pill').addEventListener('dblclick', function() {
+    terrainExaggeration = 1.0;
+    applyTerrain();
+    updateExagBtn();
+  });
+})();
+</script>
+</body>
+</html>
