@@ -36,6 +36,34 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 #exag-pill.active{color:#fff;border-color:rgba(100,160,240,.6)}
 
 /* =====================================================================
+   HANDLE DE REDIMENSIONNEMENT (A-1)
+   ===================================================================== */
+#panel-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 300;
+  background: transparent;
+  transition: background .15s;
+}
+#panel-resize-handle:hover { background: rgba(100,160,240,.15); }
+
+@media (max-width: 480px) and (orientation: portrait) {
+  #panel-resize-handle {
+    bottom: 100%;
+    top: auto;
+    right: auto;
+    left: 0;
+    width: 100%;
+    height: 12px;
+    cursor: row-resize;
+  }
+}
+
+/* =====================================================================
    SETTINGS — bouton ⚙ et drawer
    ===================================================================== */
 #settings-btn {
@@ -367,12 +395,14 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
     <div id="panel" class="expanded">
       <!-- Barre compacte — toujours visible -->
       <div id="panel-bar">
-        <button id="nav-prev" title="Étape précédente" disabled>&#9664;</button>
+        <button id="nav-prev" title="Étape précédente">&#9664;</button>
         <div id="panel-breadcrumb" title="Cliquer pour réduire / agrandir">Alban Rouzaud — Écrits de Guerre</div>
-        <button id="nav-next" title="Étape suivante" disabled>&#9654;</button>
+        <button id="nav-next" title="Étape suivante">&#9654;</button>
       </div>
       <!-- Zone de rendu des vues (navigateTo) -->
       <div id="panel-viewport"></div>
+      <!-- Handle de redimensionnement (A-1) -->
+      <div id="panel-resize-handle"></div>
     </div>
 
     <!-- sidebar, sbtoggle, sb-fab, sb-overlay supprimés (tâche 5.1) -->
@@ -399,12 +429,21 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
             <label><input type="radio" name="basemap" value="terrain"> 🏔️ Basemap.at Terrain</label>
             <label><input type="radio" name="basemap" value="ortho"> 🎞️ Basemap.at Ortho</label>
             <label><input type="radio" name="basemap" value="satellite"> 🌐 Satellite Esri</label>
+            <label style="display:flex;align-items:center;justify-content:space-between;gap:6px">Transitions carte
+              <select id="ck-transition" style="background:#0f1628;border:1px solid #1a4a7a;color:#a0b4c8;border-radius:4px;padding:2px 4px;font-size:.8em">
+                <option value="0">Instantané</option>
+                <option value="400">Rapide</option>
+                <option value="1200" selected>Normal</option>
+                <option value="2000">Lent</option>
+              </select>
+            </label>
           </div>
           <div class="settings-section">
             <div class="settings-section-title">Overlays</div>
             <label><input type="checkbox" id="ck-cadastre"> 🏛️ Cadastre franciscain (~1830)</label>
             <label><input type="checkbox" id="ck-hillshade" checked> Ombrage terrain</label>
             <label><input type="checkbox" id="ck-cpa" checked> 📷 Cartes postales</label>
+            <label><input type="checkbox" id="ck-terrain" checked> 🏔 Terrain 3D</label>
           </div>
           <div class="settings-section">
             <div class="settings-section-title">Profil altitude</div>
@@ -469,15 +508,17 @@ var NAV = (function() {
 
   /* État interne — jamais muté directement de l'extérieur */
   var _state = {
-    cahier:        null,   // 1–4 | null
-    chapitre:      null,   // numéro de phase | null
-    stopId:        null,   // id du stop actif | null
-    cpaLoc:        null,   // loc du lieu CPA actif (si pas de stopId) | null
-    section:       null,   // 'photos' | null — section de niveau 2
-    level:         0,      // 0–3
-    panelExpanded: true,
-    panelMode:     'nav',  // 'nav' | 'elev'
-    direction:     null    // 'forward' | 'back' | null — renseigné par go()
+    cahier:                   null,   // 1–4 | null
+    chapitre:                 null,   // numéro de phase | null
+    stopId:                   null,   // id du stop actif | null
+    _previousStopId:          null,   // stopId conservé pendant la transition niveau 3→2 (F-2)
+    _pendingHighlightChapitre: null,  // chapitre à mettre en surbrillance après next() depuis dernier item (D-2)
+    cpaLoc:                   null,   // loc du lieu CPA actif (si pas de stopId) | null
+    section:                  null,   // 'photos' | null — section de niveau 2
+    level:                    0,      // 0–3
+    panelExpanded:            true,
+    panelMode:                'nav',  // 'nav' | 'elev'
+    direction:                null    // 'forward' | 'back' | null — renseigné par go()
   };
 
   /* Listeners enregistrés par on('change', cb) */
@@ -505,6 +546,9 @@ var NAV = (function() {
     for (var i = 0; i < _listeners.length; i++) {
       try { _listeners[i](snapshot); } catch(e) {}
     }
+    /* NOTE: _previousStopId et _pendingHighlightChapitre sont intentionnellement
+       conservés après l'émission — ils sont nettoyés au début du prochain go()
+       pour que les fonctions de rendu appelées par les listeners puissent les lire. */
   }
 
   /* --- Abonnement --- */
@@ -537,6 +581,10 @@ var NAV = (function() {
     ids       = ids || {};
     direction = (direction === 'back') ? 'back' : 'forward';
 
+    /* Nettoyer les marqueurs transitoires de la nav précédente (F-2, D-2) */
+    _state._previousStopId           = null;
+    _state._pendingHighlightChapitre = null;
+
     /* Mise à jour de l'état selon le niveau cible */
     _state.level     = level;
     _state.direction = direction;
@@ -556,9 +604,11 @@ var NAV = (function() {
       _state.cpaLoc   = null;
       _state.section  = null;
     } else if (level === 2) {
-      /* Niveau chapitre / photos : stop effacé */
+      /* Niveau chapitre / photos : stop effacé — conserver le stopId précédent (F-2) */
       if (ids.cahier   != null) _state.cahier   = ids.cahier;
       if (ids.chapitre != null) _state.chapitre = ids.chapitre;
+      /* Sauvegarder le stopId avant de l'effacer (pour highlight au retour) */
+      _state._previousStopId = _state.stopId;
       _state.stopId  = null;
       _state.cpaLoc  = null;
       _state.section = ids.section || null;
@@ -740,7 +790,17 @@ var NAV = (function() {
   /* --- Navigation ▶ --- */
   function next() {
     if (!_seq || _seq.length === 0) return;
-    if (_seqIndex >= _seq.length - 1) return;   /* dernier item — no-op */
+    if (_seqIndex >= _seq.length - 1) {
+      /* Dernier item — remonter au niveau 1 (cahier) avec highlight du chapitre (D-2) */
+      var lastItem = _seq[_seq.length - 1];
+      if (lastItem) {
+        _state._pendingHighlightChapitre = lastItem.type === 'stop'
+          ? lastItem.data.p
+          : (lastItem.data.p || null);
+        go(1, { cahier: lastItem.cahier }, 'forward', true);
+      }
+      return;
+    }
     _seqIndex++;
     var args = _itemToGoArgs(_seq[_seqIndex]);
     go(args.level, args.ids, 'forward', true);
@@ -749,7 +809,16 @@ var NAV = (function() {
   /* --- Navigation ◀ --- */
   function prev() {
     if (!_seq || _seq.length === 0) return;
-    if (_seqIndex <= 0) return;                  /* premier item — no-op */
+    if (_seqIndex === -1) return;              /* pas encore navigué — no-op */
+    if (_seqIndex <= 0) {
+      /* Premier item — remonter au niveau 2 (chapitre) avec highlight (D-1) */
+      var firstItem = _seq[0];
+      if (firstItem && firstItem.type === 'stop') {
+        /* go() vers niveau 2 sauvegarde automatiquement _previousStopId via F-2 */
+        go(2, { cahier: firstItem.cahier, chapitre: firstItem.data.p }, 'back', true);
+      }
+      return;
+    }
     _seqIndex--;
     var args = _itemToGoArgs(_seq[_seqIndex]);
     go(args.level, args.ids, 'back', true);
@@ -769,6 +838,12 @@ var NAV = (function() {
     /* Propriété en lecture seule — retourne une copie de l'état */
     get state() { return _copy(); },
 
+    /* previousStopId — stopId conservé pendant la transition niveau 3→2 (F-2) */
+    get previousStopId() { return _state._previousStopId; },
+
+    /* pendingHighlightChapitre — chapitre à mettre en surbrillance (D-2) */
+    get pendingHighlightChapitre() { return _state._pendingHighlightChapitre; },
+
     on:             on,
     off:            off,
     go:             go,
@@ -785,6 +860,7 @@ var NAV = (function() {
     _syncSeqIndex:       _syncSeqIndex,
     _buildFlatSequence:  buildFlatSequence,
     get _seqIndex()      { return _seqIndex; },
+    set _seqIndex(v)     { _seqIndex = v; },
     get _seq()           { return _seq; }
   };
 })();
@@ -813,7 +889,7 @@ var MapAdapter = (function() {
     map.fitBounds(
       [[Math.min.apply(null,lngs), Math.min.apply(null,lats)],
        [Math.max.apply(null,lngs), Math.max.apply(null,lats)]],
-      { padding:60, duration:1200 }
+      { padding:60, duration:mapTransitionDuration }
     );
   }
 
@@ -826,16 +902,16 @@ var MapAdapter = (function() {
     map.fitBounds(
       [[Math.min.apply(null,lngs), Math.min.apply(null,lats)],
        [Math.max.apply(null,lngs), Math.max.apply(null,lats)]],
-      { padding:80, duration:1200 }
+      { padding:80, duration:mapTransitionDuration }
     );
   }
 
-  /* --- flyToStop(stop) — zoom max(actuel, 13), durée 1200ms --- */
+  /* --- flyToStop(stop) — zoom max(actuel, 13), durée mapTransitionDuration --- */
   function flyToStop(stop) {
     map.flyTo({
       center:   [stop.lng, stop.lat],
       zoom:     Math.max(map.getZoom(), 13),
-      duration: 1200
+      duration: mapTransitionDuration
     });
   }
 
@@ -916,7 +992,7 @@ var MapAdapter = (function() {
     map.fitBounds(
       [[Math.min.apply(null,allLngs), Math.min.apply(null,allLats)],
        [Math.max.apply(null,allLngs), Math.max.apply(null,allLats)]],
-      { padding:60, duration:1200 }
+      { padding:60, duration:mapTransitionDuration }
     );
   }
 
@@ -1006,6 +1082,7 @@ var terrainExaggeration = 1.0;
 var hillshadeOn         = true;
 var currentBasemap = 'ofm';
 var cpaGlobalVisible = true;
+var mapTransitionDuration = 1200; // durée des transitions MapLibre en ms (E-1)
 
 // =====================================================================
 // CADASTRE FRANCISCAIN (~1820-1860) — overlay transparent
@@ -1208,6 +1285,7 @@ map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
     terrainOn = !terrainOn;
     applyTerrain();
     updateExagBtn();
+    syncTerrainUI();
   });
 })();
 
@@ -1235,6 +1313,13 @@ function updateExagBtn() {
   var svgMtn = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><polygon points="3 20 9 8 13 14 17 9 21 20"/></svg>';
   btn.innerHTML = svgMtn + terrainExaggeration.toFixed(1);
   btn.classList.toggle('active', terrainOn);
+}
+
+/* syncTerrainUI() — synchronise la pill exag et la checkbox ck-terrain (E-2) */
+function syncTerrainUI() {
+  updateExagBtn();
+  var cb = document.getElementById('ck-terrain');
+  if (cb) cb.checked = terrainOn;
 }
 function applyHillshade() {
   addTerrainSource();
@@ -2208,6 +2293,21 @@ var Panel = (function() {
   var _transitioning = false; /* guard anti-appels concurrents */
   var _pendingNav    = null;  /* last-write-wins : nav en attente pendant une transition */
 
+  /* --- _queueNav(renderFn, direction) ---
+   * Si une transition est en cours, mémorise {renderFn, direction} dans _pendingNav.
+   * Sinon, appelle navigateTo directement.
+   * Utilisé par le dispatcher NAV.on('change') pour éviter la perte de navigations
+   * pendant une transition (F-1).
+   */
+  function _queueNav(info, direction) {
+    if (!info) return;
+    if (_transitioning) {
+      _pendingNav = { renderFn: info.renderFn, direction: info.direction || direction };
+      return;
+    }
+    navigateTo(info.renderFn, info.direction || direction);
+  }
+
   /* --- navigateTo(renderFn, direction) ---
    * renderFn : function() → HTML string
    * direction : 'forward' | 'back'
@@ -2384,11 +2484,7 @@ var Panel = (function() {
     el.textContent = text;
     el.title = text + ' \u2014 Cliquer pour r\u00e9duire / agrandir';
 
-    /* Mettre à jour l'état disabled des boutons ◀/▶ */
-    var prev = document.getElementById('nav-prev');
-    var next = document.getElementById('nav-next');
-    if (prev) prev.disabled = NAV.isFirst();
-    if (next) next.disabled = NAV.isLast();
+    /* D-4 — Les boutons ◀/▶ ne sont plus jamais disabled (logique contextuelle D-3) */
   }
 
   /* --- init() --- appel unique au Bootstrap --- */
@@ -2412,8 +2508,12 @@ var Panel = (function() {
     _expandDirect:    _expandDirect,
     updateBreadcrumb: updateBreadcrumb,
     init:             init,
-    get expanded()      { return _expanded; },
-    get _transitioning(){ return _transitioning; }
+    get expanded()        { return _expanded; },
+    get _transitioning()  { return _transitioning; },
+    set _transitioning(v) { _transitioning = v; },
+    get _pendingNav()     { return _pendingNav; },
+    set _pendingNav(v)    { _pendingNav = v; },
+    _queueNav: _queueNav
   };
 })();
 /* ========== /Panel ========== */
@@ -2497,7 +2597,19 @@ var Panel = (function() {
     '.pv-photo-nav-btn:disabled{opacity:.3;cursor:default}',
     '.pv-photo-counter{flex:1;text-align:center;font-size:.75em;color:#667788}',
     '.pv-photo-title{font-size:.95em;font-weight:600;color:#e0e0e0;margin-bottom:4px}',
-    '.pv-photo-desc{font-size:.85em;color:#8899aa;line-height:1.55}'
+    '.pv-photo-desc{font-size:.85em;color:#8899aa;line-height:1.55}',
+
+    /* Navigation contextuelle ◀/▶ (D-3) */
+    '.pv-ctx-nav{display:flex;gap:6px;margin-top:12px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)}',
+    '.nav-ctx-prev,.nav-ctx-next,.chap-ctx-prev,.chap-ctx-next{flex:1;padding:7px 10px;'
+    + 'background:#0f3460;border:1px solid #1a4a7a;border-radius:5px;'
+    + 'color:#a0b4c8;font-size:.82em;cursor:pointer;text-align:center;'
+    + 'transition:background .15s,color .15s}',
+    '.nav-ctx-prev:hover:not(:disabled),.nav-ctx-next:hover:not(:disabled),'
+    + '.chap-ctx-prev:hover:not(:disabled),.chap-ctx-next:hover:not(:disabled)'
+    + '{background:#1a5a9a;color:#fff}',
+    '.nav-ctx-prev:disabled,.nav-ctx-next:disabled,.chap-ctx-prev:disabled,.chap-ctx-next:disabled'
+    + '{opacity:.3;cursor:default}'
   ].join('\n');
   document.head.appendChild(s);
 })();
@@ -2536,7 +2648,8 @@ function renderCahier(cahierN) {
 
   /* FR-1.4 — État actif pour la surbrillance au retour */
   var navState       = NAV.state;
-  var activePhase    = navState.chapitre;
+  /* D-2 : pendingHighlightChapitre si présent, sinon chapitre actif */
+  var activePhase    = NAV.pendingHighlightChapitre || navState.chapitre;
   var activeSection  = navState.section;
 
   /* HTML — chapitres */
@@ -2627,10 +2740,12 @@ function renderChapitre(cahierN, phaseN) {
   var stops = cd.stops || [];
   var color = PC[phaseN] || CAHIER_META[cahierN].color || '#888';
   var phaseName = PN[phaseN] || ('Chapitre\u00a0' + phaseN);
-  var activeStopId = NAV.state.stopId;
 
   /* Stops de cette phase dans l'ordre */
   var phaseStops = stops.filter(function(s) { return s.p === phaseN; });
+
+  /* FR-1.4 — highlight au retour : utiliser previousStopId s'il est défini (F-2) */
+  var activeStopId = NAV.previousStopId !== null ? NAV.previousStopId : NAV.state.stopId;
 
   var itemsHTML = phaseStops.map(function(s) {
     var seqNum = getStopSeqNum(cahierN, s.id);
@@ -2648,13 +2763,30 @@ function renderChapitre(cahierN, phaseN) {
       + '</li>';
   }).join('');
 
+  /* D-3 — Boutons contextuels chapitre précédent/suivant */
+  var allPhases = Object.keys(PN).map(Number).sort(function(a,b){return a-b;});
+  stops.forEach(function(s) { if (s.p != null && allPhases.indexOf(s.p) === -1) allPhases.push(s.p); });
+  allPhases.sort(function(a,b){return a-b;});
+  var phaseIdx  = allPhases.indexOf(phaseN);
+  var prevPhase = phaseIdx > 0 ? allPhases[phaseIdx - 1] : null;
+  var nextPhase = phaseIdx < allPhases.length - 1 ? allPhases[phaseIdx + 1] : null;
+  var chapCtxNavHTML = '<div class="pv-ctx-nav">'
+    + '<button class="chap-ctx-prev"' + (!prevPhase ? ' disabled' : '')
+    + (prevPhase ? ' onclick="NAV.go(2,{cahier:' + cahierN + ',chapitre:' + prevPhase + '},\'back\')"' : '')
+    + '>&#9664; Chapitre précédent</button>'
+    + '<button class="chap-ctx-next"' + (!nextPhase ? ' disabled' : '')
+    + (nextPhase ? ' onclick="NAV.go(2,{cahier:' + cahierN + ',chapitre:' + nextPhase + '})"' : '')
+    + '>Chapitre suivant &#9654;</button>'
+    + '</div>';
+
   return '<button class="pv-back"'
     + ' onclick="NAV.go(1,{cahier:' + cahierN + '},\'back\')">'
     + '&#8592; Cahier\u00a0' + cahierN
     + '</button>'
     + '<div class="pv-title" style="color:' + color + '">' + phaseName + '</div>'
     + '<div class="pv-period">' + phaseStops.length + '\u00a0étape' + (phaseStops.length > 1 ? 's' : '') + '</div>'
-    + '<ul class="pv-list">' + itemsHTML + '</ul>';
+    + '<ul class="pv-list">' + itemsHTML + '</ul>'
+    + chapCtxNavHTML;
 }
 
 /* --- renderEtape(stop, PC, PN, cahierN) ---
@@ -2689,6 +2821,21 @@ function renderEtape(stop, PC, PN, cahierN) {
     ? '<div class="pv-etape-date">&#128197;\u00a0' + stop.date + '</div>'
     : '';
 
+  /* D-3 — Boutons contextuels ◀/▶ */
+  var seqNum = getStopSeqNum(cahierN, stop.id);
+  var cd = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var phaseStops = (cd.stops || []).filter(function(s){ return s.p === stop.p; });
+  var isFirstInChapter = (seqNum === getStopSeqNum(cahierN, phaseStops[0] && phaseStops[0].id));
+  var isLastInChapter  = (seqNum === getStopSeqNum(cahierN, phaseStops[phaseStops.length - 1] && phaseStops[phaseStops.length - 1].id));
+  /* Utiliser _seqIndex global pour prev/next */
+  var isFirstGlobal = NAV.isFirst();
+  var isLastGlobal  = NAV.isLast();
+  var ctxNavHTML = _renderCtxNav(
+    '&#9664; Précédent', 'Suivant &#9654;',
+    isFirstGlobal, isLastGlobal,
+    'NAV.prev()', 'NAV.next()'
+  );
+
   return '<button class="pv-back"'
     + ' onclick="NAV.go(2,{cahier:' + cahierN + ',chapitre:' + stop.p + '},\'back\')">'
     + '&#8592; ' + phaseName
@@ -2700,7 +2847,8 @@ function renderEtape(stop, PC, PN, cahierN) {
     + dateHTML
     + descHTML
     + citationHTML
-    + refHTML;
+    + refHTML
+    + ctxNavHTML;
 }
 
 /* --- renderPhotos(cahierN) — FR-3.5 (task 3.5) ---
@@ -2939,47 +3087,73 @@ function renderAccueil() {
 }
 /* ========== /Views ========== */
 
+/* --- _renderCtxNav(prevLabel, nextLabel, prevDisabled, nextDisabled, prevFn, nextFn) ---
+ * Génère une barre de navigation contextuelle ◀/▶.
+ * prevFn / nextFn : chaîne JS inline pour onclick.
+ */
+function _renderCtxNav(prevLabel, nextLabel, prevDisabled, nextDisabled, prevFn, nextFn) {
+  return '<div class="pv-ctx-nav">'
+    + '<button class="nav-ctx-prev"' + (prevDisabled ? ' disabled' : '')
+    + ' onclick="' + prevFn + '">' + prevLabel + '</button>'
+    + '<button class="nav-ctx-next"' + (nextDisabled ? ' disabled' : '')
+    + ' onclick="' + nextFn + '">' + nextLabel + '</button>'
+    + '</div>';
+}
+
+/* --- _getRenderFn(state) ---
+ * Fonction pure qui détermine la renderFn et la direction à partir de l'état NAV.
+ * Retourne {renderFn, direction} ou null si aucune vue n'est applicable.
+ * Utilisé par le dispatcher et les tests.
+ */
+function _getRenderFn(state) {
+  var dir = state.direction || 'forward';
+  if (state.level === 0) {
+    return { renderFn: renderAccueil, direction: dir };
+  } else if (state.level === 1 && state.cahier != null && !state.section) {
+    var cN = state.cahier;
+    return { renderFn: function() { return renderCahier(cN); }, direction: dir };
+  } else if (state.level === 2 && state.cahier != null && state.section === 'photos') {
+    var cN2 = state.cahier;
+    return { renderFn: function() { return renderPhotos(cN2); }, direction: dir };
+  } else if (state.level === 2 && state.cahier != null && state.chapitre != null && !state.section) {
+    var cN3 = state.cahier, pN = state.chapitre;
+    return { renderFn: function() { return renderChapitre(cN3, pN); }, direction: dir };
+  } else if (state.level === 3 && state.cpaLoc != null) {
+    var cN4 = state.cahier, loc = state.cpaLoc;
+    var lieu = findLieuByCpaLoc(cN4, loc);
+    if (lieu) {
+      return { renderFn: function() { return renderLieuPhoto(lieu, cN4, 0); }, direction: dir };
+    }
+  } else if (state.level === 3 && state.stopId != null) {
+    var cN5 = state.cahier, sId = state.stopId;
+    var cd = getCahierData(cN5);
+    var stop = findStop(cd, sId);
+    return { renderFn: function() { return renderEtape(stop, cd.PC || {}, cd.PN || {}, cN5); }, direction: dir };
+  }
+  return null;
+}
+
 /* --- Abonnement NAV → Views : dispatch vers les fonctions de rendu ---
  * Vagues 3+4 : niveaux 0–3 gérés (tâches 3.2, 3.3, 3.4, 3.5).
  */
 NAV.on('change', function(state) {
-  /* Guard anti-récursion : éviter que setExpanded→NAV.setExpanded→change
-     re-déclenche le dispatcher pendant une transition en cours */
-  if (Panel._transitioning) return;
   var dir = state.direction || 'forward';
-  if (state.level === 0) {
-    Panel.navigateTo(renderAccueil, dir);
-  } else if (state.level === 1 && state.cahier != null && !state.section) {
-    Panel.navigateTo(function() { return renderCahier(state.cahier); }, dir);
-  } else if (state.level === 2 && state.cahier != null && state.section === 'photos') {
-    /* Vue-photos — FR-3.5 */
-    (function(cN) {
-      Panel.navigateTo(function() { return renderPhotos(cN); }, dir);
-    })(state.cahier);
-  } else if (state.level === 2 && state.cahier != null && state.chapitre != null && !state.section) {
-    /* Closure stable pour éviter la capture de la variable de boucle */
-    (function(cN, pN) {
-      Panel.navigateTo(function() { return renderChapitre(cN, pN); }, dir);
-    })(state.cahier, state.chapitre);
-  } else if (state.level === 3 && state.cpaLoc != null) {
-    /* Vue-lieu-photo — FR-3.6 */
-    (function(cN, loc) {
-      var lieu = findLieuByCpaLoc(cN, loc);
-      if (lieu) {
-        Panel.navigateTo(function() { return renderLieuPhoto(lieu, cN, 0); }, dir);
-        MapAdapter.flyToCPA(lieu);
-        Panel._expandDirect();
-      }
-    })(state.cahier, state.cpaLoc);
-  } else if (state.level === 3 && state.stopId != null) {
-    /* Closure stable */
-    (function(cN, sId) {
-      var cd   = getCahierData(cN);
-      var stop = findStop(cd, sId);
-      Panel.navigateTo(function() { return renderEtape(stop, cd.PC || {}, cd.PN || {}, cN); }, dir);
+  var info = _getRenderFn(state);
+  if (!info) return;
+
+  /* Effets de bord non-Panel : flyTo, expand */
+  if (state.level === 3 && state.cpaLoc != null) {
+    var lieuSide = findLieuByCpaLoc(state.cahier, state.cpaLoc);
+    if (lieuSide) {
+      MapAdapter.flyToCPA(lieuSide);
       Panel._expandDirect();
-    })(state.cahier, state.stopId);
+    }
+    if (!info) return;
+  } else if (state.level === 3 && state.stopId != null) {
+    Panel._expandDirect();
   }
+
+  Panel._queueNav(info, dir);
 });
 /* ========== /NAV → Views ========== */
 
@@ -3021,12 +3195,12 @@ var Interactions = (function() {
 
     if (btnPrev) {
       btnPrev.addEventListener('click', function() {
-        if (!btnPrev.disabled) NAV.prev();
+        NAV.prev();
       });
     }
     if (btnNext) {
       btnNext.addEventListener('click', function() {
-        if (!btnNext.disabled) NAV.next();
+        NAV.next();
       });
     }
 
@@ -3176,6 +3350,25 @@ document.querySelectorAll('input[name="basemap"]').forEach(function(r){
       drawer.classList.remove('open');
     }
   });
+
+  /* E-1 — Durée des transitions MapLibre */
+  var ckTransition = document.getElementById('ck-transition');
+  if (ckTransition) {
+    ckTransition.addEventListener('change', function() {
+      mapTransitionDuration = parseInt(this.value, 10);
+    });
+  }
+
+  /* E-2 — Terrain 3D checkbox */
+  var ckTerrainEl = document.getElementById('ck-terrain');
+  if (ckTerrainEl) {
+    ckTerrainEl.addEventListener('change', function() {
+      terrainOn = this.checked;
+      applyTerrain();
+      updateExagBtn();
+      syncTerrainUI();
+    });
+  }
 })();
 // =====================================================================
 // CHARGEMENT DE TOUS LES CAHIERS + VUE D'ENSEMBLE
@@ -3184,7 +3377,7 @@ function loadAllCahiers() {
   function doLoad() {
     // Charger les données de chaque cahier sans déclencher flyTo ni setActiveCahier
     var firstLoad = loadedCahiers.size === 0;
-    [1, 2, 3].forEach(function(n) {
+    [1, 2, 3, 4].forEach(function(n) {
       if (!loadedCahiers.has(n)) {
         var data = getCahierData(n);
         renderLinesForCahier(n, data);
@@ -3193,9 +3386,9 @@ function loadAllCahiers() {
         loadedCahiers.add(n);
       }
     });
-    // S'assurer que C1-3 sont visibles pour la vue d'ensemble
+    // S'assurer que C1-3 sont visibles pour la vue d'ensemble, C4 masqué
     [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, true); });
-    if (loadedCahiers.has(4)) setCahierVisibility(4, false);
+    setCahierVisibility(4, false);
     updateVueEnsembleBtn();
     // Activer C1 au premier chargement (pour le profil altitude et le hash URL)
     if (firstLoad) setActiveCahier(1, true);
@@ -3366,6 +3559,105 @@ window.addEventListener('popstate', function(e) {
     updateExagBtn();
   });
 })();
+
+// =====================================================================
+// PANEL RESIZE — module de redimensionnement par drag (A-1)
+// =====================================================================
+var PanelResize = (function() {
+  var _active    = false;
+  var _startPos  = 0;    // clientX (desktop) ou clientY (mobile)
+  var _startSize = 0;    // width (desktop) ou height (mobile) au début du drag
+  var _mobile    = false;
+
+  var MIN_WIDTH  = 220;
+  var MIN_HEIGHT = 48;
+
+  function _getPanel() { return document.getElementById('panel'); }
+  function _getMap()   { return typeof map !== 'undefined' ? map : null; }
+
+  function _clampDesktop(w) {
+    return Math.min(Math.round(window.innerWidth * 0.5), Math.max(MIN_WIDTH, w));
+  }
+  function _clampMobile(h) {
+    return Math.min(Math.round(window.innerHeight * 0.8), Math.max(MIN_HEIGHT, h));
+  }
+
+  function _onStart(e) {
+    var handle = document.getElementById('panel-resize-handle');
+    if (!handle) return;
+    _mobile = window.matchMedia('(max-width:480px) and (orientation:portrait)').matches;
+    var panel = _getPanel();
+    if (!panel) return;
+    _active    = true;
+    if (_mobile) {
+      _startPos  = (e.touches ? e.touches[0].clientY : e.clientY);
+      _startSize = panel.offsetHeight;
+    } else {
+      _startPos  = (e.touches ? e.touches[0].clientX : e.clientX);
+      _startSize = panel.offsetWidth;
+    }
+    e.preventDefault();
+  }
+
+  function _onMove(e) {
+    if (!_active) return;
+    var panel = _getPanel();
+    if (!panel) return;
+    var pos = e.touches ? e.touches[0].clientX : e.clientX;
+    if (_mobile) {
+      pos = e.touches ? e.touches[0].clientY : e.clientY;
+      var newH = _clampMobile(_startSize - (pos - _startPos));
+      panel.style.height = newH + 'px';
+    } else {
+      var newW = _clampDesktop(_startSize + (pos - _startPos));
+      panel.style.width    = newW + 'px';
+      panel.style.minWidth = newW + 'px';
+    }
+    requestAnimationFrame(function() {
+      var m = _getMap();
+      if (m) try { m.resize(); } catch(e2) {}
+    });
+  }
+
+  function _onEnd(e) {
+    if (!_active) return;
+    _active = false;
+    var panel = _getPanel();
+    if (!panel) return;
+    var val = _mobile ? parseInt(panel.style.height) : parseInt(panel.style.width);
+    if (!isNaN(val)) {
+      try { localStorage.setItem('panelWidth', String(val)); } catch(e2) {}
+    }
+  }
+
+  function init() {
+    var handle = document.getElementById('panel-resize-handle');
+    if (!handle) return;
+
+    handle.addEventListener('mousedown',  _onStart, { passive: false });
+    handle.addEventListener('touchstart', _onStart, { passive: false });
+    document.addEventListener('mousemove', _onMove);
+    document.addEventListener('touchmove', _onMove, { passive: false });
+    document.addEventListener('mouseup',   _onEnd);
+    document.addEventListener('touchend',  _onEnd);
+
+    /* Restaurer depuis localStorage */
+    try {
+      var saved = localStorage.getItem('panelWidth');
+      if (saved) {
+        var v = parseInt(saved, 10);
+        var panel = _getPanel();
+        if (!isNaN(v) && panel) {
+          panel.style.width    = v + 'px';
+          panel.style.minWidth = v + 'px';
+        }
+      }
+    } catch(e3) {}
+  }
+
+  return { init: init, _onStart: _onStart, _onMove: _onMove, _onEnd: _onEnd };
+})();
+PanelResize.init();
 </script>
 </body>
 </html>

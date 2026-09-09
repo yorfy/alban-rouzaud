@@ -337,6 +337,65 @@ async function runTests() {
       }
     });
 
+    // ─── Suite 8 : Chargement C4 au démarrage (B-1) ──────────────────────────
+    await suite('Chargement C4 au démarrage', async () => {
+      const c4Loaded = await page.evaluate(() => loadedCahiers.has(4));
+      await assert(c4Loaded, 'loadedCahiers.has(4) === true après chargement');
+
+      const c4Markers = await page.evaluate(() =>
+        Object.keys(stopMarkerIndex).some(id => parseInt(id) >= 400)
+      );
+      await assert(c4Markers, 'stopMarkerIndex contient des marqueurs C4 (id >= 400)');
+    });
+
+    // ─── Suite 9 : Boutons globaux jamais disabled (D-4) ─────────────────────
+    await suite('Boutons globaux jamais disabled', async () => {
+      // Au chargement
+      const prevDisabledInit = await page.evaluate(() => document.getElementById('nav-prev').disabled);
+      await assert(!prevDisabledInit, 'nav-prev non disabled au chargement');
+      const nextDisabledInit = await page.evaluate(() => document.getElementById('nav-next').disabled);
+      await assert(!nextDisabledInit, 'nav-next non disabled au chargement');
+
+      // Après 3× next()
+      for (let i = 0; i < 3; i++) {
+        await page.evaluate(() => NAV.next());
+        await waitForTransitionEnd(page, 1000);
+      }
+      const prevDisabledAfter = await page.evaluate(() => document.getElementById('nav-prev').disabled);
+      await assert(!prevDisabledAfter, 'nav-prev non disabled après 3× next()');
+      const nextDisabledAfter = await page.evaluate(() => document.getElementById('nav-next').disabled);
+      await assert(!nextDisabledAfter, 'nav-next non disabled après 3× next()');
+    });
+
+    // ─── Suite 10 : Handle redimensionnement panneau (A-1) ───────────────────
+    await suite('Handle redimensionnement panneau', async () => {
+      const handleExists = await page.$('#panel-resize-handle') !== null;
+      await assert(handleExists, 'Le handle #panel-resize-handle existe');
+
+      if (handleExists) {
+        // Obtenir la position du handle
+        const panelWidth = await page.$eval('#panel', el => el.offsetWidth);
+        const handleX = panelWidth - 3;
+        const handleY = 200;
+
+        // Simuler drag : mousedown → mousemove → mouseup
+        await page.mouse.move(handleX, handleY);
+        await page.mouse.down();
+        await page.mouse.move(handleX + 85, handleY);
+        await page.mouse.up();
+        await new Promise(r => setTimeout(r, 100));
+
+        const newWidth = await page.$eval('#panel', el => parseInt(el.style.width) || el.offsetWidth);
+        await assert(newWidth > panelWidth, 'Panneau élargi après drag handle');
+
+        const savedWidth = await page.evaluate(() => {
+          try { return localStorage.getItem('panelWidth'); } catch(e) { return null; }
+        });
+        await assert(savedWidth !== null, 'panelWidth sauvegardé dans localStorage');
+        await assert(await isResponsive(page), 'Page responsive après drag handle');
+      }
+    });
+
   } finally {
     await browser.close();
   }
