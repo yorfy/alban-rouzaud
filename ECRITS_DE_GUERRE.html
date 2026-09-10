@@ -304,6 +304,106 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   #cover-inner h1{font-size:1.25em}
   .ctab{min-width:70px;font-size:.7em}
 }
+
+/* =====================================================================
+   NAV PANEL — navigation arborescente
+   ===================================================================== */
+
+/* Fil d'Ariane */
+#nav-breadcrumb {
+  font-size: .75em;
+  color: #667788;
+  padding: 6px 0 10px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-bottom: 1px solid #1a4a7a;
+  margin-bottom: 10px;
+}
+
+/* Grille de flèches */
+#nav-arrows {
+  display: grid;
+  grid-template-columns: 40px 1fr 40px;
+  grid-template-rows: 40px auto 40px;
+  gap: 4px;
+  margin: 12px 0;
+  align-items: center;
+  justify-items: center;
+}
+.nav-arrow {
+  width: 36px; height: 36px;
+  border-radius: 6px;
+  background: #0f3460;
+  border: 1px solid #1a4a7a;
+  color: #a0b4c8;
+  font-size: 1.1em;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background .15s, color .15s;
+  user-select: none;
+}
+.nav-arrow:hover:not(:disabled) { background: #1a5a9a; color: #fff; }
+.nav-arrow:disabled { opacity: .25; cursor: default; }
+#nav-center { grid-column: 2; grid-row: 2; font-size: 1.4em; }
+
+/* Contenu du nœud */
+#nav-node-content {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 60px;
+}
+#nav-node-content .node-title {
+  font-size: 1.05em;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+#nav-node-content .node-period {
+  font-size: .8em;
+  color: #e94560;
+  margin-bottom: 8px;
+}
+#nav-node-content .node-desc {
+  font-size: .9em;
+  color: #a0b4c8;
+  line-height: 1.55;
+  text-align: justify;
+  margin-bottom: 8px;
+}
+#nav-node-content .node-quote {
+  font-style: italic;
+  border-left: 3px solid #e94560;
+  padding-left: 8px;
+  color: #8899aa;
+  font-size: .9em;
+  margin-bottom: 8px;
+}
+#nav-node-content .node-route {
+  font-size: .82em;
+  color: #667788;
+  font-style: italic;
+}
+
+/* Items enfants */
+.nav-child-item {
+  padding: 7px 10px;
+  margin: 3px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: .93em;
+  border-left: 3px solid transparent;
+  transition: background .15s;
+  color: #e0e0e0;
+}
+.nav-child-item:hover { background: rgba(255,255,255,.08); }
+.nav-child-item .ci-num { color: #667788; font-size: .85em; margin-right: 4px; }
+
+/* Mobile: tap-friendly */
+@media(max-width:768px) {
+  .nav-arrow { width: 44px; height: 44px; font-size: 1.3em; }
+  #nav-arrows { grid-template-columns: 44px 1fr 44px; grid-template-rows: 44px auto 44px; }
+}
 </style>
 <script src="data/data_c1.js"></script>
 <script src="data/data_c2.js"></script>
@@ -322,17 +422,14 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
     <div class="cover-years">1939 — 1945</div>
     <p class="cover-bio">
       Instituteur à Lavelanet (Ariège), Alban Rouzaud est mobilisé en août&nbsp;1939. Il vit la
-      «&nbsp;drôle de guerre&nbsp;» en Alsace face à Pirmasens, puis la débâcle de juin&nbsp;1940 jusqu'à
-      sa capture. Prisonnier au Stalag XVIII&nbsp;D de Marburg an der Drau (Slovénie), il s'évade
-      en septembre&nbsp;1941 avec son camarade André depuis leur Arbeitskommando près de Weiz
-      (Styrie), traversant les Alpes autrichiennes à pied avant d'être arrêté par des carabiniers
-      en Italie. Reconduit à Marburg, il purge 21&nbsp;jours de cachot, puis reprend son existence
-      de prisonnier jusqu'à la Libération en&nbsp;1945. Ces quatre cahiers en sont le témoignage.
+      «&nbsp;drôle de guerre&nbsp;» en Alsace, la débâcle de juin&nbsp;1940, une évasion à travers
+      les Alpes autrichiennes en&nbsp;1941, et la captivité au Stalag XVIII&nbsp;D de Marburg
+      jusqu'en&nbsp;1945. Ces quatre cahiers en sont le témoignage.
     </p>
     <div id="cover-cahiers">
 
       <!-- CAHIER 1 -->
-      <div class="cover-card" data-n="1">
+      <div class="cover-card" data-n="1" onclick="navigateTo(TREE_ROOT.children[0]);closeCover()" style="cursor:pointer">
         <div class="cover-card-head">
           <div class="cover-num">CAHIER 1</div>
           <a class="cover-orig" href="https://drive.google.com/file/d/1eEFtKvP_8kEG_qQVTPKMJxi6TKhQs4-I/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
@@ -345,7 +442,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
       </div>
 
       <!-- CAHIER 2 -->
-      <div class="cover-card" data-n="2">
+      <div class="cover-card" data-n="2" onclick="navigateTo(TREE_ROOT.children[1]);closeCover()" style="cursor:pointer">
         <div class="cover-card-head">
           <div class="cover-num">CAHIER 2</div>
           <a class="cover-orig" href="https://drive.google.com/file/d/1JKTnWPOrwgF-Oi9N0_5aGpOe_2UbRlX9/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
@@ -353,12 +450,12 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
         <a class="cover-card-link" href="https://docs.google.com/document/d/1CJ_H8KuLxS6C2K5QgyMGPXW4mBOQLGyT/edit?usp=drive_link" target="_blank">
           <h2>Journal non écrit d'un fantassin en repli stratégique</h2>
           <div class="cover-period">Mai – Juin 1940</div>
-          <p>Mai–juin&#160;1940&#160;: le repli à travers la France en déroute, les routes embouteillées, les ordres contradictoires, et finalement la capture.</p>
+          <p>Le repli à travers la France en déroute, les routes embouteillées, les ordres contradictoires, et finalement la capture.</p>
         </a>
       </div>
 
       <!-- CAHIER 3 -->
-      <div class="cover-card" data-n="3">
+      <div class="cover-card" data-n="3" onclick="navigateTo(TREE_ROOT.children[2]);closeCover()" style="cursor:pointer">
         <div class="cover-card-head">
           <div class="cover-num">CAHIER 3</div>
           <a class="cover-orig" href="https://drive.google.com/file/d/1mRKi9u4zP9oXgVjFl_Fuj4GTTESVpxIA/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
@@ -366,12 +463,12 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
         <a class="cover-card-link" href="https://docs.google.com/document/d/1LlsB4U3KwqlwQ5cNaj8wKaccrTnL7hu0/edit?usp=drive_link" target="_blank">
           <h2>L'Évasion</h2>
           <div class="cover-period">Sept. – Oct. 1941</div>
-          <p>Nuit du 20&#160;septembre&#160;1941&#160;: Alban et André sautent dans le noir depuis leur Kommando. Deux semaines à pied dans les Alpes autrichiennes, boussole et carte copiée à la main.</p>
+          <p>Alban et André sautent dans le noir depuis leur Kommando. Deux semaines à pied dans les Alpes autrichiennes, boussole et carte copiée à la main.</p>
         </a>
       </div>
 
       <!-- CAHIER 4 -->
-      <div class="cover-card" data-n="4">
+      <div class="cover-card" data-n="4" onclick="navigateTo(TREE_ROOT.children[3]);closeCover()" style="cursor:pointer">
         <div class="cover-card-head">
           <div class="cover-num">CAHIER 4</div>
           <a class="cover-orig" href="https://drive.google.com/file/d/1ZW2hv8iLNkZE0e73iSyS1fN-bNBj3H_X/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
@@ -384,7 +481,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
       </div>
 
     </div>
-    <button id="btn-entrer" onclick="loadAllCahiers();closeCover()"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>Carte interactive</button>
+    <button id="btn-entrer" onclick="navigateTo(TREE_ROOT.children[0]);closeCover()"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>Carte interactive</button>
   </div>
 </div>
 
@@ -393,7 +490,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
      =================================================================== -->
 <div id="header">
   <div id="header-nav">
-    <button id="btn-home" onclick="showCover()" title="Page de garde — navigation entre cahiers">
+    <button id="btn-home" onclick="navigateTo(TREE_ROOT)" title="Vue globale — navigation arborescente">
       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
     </button>
     <button id="btn-overview" onclick="loadAllCahiers()" title="Vue d'ensemble — tous les cahiers">
@@ -401,13 +498,13 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
     </button>
   </div>
   <div id="cahier-tabs">
-    <button class="ctab" data-n="1" onclick="loadCahier(1)">La Guerre</button>
+    <button class="ctab" data-n="1" onclick="navigateTo(TREE_ROOT.children[0])">La Guerre</button>
     <div class="ctab-sep"></div>
-    <button class="ctab" data-n="2" onclick="loadCahier(2)">Journal non écrit…</button>
+    <button class="ctab" data-n="2" onclick="navigateTo(TREE_ROOT.children[1])">Journal non écrit…</button>
     <div class="ctab-sep"></div>
-    <button class="ctab" data-n="3" onclick="loadCahier(3)">L'Évasion</button>
+    <button class="ctab" data-n="3" onclick="navigateTo(TREE_ROOT.children[2])">L'Évasion</button>
     <div class="ctab-sep"></div>
-    <button class="ctab" data-n="4" onclick="loadCahier(4)">Captivité…</button>
+    <button class="ctab" data-n="4" onclick="navigateTo(TREE_ROOT.children[3])">Captivité…</button>
   </div>
   <div id="header-info">
     <div id="header-title">Alban Rouzaud — Écrits de Guerre 1939–1945</div>
@@ -433,8 +530,14 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
           <p id="legend-subtitle" style="color:#c0cce0;font-size:.9em;margin-bottom:6px;font-style:italic"></p>
         </div>
       </div>
-      <div id="sl">
-        <p style="color:#667788;font-size:.9em;padding:8px 4px;">Sélectionnez un cahier via les onglets du haut pour afficher les étapes.</p>
+      <div id="nav-breadcrumb"></div>
+      <div id="nav-node-content"></div>
+      <div id="nav-arrows" style="display:grid;grid-template-columns:40px 1fr 40px;grid-template-rows:40px auto 40px;gap:4px;margin:12px 0;align-items:center;justify-items:center;">
+        <button id="nav-arrow-up"    class="nav-arrow" style="grid-column:2;grid-row:1">↑</button>
+        <button id="nav-arrow-left"  class="nav-arrow" style="grid-column:1;grid-row:2">←</button>
+        <div    id="nav-center"                         style="grid-column:2;grid-row:2"></div>
+        <button id="nav-arrow-right" class="nav-arrow" style="grid-column:3;grid-row:2">→</button>
+        <button id="nav-arrow-down"  class="nav-arrow" style="grid-column:2;grid-row:3">↓</button>
       </div>
     </div>
     <button id="sbtoggle">&#9668;</button>
@@ -523,7 +626,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 // =====================================================================
 var loadedCahiers = new Set();  // cahiers dont les données sont sur la carte
 var activeCahier  = null;       // cahier dont sidebar + profil sont affichés
+var TREE_ROOT     = null;       // racine de l'arbre hiérarchique global
+var activeNode    = null;       // nœud actuellement sélectionné dans l'arbre
 var htmlMarkers   = {1:[],2:[],3:[],4:[]};
+var htmlMarkersInner = {1:[],2:[],3:[],4:[]};
 var cpaMarkers    = {1:[],2:[],3:[],4:[]};
 var terrainOn           = true;
 var terrainExaggeration = 1.0;
@@ -580,7 +686,7 @@ var CAHIER_META = {
   2: {
     title:       'Journal non écrit',
     subtitle:    'Mai \u2013 Juin 1940 \u2014 Repli stratégique et capture',
-    resume:      'Mai\u2013juin\u00a01940\u00a0: la France s\u2019effondre. Alban Rouzaud retrace le repli chaotique de son unité à travers la Lorraine et la Champagne \u2014 routes embouteillées de civils, ordres contradictoires, villages en flammes \u2014 jusqu\u2019à la capture et le début de la captivité.',
+    resume:      'La France s\u2019effondre. Alban Rouzaud retrace le repli chaotique de son unité à travers la Lorraine et la Champagne \u2014 routes embouteillées de civils, ordres contradictoires, villages en flammes \u2014 jusqu\u2019à la capture et le début de la captivité.',
     pdfTranscript: 'https://docs.google.com/document/d/1CJ_H8KuLxS6C2K5QgyMGPXW4mBOQLGyT/edit?usp=drive_link',
     pdfOriginal:   'https://drive.google.com/file/d/1JKTnWPOrwgF-Oi9N0_5aGpOe_2UbRlX9/view?usp=sharing',
     color:       '#e94560',
@@ -639,8 +745,305 @@ function getCahierData(n) {
     noElevation: !!meta.noElevation,
     color:       meta.color,
     title:       meta.title,
-    subtitle:    meta.subtitle
+    subtitle:    meta.subtitle,
+    bounds:      cd.bounds || null
   };
+}
+
+// =====================================================================
+// TREE — buildTree / findNodeById / getCahierN
+// =====================================================================
+function buildTree() {
+  var root = { id:'root', type:'root', label:'Alban Rouzaud', parent:null, children:[], bounds:null };
+
+  [1,2,3,4].forEach(function(n) {
+    var data = getCahierData(n);
+    var meta = CAHIER_META[n];
+    var cahierNode = {
+      id: 'c'+n, type:'cahier', label:'Cahier '+n+' — '+meta.title,
+      parent: root, children: [],
+      cahierN: n, meta: meta,
+      bounds: (data.bounds && data.bounds.cahier) || meta.bbox || null
+    };
+    root.children.push(cahierNode);
+
+    var seqN = 0;
+    Object.keys(data.PC).sort(function(a,b){return+a-+b;}).forEach(function(p) {
+      var phaseNode = {
+        id: 'c'+n+'_p'+p, type:'phase',
+        label: data.PN[p] || 'Phase '+p,
+        parent: cahierNode, children: [],
+        phaseKey: p, color: data.PC[p], cahierN: n,
+        bounds: (data.bounds && data.bounds.phases && data.bounds.phases[p]) || null
+      };
+      cahierNode.children.push(phaseNode);
+
+      var stopsInPhase = (data.stops || data.S || []).filter(function(s){ return String(s.p) == String(p); });
+      stopsInPhase.forEach(function(s) {
+        seqN++;
+        phaseNode.children.push({
+          id: 'c'+n+'_p'+p+'_s'+s.id, type:'stop',
+          label: s.n,
+          parent: phaseNode, children: [],
+          stop: s, cahierN: n, seqN: seqN,
+          bounds: [[s.lng, s.lat],[s.lng, s.lat]]
+        });
+      });
+    });
+  });
+
+  return root;
+}
+
+function findNodeById(root, id) {
+  if (root.id === id) return root;
+  for (var i=0; i<root.children.length; i++) {
+    var found = findNodeById(root.children[i], id);
+    if (found) return found;
+  }
+  return null;
+}
+
+function getCahierN(node) {
+  var cur = node;
+  while (cur) {
+    if (cur.type === 'cahier') return cur.cahierN;
+    cur = cur.parent;
+  }
+  return null;
+}
+
+// =====================================================================
+// RENDER PANEL — renderBreadcrumb / renderArrows / renderCenterIndicator / renderNodeContent / renderPanel
+// =====================================================================
+
+// Task 4.1 — renderBreadcrumb
+function renderBreadcrumb(node) {
+  var parts = [], cur = node;
+  while (cur) { parts.unshift(cur.label); cur = cur.parent; }
+  document.getElementById('nav-breadcrumb').textContent = parts.join(' › ');
+}
+
+// Task 4.2 — renderArrows + setArrow
+function setArrow(dir, targetNode) {
+  var btn = document.getElementById('nav-arrow-'+dir);
+  if (!btn) return;
+  if (targetNode) {
+    btn.disabled = false;
+    btn.onclick = function() { navigateTo(targetNode); };
+  } else {
+    btn.disabled = true;
+    btn.onclick = null;
+  }
+}
+
+function renderArrows(node) {
+  var siblings = node.parent ? node.parent.children : [];
+  var idx = siblings.indexOf(node);
+  setArrow('up',    idx > 0 ? siblings[idx-1] : null);
+  setArrow('down',  idx < siblings.length-1 ? siblings[idx+1] : null);
+  setArrow('left',  node.parent || null);
+  setArrow('right', node.children.length > 0 ? node.children[0] : null);
+}
+
+// Task 4.3 — renderCenterIndicator
+function renderCenterIndicator(node) {
+  var el = document.getElementById('nav-center');
+  if (!el) return;
+  var icons = { root:'🌍', cahier:'📖', phase:'📍', stop:'✦' };
+  el.textContent = icons[node.type] || '●';
+}
+
+// Task 4.4/4.5/4.6/4.7 — renderNodeContent
+function renderNodeContent(node) {
+  var el = document.getElementById('nav-node-content');
+  if (!el) return;
+  el.innerHTML = '';
+
+  if (node.type === 'root') {
+    // Task 4.4 — root view
+    var h = '<div class="node-title">Alban Rouzaud — Écrits de Guerre 1939–1945</div>';
+    h += '<div class="node-desc">Instituteur à Lavelanet (Ariège), Alban Rouzaud est mobilisé en août 1939. Il vit la « drôle de guerre » en Alsace, la débâcle de juin 1940, une évasion à travers les Alpes autrichiennes en 1941, et la captivité au Stalag XVIII D de Marburg jusqu\'en 1945. Ces quatre cahiers en sont le témoignage.</div>';
+    h += '<div style="margin-top:8px">';
+    node.children.forEach(function(child) {
+      var meta = child.meta || {};
+      var n = child.cahierN || (node.children.indexOf(child) + 1);
+      h += '<div class="nav-child-item" data-n="'+n+'" onclick="navigateTo(TREE_ROOT.children['+node.children.indexOf(child)+'])">'
+        + '<span class="ci-num">📖</span>'
+        + '<strong style="color:'+(meta.color||'#fff')+'">' + child.label + '</strong>'
+        + (meta.subtitle ? '<div style="font-size:.8em;color:#8899aa;margin-top:2px">'+meta.subtitle+'</div>' : '')
+        + '</div>';
+    });
+    h += '</div>';
+    el.innerHTML = h;
+    // Highlight markers on hover
+    el.querySelectorAll('.nav-child-item[data-n]').forEach(function(item) {
+      var n = parseInt(item.getAttribute('data-n'));
+      item.addEventListener('mouseenter', function() {
+        (htmlMarkersInner[n] || []).forEach(function(inner) {
+          inner.style.transform = 'scale(1.25) translateY(-4px)';
+          inner.style.filter = 'drop-shadow(0 6px 12px rgba(0,0,0,0.8))';
+        });
+      });
+      item.addEventListener('mouseleave', function() {
+        (htmlMarkersInner[n] || []).forEach(function(inner) {
+          inner.style.transform = '';
+          inner.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.55))';
+        });
+      });
+    });
+
+  } else if (node.type === 'cahier') {
+    // Task 4.5 — cahier view
+    var meta = node.meta || {};
+    var h = '<div class="node-title" style="color:'+(meta.color||'#fff')+'">' + node.label + '</div>';
+    if (meta.subtitle) h += '<div class="node-period">' + meta.subtitle + '</div>';
+    if (meta.resume)   h += '<div class="node-desc">' + meta.resume + '</div>';
+    h += '<div style="margin-top:8px">';
+    node.children.forEach(function(phaseNode) {
+      var nStops = phaseNode.children.length;
+      h += '<div class="nav-child-item" onclick="navigateTo(findNodeById(TREE_ROOT,\''+phaseNode.id+'\'))">'
+        + '<span class="ci-num" style="background:'+(phaseNode.color||'#888')+'22;padding:1px 4px;border-radius:3px;color:'+(phaseNode.color||'#888')+'">'+phaseNode.label+'</span>'
+        + (nStops > 0 ? '<span style="color:#667788;font-size:.8em;margin-left:6px">'+nStops+' étape'+(nStops>1?'s':'')+'</span>' : '')
+        + '</div>';
+    });
+    h += '</div>';
+    el.innerHTML = h;
+
+  } else if (node.type === 'phase') {
+    // Task 4.6 — phase view
+    var h = '<div class="node-title" style="color:'+(node.color||'#fff')+'">' + node.label + '</div>';
+    h += '<div style="margin-top:8px">';
+    node.children.forEach(function(stopNode) {
+      h += '<div class="nav-child-item" onclick="navigateTo(findNodeById(TREE_ROOT,\''+stopNode.id+'\'))">'
+        + '<span class="ci-num">'+stopNode.seqN+'.</span> '
+        + stopNode.label
+        + '</div>';
+    });
+    h += '</div>';
+    el.innerHTML = h;
+
+  } else if (node.type === 'stop') {
+    // Task 4.7 — stop view
+    var s = node.stop;
+    var data = getCahierData(node.cahierN);
+    var h = '<div class="node-title"><span style="color:'+(data.PC[s.p]||'#888');
+    h += ';font-size:.85em;font-weight:normal">'+node.seqN+'.</span> '+s.n+'</div>';
+    if (s.date) h += '<div class="node-period">📅 '+s.date+'</div>';
+    if (s.d)    h += '<div class="node-desc">'+s.d+'</div>';
+    if (s.q)    h += '<div class="node-quote">«\u00a0'+s.q+'\u00a0»</div>';
+    if (s.r)    h += '<div class="node-route">🛣️ '+s.r+'</div>';
+    // CPA button
+    var hasCPA = false;
+    if (data.CPA) {
+      data.CPA.forEach(function(cpaStop) {
+        if (cpaStop.stopId == s.id || cpaStop.p == s.p) {
+          // Check by stopId first, then proximity
+          if (cpaStop.stopId == s.id) hasCPA = true;
+        }
+      });
+    }
+    if (hasCPA) {
+      h += '<div style="margin-top:8px"><button class="hbtn" onclick="(function(){';
+      h += 'var cpaList=getCahierData('+node.cahierN+').CPA;';
+      h += 'var idx=cpaList.findIndex(function(c){return c.stopId=='+s.id+';});';
+      h += 'if(idx>=0)cpaLbOpenItem(\'c'+node.cahierN+'_\'+idx,0);';
+      h += '})()">📷 Cartes postales</button></div>';
+    }
+    el.innerHTML = h;
+  }
+}
+
+// Task 4.8 — renderPanel
+function renderPanel(node) {
+  renderBreadcrumb(node);
+  renderCenterIndicator(node);
+  renderNodeContent(node);
+  renderArrows(node);
+}
+
+// =====================================================================
+// NAVIGATE — flyToNode / updateHashForNode / restoreFromHash / navigateTo
+// =====================================================================
+
+// Task 5.1 — flyToNode
+function flyToNode(node) {
+  switch (node.type) {
+    case 'stop':
+      var s = node.stop;
+      if (activePopup) { try { activePopup.remove(); } catch(e){} activePopup = null; }
+      map.flyTo({
+        center:   [s.lng, s.lat],
+        zoom:     Math.max(map.getZoom(), 11),
+        duration: 1200,
+        padding:  { top:300, bottom:50, left:0, right:0 }
+      });
+      map.once('moveend', function() {
+        var data = getCahierData(node.cahierN);
+        openStopPopup(s, 46, data.PC, data.PN);
+      });
+      break;
+
+    case 'phase':
+    case 'cahier':
+      if (node.bounds) {
+        var pitch = (node.type === 'cahier' && node.meta && node.meta.initialView)
+                    ? (node.meta.initialView.pitch || 0) : 0;
+        map.fitBounds(node.bounds, { padding:80, duration:800, pitch:pitch });
+      }
+      break;
+
+    case 'root':
+      var loaded = Array.from(loadedCahiers);
+      if (!loaded.length) break;
+      var union = loaded.reduce(function(acc, n) {
+        var data = getCahierData(n);
+        var bb = (data.bounds && data.bounds.cahier) || CAHIER_META[n].bbox;
+        if (!bb) return acc;
+        if (!acc) return bb;
+        return [[Math.min(acc[0][0],bb[0][0]),Math.min(acc[0][1],bb[0][1])],
+                [Math.max(acc[1][0],bb[1][0]),Math.max(acc[1][1],bb[1][1])]];
+      }, null);
+      if (union) map.fitBounds(union, { padding:80, duration:1200 });
+      break;
+  }
+}
+
+// Task 5.2 — updateHashForNode
+function updateHashForNode(node) {
+  history.replaceState(null, '', node.type === 'root' ? '#' : '#' + node.id);
+}
+
+// Task 5.3 — restoreFromHash
+function restoreFromHash() {
+  var h = location.hash.replace('#', '');
+  if (!h) return;
+  if (!TREE_ROOT) return;
+  var node = findNodeById(TREE_ROOT, h);
+  if (node) navigateTo(node);
+}
+
+// Task 5.4 — navigateTo
+function navigateTo(node, opts) {
+  opts = opts || {};
+  activeNode = node;
+
+  // 1. Ensure the right cahier is loaded on the map
+  var cahierN = getCahierN(node);
+  if (cahierN && !loadedCahiers.has(cahierN)) {
+    loadCahier(cahierN);            // loads data + markers + sets active
+  } else if (cahierN) {
+    setActiveCahier(cahierN, true); // update tab + elevation (noFit=true)
+  }
+
+  // 2. Update the panel
+  renderPanel(node);
+
+  // 3. Cartographic transition (unless skipFly)
+  if (!opts.skipFly) flyToNode(node);
+
+  // 4. Update URL hash
+  updateHashForNode(node);
 }
 
 // =====================================================================
@@ -915,14 +1318,21 @@ function renderMarkersForCahier(n, data) {
     var el = makePinEl(color, iconSvg, small);
     el.title = s.n;
     var pinH = 46;
+    var markerInner = el.firstElementChild;
     var marker = new maplibregl.Marker({ element:el, anchor:'bottom' })
       .setLngLat([s.lng, s.lat])
       .addTo(map);
+    htmlMarkersInner[n].push(markerInner);
     (function(stop, ph, cahierN) {
       var key = 'c'+cahierN+'_'+stop.id;
       stopPopupData[key] = { stop:stop, ph:ph, PC:data.PC, PN:data.PN };
       el.addEventListener('click', function(e) {
         e.stopPropagation();
+        if (TREE_ROOT) {
+          var nodeId = 'c'+cahierN+'_p'+stop.p+'_s'+stop.id;
+          var node = findNodeById(TREE_ROOT, nodeId);
+          if (node) { navigateTo(node, {skipFly:true}); return; }
+        }
         openStopPopup(stop, ph, data.PC, data.PN);
       });
     })(s, pinH, n);
@@ -965,76 +1375,6 @@ function renderLinesForCahier(n, data) {
     id:dashedId, type:'line', source:dashedId,
     layout:{ 'line-join':'round','line-cap':'round' },
     paint:{ 'line-color':['get','color'], 'line-width':2.5, 'line-opacity':0.75, 'line-dasharray':[3,3] }
-  });
-}
-
-// =====================================================================
-// renderSidebar(data)  — cahier actif uniquement
-// =====================================================================
-function renderSidebar(data) {
-  var container = document.getElementById('sl');
-  container.innerHTML = '';
-
-  if (!data.S || !data.S.length) {
-    container.innerHTML = '<p style="color:#667788;font-size:.9em;padding:8px 4px;">Aucune étape disponible pour ce cahier.</p>';
-    return;
-  }
-
-  var byPhase = {};
-  data.S.forEach(function(s){ if(!byPhase[s.p]) byPhase[s.p]=[]; byPhase[s.p].push(s); });
-  var stepN = 0;
-
-  Object.keys(byPhase).sort(function(a,b){return+a-+b;}).forEach(function(p) {
-    var col  = data.PC[p] || '#888';
-    var grp  = document.createElement('div'); grp.className='grp';
-    var title= document.createElement('div'); title.className='grp-t';
-    title.style.background = col+'22';
-    title.innerHTML = '<span class="grp-dot" style="background:'+col+'"></span>'+(data.PN[p]||'Phase '+p);
-    var list = document.createElement('div'); list.className='grp-s';
-
-    title.addEventListener('click', function(){
-      var open = list.style.maxHeight === '' || list.style.maxHeight === '0px';
-      list.style.maxHeight = open ? '2000px' : '0px';
-      if (open) {
-        var lngs = byPhase[p].map(function(s){return s.lng;});
-        var lats = byPhase[p].map(function(s){return s.lat;});
-        var dLng = Math.max.apply(null,lngs) - Math.min.apply(null,lngs);
-        var dLat = Math.max.apply(null,lats) - Math.min.apply(null,lats);
-        var maxZ = (dLng < 0.05 && dLat < 0.05) ? 12 : (dLng > 2 || dLat > 2) ? 7 : 11;
-        var minZ = (dLng > 2 || dLat > 2) ? 5 : undefined;
-        var opts = {padding:80, duration:800, maxZoom:maxZ};
-        if (minZ) opts.minZoom = minZ;
-        map.fitBounds([[Math.min.apply(null,lngs),Math.min.apply(null,lats)],
-                       [Math.max.apply(null,lngs),Math.max.apply(null,lats)]],
-                      opts);
-        // Après l'animation d'ouverture, scroll pour voir le premier item
-        setTimeout(function(){
-          var firstItem = list.querySelector('.si');
-          if (firstItem) firstItem.scrollIntoView({behavior:'smooth', block:'nearest'});
-        }, 260);
-      }
-    });
-
-    byPhase[p].forEach(function(s){
-      stepN++;
-      var item = document.createElement('div'); item.className='si';
-      item.style.borderLeftColor = col;
-      var pfx = '<span style="color:'+col+'">'+stepN+'.</span>\u00a0';
-      var h = '<div class="sn">'+pfx+s.n+'</div>';
-      if (s.date) h += '<div class="sd" style="color:#e94560">📅 '+s.date+'</div>';
-      if (s.d)    h += '<div class="sd">'+s.d.substring(0,120)+(s.d.length>120?'…':'')+'</div>';
-      if (s.r)    h += '<div class="sr">🛣️ '+s.r+'</div>';
-      item.innerHTML = h;
-      item.addEventListener('click', function(){
-        openStopPopup(s, 46, data.PC, data.PN);
-        map.flyTo({center:[s.lng,s.lat],zoom:Math.max(map.getZoom(),11),duration:1800,
-                   padding:{top:300,bottom:50,left:0,right:0}});
-      });
-      list.appendChild(item);
-    });
-
-    grp.appendChild(title); grp.appendChild(list);
-    container.appendChild(grp);
   });
 }
 
@@ -1150,11 +1490,41 @@ function _cpaLbRender() {
   }
 }
 document.addEventListener('keydown', function(e) {
+  // Task 7.4: ne pas interférer avec les champs de saisie
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
+
+  // Task 7.1: lightbox CPA ouverte → navigation CPA uniquement
   var lb = document.getElementById('cpa-lb');
-  if (!lb.classList.contains('open')) return;
-  if (e.key==='Escape')     lb.classList.remove('open');
-  if (e.key==='ArrowRight') { _cpaLbIdx=Math.min(_cpaLbList.length-1,_cpaLbIdx+1); _cpaLbRender(); }
-  if (e.key==='ArrowLeft')  { _cpaLbIdx=Math.max(0,_cpaLbIdx-1); _cpaLbRender(); }
+  if (lb && lb.classList.contains('open')) {
+    if (e.key === 'Escape')      lb.classList.remove('open');
+    if (e.key === 'ArrowRight')  { _cpaLbIdx = Math.min(_cpaLbList.length-1, _cpaLbIdx+1); _cpaLbRender(); }
+    if (e.key === 'ArrowLeft')   { _cpaLbIdx = Math.max(0, _cpaLbIdx-1); _cpaLbRender(); }
+    return;
+  }
+
+  // Task 7.2/7.3: navigation arborescente
+  if (!activeNode) return;
+  var siblings = activeNode.parent ? activeNode.parent.children : [];
+  var idx = siblings.indexOf(activeNode);
+
+  switch(e.key) {
+    case 'ArrowUp':
+      if (idx > 0) navigateTo(siblings[idx-1]);
+      e.preventDefault(); // Task 7.3
+      break;
+    case 'ArrowDown':
+      if (idx < siblings.length-1) navigateTo(siblings[idx+1]);
+      e.preventDefault(); // Task 7.3
+      break;
+    case 'ArrowLeft':
+      if (activeNode.parent) navigateTo(activeNode.parent);
+      e.preventDefault(); // Task 7.3
+      break;
+    case 'ArrowRight':
+      if (activeNode.children.length) navigateTo(activeNode.children[0]);
+      e.preventDefault(); // Task 7.3
+      break;
+  }
 });
 
 // =====================================================================
@@ -1295,8 +1665,7 @@ function setActiveCahier(n, noFit) {
       map.fitBounds(meta.bbox, { padding:80, duration:1200, pitch:0, bearing:0 });
     }
   }
-  // 2. Sidebar
-  renderSidebar(getCahierData(n));
+  // 2. Header only (panel is managed by renderPanel via navigateTo)
   // 3. En-tête
   updateHeader(n);
   // 4. Profil altitude
@@ -1993,6 +2362,12 @@ function updateHash(n) {
 }
 
 window.addEventListener('hashchange', function(){
+  if (!TREE_ROOT) return;
+  var h = location.hash.replace('#', '');
+  if (!h) return;
+  var node = findNodeById(TREE_ROOT, h);
+  if (node) { navigateTo(node); return; }
+  // Legacy: #c1 through #c4
   var m = location.hash.match(/^#c([1-4])$/);
   if (m) loadCahier(parseInt(m[1]));
 });
@@ -2003,6 +2378,10 @@ window.addEventListener('hashchange', function(){
 (function init() {
   // La page de garde est toujours affichée à l'ouverture.
   updateExagBtn();
+  TREE_ROOT  = buildTree();
+  activeNode = TREE_ROOT;
+  renderPanel(activeNode);
+  restoreFromHash();
 })();
 
 // =====================================================================
