@@ -213,53 +213,6 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   transition: width .25s, min-width .25s;
 }
 
-/* Barre compacte — toujours visible */
-#panel-bar {
-  height: 48px;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 0 8px;
-  background: #0f1628;
-  border-bottom: 1px solid #1a4a7a;
-  z-index: 10;
-}
-
-#nav-prev, #nav-next {
-  background: #0f3460;
-  border: 1px solid #1a4a7a;
-  color: #a0b4c8;
-  width: 32px;
-  height: 32px;
-  border-radius: 5px;
-  font-size: .95em;
-  cursor: pointer;
-  flex-shrink: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: background .15s, color .15s, opacity .15s;
-}
-#nav-prev:hover, #nav-next:hover { background: #1a5a9a; color: #fff; }
-#nav-prev:disabled, #nav-next:disabled { opacity: .3; cursor: default; }
-
-#panel-breadcrumb {
-  flex: 1;
-  min-width: 0;
-  font-size: .82em;
-  color: #c0cce0;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  cursor: pointer;
-  padding: 4px 6px;
-  border-radius: 4px;
-  transition: background .15s;
-  user-select: none;
-}
-#panel-breadcrumb:hover { background: rgba(255,255,255,.08); }
-
 /* Zone de rendu des vues — scrollable */
 #panel-viewport {
   flex: 1;
@@ -393,12 +346,6 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
          PANNEAU — sidebar desktop / bottombar portrait mobile
          =================================================================== -->
     <div id="panel" class="expanded">
-      <!-- Barre compacte — toujours visible -->
-      <div id="panel-bar">
-        <button id="nav-prev" title="Étape précédente">&#9664;</button>
-        <div id="panel-breadcrumb" title="Cliquer pour réduire / agrandir">Alban Rouzaud — Écrits de Guerre</div>
-        <button id="nav-next" title="Étape suivante">&#9654;</button>
-      </div>
       <!-- Zone de rendu des vues (navigateTo) -->
       <div id="panel-viewport"></div>
       <!-- Handle de redimensionnement (A-1) -->
@@ -513,6 +460,8 @@ var NAV = (function() {
     stopId:                   null,   // id du stop actif | null
     _previousStopId:          null,   // stopId conservé pendant la transition niveau 3→2 (F-2)
     _pendingHighlightChapitre: null,  // chapitre à mettre en surbrillance après next() depuis dernier item (D-2)
+    _previousCahier:          null,   // cahier conservé pendant la transition niveau 1→0 (highlight retour accueil)
+    _previousContext:         null,   // contexte complet avant go(3, cpaLoc) depuis carte (retour photo)
     cpaLoc:                   null,   // loc du lieu CPA actif (si pas de stopId) | null
     section:                  null,   // 'photos' | null — section de niveau 2
     level:                    0,      // 0–3
@@ -584,21 +533,27 @@ var NAV = (function() {
     /* Nettoyer les marqueurs transitoires de la nav précédente (F-2, D-2) */
     _state._previousStopId           = null;
     _state._pendingHighlightChapitre = null;
+    _state._previousCahier           = null;
+    _state._previousContext          = null;
+
+    var prevLevel = _state.level;
 
     /* Mise à jour de l'état selon le niveau cible */
     _state.level     = level;
     _state.direction = direction;
 
     if (level === 0) {
-      /* Retour accueil : tout remettre à null */
+      /* Retour accueil : sauvegarder le cahier avant de le nullifier */
+      _state._previousCahier = _state.cahier;
       _state.cahier   = null;
       _state.chapitre = null;
       _state.stopId   = null;
       _state.cpaLoc   = null;
       _state.section  = null;
     } else if (level === 1) {
-      /* Niveau cahier : chapitre et stop effacés */
+      /* Niveau cahier : sauvegarder le chapitre avant de l'effacer (pour highlight au retour) */
       if (ids.cahier != null) _state.cahier = ids.cahier;
+      _state._pendingHighlightChapitre = _state.chapitre;
       _state.chapitre = null;
       _state.stopId   = null;
       _state.cpaLoc   = null;
@@ -617,6 +572,16 @@ var NAV = (function() {
       if (ids.cahier   != null) _state.cahier   = ids.cahier;
       if (ids.chapitre != null) _state.chapitre = ids.chapitre;
       if (ids.stopId   != null) _state.stopId   = ids.stopId;
+      /* Sauvegarder le contexte précédent si on arrive sur une CPA depuis la carte */
+      if (ids.cpaLoc != null && _state.cpaLoc == null) {
+        _state._previousContext = {
+          level:    _state.level,
+          cahier:   _state.cahier,
+          chapitre: _state.chapitre,
+          stopId:   _state.stopId,
+          section:  _state.section
+        };
+      }
       /* Conserver cpaLoc si fourni (pour CPA sans stopId) */
       _state.cpaLoc = ids.cpaLoc || null;
       /* section : ne pas effacer (le lieu-photo est dans la section photos) */
@@ -625,6 +590,11 @@ var NAV = (function() {
     /* Synchroniser _seqIndex si l'appel vient de l'extérieur */
     if (!_fromSeq) {
       _syncSeqIndex(_state.stopId, _state.cahier);
+    }
+
+    /* Raffiner la direction : back-level si on remonte dans la hiérarchie */
+    if (direction === 'back' && _state.level < prevLevel) {
+      _state.direction = 'back-level';
     }
 
     _emit('change');
@@ -790,8 +760,15 @@ var NAV = (function() {
   /* --- Navigation ▶ --- */
   function next() {
     if (!_seq || _seq.length === 0) return;
-    if (_seqIndex >= _seq.length - 1) {
-      /* Dernier item — remonter au niveau 1 (cahier) avec highlight du chapitre (D-2) */
+    var skipCpa = (_state.cpaLoc == null); /* sauter les CPA sauf si déjà sur une CPA */
+    var idx = _seqIndex;
+    /* Trouver le prochain item valide */
+    var target = -1;
+    for (var i = idx + 1; i < _seq.length; i++) {
+      if (!skipCpa || _seq[i].type === 'stop') { target = i; break; }
+    }
+    if (target === -1) {
+      /* Plus d'item valide — remonter au niveau 1 (cahier) avec highlight du chapitre */
       var lastItem = _seq[_seq.length - 1];
       if (lastItem) {
         _state._pendingHighlightChapitre = lastItem.type === 'stop'
@@ -801,7 +778,7 @@ var NAV = (function() {
       }
       return;
     }
-    _seqIndex++;
+    _seqIndex = target;
     var args = _itemToGoArgs(_seq[_seqIndex]);
     go(args.level, args.ids, 'forward', true);
   }
@@ -809,17 +786,23 @@ var NAV = (function() {
   /* --- Navigation ◀ --- */
   function prev() {
     if (!_seq || _seq.length === 0) return;
-    if (_seqIndex === -1) return;              /* pas encore navigué — no-op */
-    if (_seqIndex <= 0) {
-      /* Premier item — remonter au niveau 2 (chapitre) avec highlight (D-1) */
+    if (_seqIndex === -1) return;
+    var skipCpa = (_state.cpaLoc == null);
+    var idx = _seqIndex;
+    /* Trouver le précédent item valide */
+    var target = -1;
+    for (var i = idx - 1; i >= 0; i--) {
+      if (!skipCpa || _seq[i].type === 'stop') { target = i; break; }
+    }
+    if (target === -1) {
+      /* Plus d'item valide — remonter au niveau 2 (chapitre) avec highlight */
       var firstItem = _seq[0];
       if (firstItem && firstItem.type === 'stop') {
-        /* go() vers niveau 2 sauvegarde automatiquement _previousStopId via F-2 */
         go(2, { cahier: firstItem.cahier, chapitre: firstItem.data.p }, 'back', true);
       }
       return;
     }
-    _seqIndex--;
+    _seqIndex = target;
     var args = _itemToGoArgs(_seq[_seqIndex]);
     go(args.level, args.ids, 'back', true);
   }
@@ -840,6 +823,12 @@ var NAV = (function() {
 
     /* previousStopId — stopId conservé pendant la transition niveau 3→2 (F-2) */
     get previousStopId() { return _state._previousStopId; },
+
+    /* previousCahier — cahier conservé pendant la transition niveau 1→0 */
+    get previousCahier() { return _state._previousCahier; },
+
+    /* previousContext — contexte complet avant go(3, cpaLoc) depuis carte */
+    get previousContext() { return _state._previousContext; },
 
     /* pendingHighlightChapitre — chapitre à mettre en surbrillance (D-2) */
     get pendingHighlightChapitre() { return _state._pendingHighlightChapitre; },
@@ -996,61 +985,99 @@ var MapAdapter = (function() {
     );
   }
 
-  /* --- syncToState(state) — handler principal branché sur NAV.on('change') ---
-   * Applique le bon zoom + met à jour le marqueur actif selon l'état NAV.
-   */
-  function syncToState(state) {
-    if (!map || !map.loaded()) return;
+  /* =====================================================================
+   * showOverview() — efface tout, affiche summary markers + tracés couleur cahier
+   * showCahier(n)  — efface tout, affiche marqueurs + tracés couleur phase de n
+   * ===================================================================== */
 
+  function showOverview() {
+    /* 1. Retirer tous les marqueurs individuels et CPA de tous les cahiers */
+    [1,2,3,4].forEach(function(n) {
+      if (htmlMarkers[n]) htmlMarkers[n].forEach(function(m){ try{m.remove();}catch(e){} });
+      if (cpaMarkers[n])  cpaMarkers[n].forEach(function(m){ try{m.remove();}catch(e){} });
+    });
+    /* 2. Tracés : visibles en couleur cahier pour C1/C2/C3, masqués pour C4 */
+    [1,2,3,4].forEach(function(n) {
+      var visible = loadedCahiers.has(n) && (n !== 4);
+      var vis = visible ? 'visible' : 'none';
+      var col = CAHIER_META[n].color;
+      ['route-c'+n+'-solid','route-c'+n+'-dashed'].forEach(function(id) {
+        if (!map.getLayer(id)) return;
+        map.setLayoutProperty(id, 'visibility', vis);
+        if (visible) map.setPaintProperty(id, 'line-color', col);
+      });
+    });
+    /* 3. Summary markers */
+    showSummaryMarkers(true);
+    setActiveMarker(null);
+    _fitAllLoaded();
+  }
+
+  function showCahier(n) {
+    /* 1. Retirer summary markers */
+    showSummaryMarkers(false);
+    /* 2. Masquer tous les cahiers sauf n */
+    [1,2,3,4].forEach(function(c) {
+      if (c === n) return;
+      if (htmlMarkers[c]) htmlMarkers[c].forEach(function(m){ try{m.remove();}catch(e){} });
+      if (cpaMarkers[c])  cpaMarkers[c].forEach(function(m){ try{m.remove();}catch(e){} });
+      ['route-c'+c+'-solid','route-c'+c+'-dashed'].forEach(function(id) {
+        if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
+      });
+    });
+    /* 3. Afficher le cahier n en couleur phase */
+    var solidId  = 'route-c'+n+'-solid';
+    var dashedId = 'route-c'+n+'-dashed';
+    if (map.getLayer(solidId)) {
+      map.setPaintProperty(solidId, 'line-color', ['get','color']);
+      map.setPaintProperty(solidId, 'line-width', 4);
+      map.setPaintProperty(solidId, 'line-opacity', 0.85);
+      map.setLayoutProperty(solidId, 'visibility', 'visible');
+    }
+    if (map.getLayer(dashedId)) {
+      map.setPaintProperty(dashedId, 'line-color', ['get','color']);
+      map.setLayoutProperty(dashedId, 'visibility', 'visible');
+    }
+    if (htmlMarkers[n]) htmlMarkers[n].forEach(function(m){ try{m.addTo(map);}catch(e){} });
+    if (cpaGlobalVisible && cpaMarkers[n]) cpaMarkers[n].forEach(function(m){ try{m.addTo(map);}catch(e){} });
+    /* Mettre à jour le profil altitude pour ce cahier */
+    if (activeCahier !== n) renderElevation(n);
+    activeCahier = n;
+  }
+
+  /* --- onNavChange(state) — aiguillage carte selon l'état NAV ---  */
+  function onNavChange(state) {
+    if (!map) return;
     var level = state.level;
 
     if (level === 0) {
-      /* FR-5.3 : C2/C3 tracés seuls, C1/C4 marqueurs seuls */
-      loadedCahiers.forEach(function(n) {
-        if (n === 2 || n === 3) {
-          showTracksOnly(n);
-        } else {
-          showMarkersOnly(n);
-        }
-      });
-      /* Désactiver le marqueur actif */
-      setActiveMarker(null);
-      /* FR-5.2 niveau 0 : fitBounds sur tout */
-      _fitAllLoaded();
+      showOverview();
 
     } else if (level === 1) {
-      /* FR-5.3 : au niveau cahier, tous les marqueurs + tracés du cahier */
       if (state.cahier != null) {
-        /* Rétablir la visibilité normale du cahier actif */
-        setCahierVisibility(state.cahier, true);
-        /* Zoom FR-5.2 niveau 1 */
+        showCahier(state.cahier);
         fitCahier(state.cahier);
       }
 
     } else if (level === 2) {
-      /* FR-5.2 niveau 2 : fitBounds sur le chapitre */
-      if (state.cahier != null && state.chapitre != null) {
+      if (state.cahier != null) {
+        showCahier(state.cahier);
         fitChapitre(state.cahier, state.chapitre);
       }
 
     } else if (level === 3) {
+      if (state.cahier != null) showCahier(state.cahier);
       if (state.stopId != null) {
-        /* FR-5.2 niveau 3 étape */
-        var entry = stopMarkerIndex[state.stopId];
-        if (entry) {
-          flyToStop(entry.marker.getLngLat());
-        }
-        setActiveMarker(state.stopId);
+        var entry = stopMarkerIndex['c' + state.cahier + '_' + state.stopId];
+        if (entry) flyToStop(entry.marker.getLngLat());
+        setActiveMarker('c' + state.cahier + '_' + state.stopId);
       } else if (state.cpaLoc != null) {
-        /* FR-5.2 niveau 3 lieu-photo : chercher le lieu dans les data */
         var cahierN = state.cahier;
         var cd = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
         var lieux = cd.cpa || cd.lieux || [];
-        var found = null;
         for (var i = 0; i < lieux.length; i++) {
-          if (lieux[i].loc === state.cpaLoc) { found = lieux[i]; break; }
+          if (lieux[i].loc === state.cpaLoc) { flyToCPA(lieux[i]); break; }
         }
-        if (found) flyToCPA(found);
         setActiveMarker(null);
       }
     }
@@ -1065,7 +1092,8 @@ var MapAdapter = (function() {
     setActiveMarker:setActiveMarker,
     showTracksOnly: showTracksOnly,
     showMarkersOnly:showMarkersOnly,
-    syncToState:    syncToState
+    syncToState:    onNavChange,
+    onNavChange:    onNavChange
   };
 })();
 /* ========== /MapAdapter ========== */
@@ -1132,7 +1160,7 @@ var CAHIER_META = {
   2: {
     title:       'Journal non écrit',
     subtitle:    'Mai \u2013 Juin 1940 \u2014 Repli stratégique et capture',
-    resume:      'Mai\u2013juin\u00a01940\u00a0: la France s\u2019effondre. Alban Rouzaud retrace le repli chaotique de son unité à travers la Lorraine et la Champagne \u2014 routes embouteillées de civils, ordres contradictoires, villages en flammes \u2014 jusqu\u2019à la capture et le début de la captivité.',
+    resume:      'La France s\u2019effondre. Alban Rouzaud retrace le repli chaotique de son unité à travers la Lorraine et la Champagne \u2014 routes embouteillées de civils, ordres contradictoires, villages en flammes \u2014 jusqu\u2019à la capture et le début de la captivité.',
     pdfTranscript: 'https://docs.google.com/document/d/1CJ_H8KuLxS6C2K5QgyMGPXW4mBOQLGyT/edit?usp=drive_link',
     pdfOriginal:   'https://drive.google.com/file/d/1JKTnWPOrwgF-Oi9N0_5aGpOe_2UbRlX9/view?usp=sharing',
     color:       '#e94560',
@@ -1191,7 +1219,9 @@ function getCahierData(n) {
     noElevation: !!meta.noElevation,
     color:       meta.color,
     title:       meta.title,
-    subtitle:    meta.subtitle
+    subtitle:    meta.subtitle,
+    bounds:      cd.bounds || null,
+    pins:        cd.pins   || {}
   };
 }
 
@@ -1458,11 +1488,11 @@ function renderMarkersForCahier(n, data) {
     el.title = s.n;
     var pinH = 46;
     var marker = new maplibregl.Marker({ element:el, anchor:'bottom' })
-      .setLngLat([s.lng, s.lat])
-      .addTo(map);
+      .setLngLat([s.lng, s.lat]);
+    /* Les marqueurs naissent détachés — setActiveCahier les ajoute à la carte */
     (function(stop, ph, cahierN) {
       // Indexer le marker par stopId pour MapAdapter.setActiveMarker
-      stopMarkerIndex[stop.id] = { marker:marker, cahier:cahierN };
+      stopMarkerIndex['c' + cahierN + '_' + stop.id] = { marker:marker, cahier:cahierN };
       el.addEventListener('click', function(e) {
         e.stopPropagation();
         /* FR-7 : plus de Popup — naviguer vers la vue-étape dans le Panneau */
@@ -1471,6 +1501,88 @@ function renderMarkersForCahier(n, data) {
       });
     })(s, pinH, n);
     htmlMarkers[n].push(marker);
+  });
+}
+
+// =====================================================================
+// renderSummaryMarkers(n, data) — marqueurs résumé (un par chapitre, niveau 0)
+// =====================================================================
+var summaryMarkers = {1:[],2:[],3:[],4:[]};
+
+/* Tooltip custom — partagé par tous les summary markers */
+var _summaryTooltip = (function() {
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;z-index:9000;background:rgba(15,22,40,.97);'
+    + 'color:#e0e0e0;border:1px solid #1a4a7a;border-radius:5px;'
+    + 'padding:4px 10px;font-size:.82em;pointer-events:none;'
+    + 'white-space:nowrap;display:none;';
+  document.body.appendChild(t);
+  return t;
+})();
+function _summaryTooltipPosition(e) {
+  _summaryTooltip.style.left = (e.clientX + 12) + 'px';
+  _summaryTooltip.style.top  = (e.clientY - 28) + 'px';
+}
+
+function renderSummaryMarkers(n, data) {
+  var color = CAHIER_META[n].color;
+  var pins  = data.pins || {};
+  var phases = Object.keys(data.PC).sort(function(a,b){return+a-+b;});
+
+  phases.forEach(function(p) {
+    /* Position : pin explicite ou centre du bounds.phase */
+    var pos = pins[p];
+    if (!pos) {
+      var bb = data.bounds && data.bounds.phases && data.bounds.phases[p];
+      if (bb) {
+        pos = { lat: (bb[0][1]+bb[1][1])/2, lng: (bb[0][0]+bb[1][0])/2 };
+      }
+    }
+    if (!pos) return;
+
+    /* Élément visuel : disque coloré sans numéro */
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'width:18px;height:18px;display:flex;align-items:center;justify-content:center;';
+    var el = document.createElement('div');
+    el.style.cssText = 'width:14px;height:14px;border-radius:50%;'
+      + 'background:'+color+';border:2px solid rgba(255,255,255,0.85);'
+      + 'box-shadow:0 1px 4px rgba(0,0,0,0.55);cursor:pointer;'
+      + 'transition:transform .12s,box-shadow .12s;transform-origin:center center;';
+    var label = data.PN[p] || ('Chapitre '+p);
+    wrap.appendChild(el);
+    wrap.addEventListener('mouseenter', function(e) {
+      el.style.transform = 'scale(1.5)';
+      el.style.boxShadow = '0 3px 8px rgba(0,0,0,0.7)';
+      _summaryTooltip.textContent = label;
+      _summaryTooltip.style.display = 'block';
+      _summaryTooltipPosition(e);
+    });
+    wrap.addEventListener('mousemove', _summaryTooltipPosition);
+    wrap.addEventListener('mouseleave', function() {
+      el.style.transform = '';
+      el.style.boxShadow = '0 1px 4px rgba(0,0,0,0.55)';
+      _summaryTooltip.style.display = 'none';
+    });
+    wrap.addEventListener('click', function(e) {
+      e.stopPropagation();
+      _summaryTooltip.style.display = 'none';
+      showSummaryMarkers(false);
+      loadCahier(n);
+      NAV.go(2, { cahier: n, chapitre: parseInt(p) });
+    });
+
+    var marker = new maplibregl.Marker({ element: wrap, anchor: 'center' })
+      .setLngLat([pos.lng, pos.lat]);
+    /* Naît détaché — showSummaryMarkers l'ajoute au niveau 0 */
+    summaryMarkers[n].push(marker);
+  });
+}
+
+function showSummaryMarkers(visible) {
+  [1,2,3,4].forEach(function(n) {
+    summaryMarkers[n].forEach(function(m) {
+      try { if (visible) { m.addTo(map); } else { m.remove(); } } catch(e){}
+    });
   });
 }
 
@@ -1500,15 +1612,17 @@ function renderLinesForCahier(n, data) {
   map.addSource(solidId,  { type:'geojson', data:solidGJ  });
   map.addSource(dashedId, { type:'geojson', data:dashedGJ });
 
+  /* Vue résumé (niveau 0) : couleur uniforme du cahier */
+  var cahierColor = CAHIER_META[n].color;
   map.addLayer({
     id:solidId, type:'line', source:solidId,
     layout:{ 'line-join':'round','line-cap':'round' },
-    paint:{ 'line-color':['get','color'], 'line-width':4, 'line-opacity':0.85 }
+    paint:{ 'line-color':cahierColor, 'line-width':3.5, 'line-opacity':0.9 }
   });
   map.addLayer({
     id:dashedId, type:'line', source:dashedId,
     layout:{ 'line-join':'round','line-cap':'round' },
-    paint:{ 'line-color':['get','color'], 'line-width':2.5, 'line-opacity':0.75, 'line-dasharray':[3,3] }
+    paint:{ 'line-color':cahierColor, 'line-width':2.5, 'line-opacity':0.75, 'line-dasharray':[3,3] }
   });
 }
 
@@ -1558,8 +1672,8 @@ function addCpaMarkersForCahier(n, cpaList) {
     })(stop, n);
 
     var m = new maplibregl.Marker({element:wrap,anchor:'center'})
-      .setLngLat([stop.lng,stop.lat])
-      .addTo(map);
+      .setLngLat([stop.lng,stop.lat]);
+    /* Naît détaché — setCahierVisibility l'ajoute quand le cahier devient actif */
     cpaMarkers[n].push(m);
   });
 }
@@ -1649,33 +1763,21 @@ function setCahierVisibility(n, visible) {
 // Maintient la compatibilité avec loadAllCahiers et loadCahier.
 // Sans sidebar ni header, seules les fonctions essentielles restent.
 // =====================================================================
-function setActiveCahier(n, noFit) {
-  // Visibilité : afficher uniquement le cahier actif
-  if (n === 4) {
-    [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, false); });
-    if (loadedCahiers.has(4)) setCahierVisibility(4, true);
-  } else {
-    [1, 2, 3, 4].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, c === n); });
-  }
-  // Zoom sur l'étendue réelle des stops du cahier
-  var meta = CAHIER_META[n];
-  if (!noFit && meta) {
-    var data = getCahierData(n);
-    var stops = data.S || [];
-    if (stops.length >= 2) {
-      var lngs = stops.map(function(s){ return s.lng; });
-      var lats = stops.map(function(s){ return s.lat; });
-      var sw = [Math.min.apply(null,lngs), Math.min.apply(null,lats)];
-      var ne = [Math.max.apply(null,lngs), Math.max.apply(null,lats)];
-      map.fitBounds([sw, ne], {
-        padding: 80,
-        duration: 1200,
-        pitch:   meta.initialView && meta.initialView.pitch ? meta.initialView.pitch : 0,
-        bearing: 0
-      });
-    } else if (meta.bbox) {
-      map.fitBounds(meta.bbox, { padding:80, duration:1200, pitch:0, bearing:0 });
+function setActiveCahier(n, noFit, skipVisibility) {
+  if (!skipVisibility) {
+    // Repasser les tracés du cahier actif en couleur de phase
+    var solidId  = 'route-c'+n+'-solid';
+    var dashedId = 'route-c'+n+'-dashed';
+    if (map.getLayer(solidId)) {
+      map.setPaintProperty(solidId,  'line-color', ['get','color']);
+      map.setPaintProperty(solidId,  'line-width', 4);
+      map.setPaintProperty(solidId,  'line-opacity', 0.85);
     }
+    if (map.getLayer(dashedId)) {
+      map.setPaintProperty(dashedId, 'line-color', ['get','color']);
+    }
+    // Afficher marqueurs + tracés du cahier actif
+    setCahierVisibility(n, true);
   }
   // Profil altitude
   renderElevation(n);
@@ -1694,7 +1796,7 @@ function loadCahier(n) {
     return;
   }
   if (loadedCahiers.has(n)) {
-    setActiveCahier(n);
+    setActiveCahier(n, true);
     return;
   }
   var data = getCahierData(n);
@@ -1704,7 +1806,7 @@ function loadCahier(n) {
   loadedCahiers.add(n);
   updateVueEnsembleBtn();
 
-  setActiveCahier(n);
+  setActiveCahier(n, true);
 }
 
 // =====================================================================
@@ -2336,6 +2438,7 @@ var Panel = (function() {
     var viewH = viewport.offsetHeight || 400;
     viewport.style.height = viewH + 'px';
     viewport.style.overflowX = 'hidden';
+    if (isBackLevel) viewport.style.overflowY = 'hidden';
 
     /* Rendre la vue sortante absolue pour l'animer */
     if (outgoing) {
@@ -2345,20 +2448,23 @@ var Panel = (function() {
       outgoing.style.width = '100%';
     }
 
-    /* Position initiale de la vue entrante hors écran */
-    incoming.style.transform = direction === 'forward'
-      ? 'translateX(100%)' : 'translateX(-100%)';
+    /* Position initiale de la vue entrante hors écran
+       forward     : slide horizontal droite→gauche
+       back-level  : slide vertical bas→haut (retour hiérarchique)
+       back        : slide horizontal gauche→droite (précédent même niveau) */
+    var isBack      = direction === 'back';
+    var isBackLevel = direction === 'back-level';
+    incoming.style.transform = isBackLevel ? 'translateY(100%)' : (isBack ? 'translateX(-100%)' : 'translateX(100%)');
     viewport.appendChild(incoming);
 
     /* Double rAF pour garantir le reflow avant l'animation */
     requestAnimationFrame(function() {
       requestAnimationFrame(function() {
         incoming.style.transition = 'transform 200ms ease-in-out';
-        incoming.style.transform = 'translateX(0)';
+        incoming.style.transform = 'translate(0,0)';
         if (outgoing) {
           outgoing.style.transition = 'transform 200ms ease-in-out';
-          outgoing.style.transform = direction === 'forward'
-            ? 'translateX(-100%)' : 'translateX(100%)';
+          outgoing.style.transform = isBackLevel ? 'translateY(-100%)' : (isBack ? 'translateX(100%)' : 'translateX(-100%)');
         }
         setTimeout(function() {
           if (outgoing && outgoing.parentNode) {
@@ -2371,9 +2477,10 @@ var Panel = (function() {
           }
           viewport.style.height = '';
           viewport.style.overflowX = '';
+          viewport.style.overflowY = '';
           viewport.scrollTop = 0;
           /* FR-1.4 */
-          var activeEl = viewport.querySelector('.pv-item.active');
+          var activeEl = viewport.querySelector('.pv-item.active, .va-card.active');
           if (activeEl) {
             activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
@@ -2422,83 +2529,8 @@ var Panel = (function() {
     setExpanded(!_expanded);
   }
 
-  /* --- updateBreadcrumb(state) ---
-   * Met à jour le fil d'Ariane selon le niveau et les ids actifs.
-   * Format FR-1.3 :
-   *   0 → 'Alban Rouzaud — Écrits de Guerre'
-   *   1 → 'Cahier N — [titre]'
-   *   2 → 'Cahier N › Ch. N — [titre]'
-   *   3 → 'Cahier N › Ch. N › [nom stop]'
-   */
-  function updateBreadcrumb(state) {
-    var el = document.getElementById('panel-breadcrumb');
-    if (!el) return;
-
-    var level = state.level;
-    var text = '';
-
-    if (level === 0) {
-      text = 'Alban Rouzaud — Écrits de Guerre';
-
-    } else if (level === 1) {
-      var meta1 = CAHIER_META[state.cahier];
-      text = 'Cahier ' + state.cahier + '\u00a0— ' + (meta1 ? meta1.title : '');
-
-    } else if (level === 2) {
-      var meta2 = CAHIER_META[state.cahier];
-      var cd2 = (state.cahier===1?CAHIER_1_DATA:state.cahier===2?CAHIER_2_DATA:state.cahier===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
-      var pnTitle;
-      if (state.section === 'photos') {
-        pnTitle = 'Photos';
-      } else {
-        pnTitle = state.chapitre != null ? (cd2.PN && cd2.PN[state.chapitre]) || ('Ch.\u00a0' + state.chapitre) : '';
-      }
-      text = 'Cahier\u00a0' + state.cahier
-        + '\u00a0\u203a ' + pnTitle;
-
-    } else if (level === 3) {
-      var meta3 = CAHIER_META[state.cahier];
-      var cd3 = (state.cahier===1?CAHIER_1_DATA:state.cahier===2?CAHIER_2_DATA:state.cahier===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
-      /* Nom de l'étape ou du lieu CPA */
-      var itemName = '';
-      var sectionLabel = '';
-      if (state.cpaLoc) {
-        /* Lieu-photo : section "Photos" */
-        sectionLabel = 'Photos';
-        itemName = state.cpaLoc;
-      } else {
-        var pnTitle3 = state.chapitre != null ? (cd3.PN && cd3.PN[state.chapitre]) || ('Ch.\u00a0' + state.chapitre) : '';
-        sectionLabel = pnTitle3;
-        if (state.stopId != null) {
-          var stops3 = cd3.stops || [];
-          for (var i = 0; i < stops3.length; i++) {
-            if (stops3[i].id === state.stopId) { itemName = stops3[i].n; break; }
-          }
-        }
-      }
-      text = 'Cahier\u00a0' + state.cahier
-        + '\u00a0\u203a ' + sectionLabel
-        + '\u00a0\u203a ' + itemName;
-    }
-
-    el.textContent = text;
-    el.title = text + ' \u2014 Cliquer pour r\u00e9duire / agrandir';
-
-    /* D-4 — Les boutons ◀/▶ ne sont plus jamais disabled (logique contextuelle D-3) */
-  }
-
   /* --- init() --- appel unique au Bootstrap --- */
   function init() {
-    /* Breadcrumb click → toggle expanded/compact */
-    var bc = document.getElementById('panel-breadcrumb');
-    if (bc) {
-      bc.addEventListener('click', function() { toggleExpanded(); });
-    }
-
-    /* Abonnement NAV → breadcrumb + boutons */
-    NAV.on('change', function(state) {
-      updateBreadcrumb(state);
-    });
   }
 
   return {
@@ -2506,7 +2538,6 @@ var Panel = (function() {
     setExpanded:      setExpanded,
     toggleExpanded:   toggleExpanded,
     _expandDirect:    _expandDirect,
-    updateBreadcrumb: updateBreadcrumb,
     init:             init,
     get expanded()        { return _expanded; },
     get _transitioning()  { return _transitioning; },
@@ -2533,6 +2564,19 @@ var Panel = (function() {
     '.pv-back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;'
     + 'color:#7a9ec8;font-size:.85em;cursor:pointer;padding:4px 0 10px;transition:color .15s}',
     '.pv-back:hover{color:#fff}',
+    /* Barre de navigation haut : ◀ titre ▶ */
+    '.pv-nav-bar{display:flex;align-items:center;gap:4px;margin-bottom:10px;'
+    + 'border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:8px}',
+    '.pv-nav-btn{flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;'
+    + 'justify-content:center;background:#0f3460;border:1px solid #1a4a7a;border-radius:4px;'
+    + 'color:#a0b4c8;font-size:.85em;cursor:pointer;transition:background .15s,color .15s;'
+    + 'padding:0}',
+    '.pv-nav-btn:hover:not(:disabled){background:#1a5a9a;color:#fff}',
+    '.pv-nav-btn:disabled{opacity:.25;cursor:default}',
+    '.pv-nav-title{flex:1;min-width:0;text-align:center;font-size:.88em;font-weight:600;'
+    + 'color:#a0c4e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'
+    + 'cursor:pointer;padding:2px 4px;border-radius:3px;transition:color .15s}',
+    '.pv-nav-title:hover{color:#fff}',
     /* Titre de vue */
     '.pv-title{font-size:1.1em;font-weight:700;color:#e0e0e0;margin-bottom:2px;line-height:1.3}',
     '.pv-period{font-size:.82em;color:#8899aa;margin-bottom:14px}',
@@ -2546,8 +2590,8 @@ var Panel = (function() {
     '.pv-item-body{flex:1;min-width:0}',
     '.pv-item-name{font-size:.93em;font-weight:600;color:#e0e0e0;'
     + 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
-    '.pv-item-meta{font-size:.78em;color:#667788;margin-top:2px}',
-    '.pv-item-arrow{color:#3a5a8a;font-size:.8em;flex-shrink:0}',
+    '.pv-item-meta{font-size:.78em;color:#667788;margin-top:2px;margin-left:auto;padding-left:8px;flex-shrink:0}',
+    '.pv-item-arrow{display:none}',
     /* Section photos */
     '.pv-photos-item{border-left-color:#c8a96e!important}',
     '.pv-photos-icon{font-size:1.2em;flex-shrink:0}',
@@ -2689,10 +2733,16 @@ function renderCahier(cahierN) {
       + '</li>'
     : '';
 
-  return '<button class="pv-back" onclick="NAV.go(0,null,\'back\')">'
-    + '&#8592; Accueil'
-    + '</button>'
-    + '<div class="pv-title">Cahier\u00a0' + cahierN + '\u00a0\u2014 ' + (meta.title || '') + '</div>'
+  var prevCahier = cahierN > 1 ? cahierN - 1 : null;
+  var nextCahier = cahierN < 4 ? cahierN + 1 : null;
+
+  return _renderNavBar(
+      'Cahier\u00a0' + cahierN + '\u00a0\u2014 ' + (meta.title || ''),
+      'NAV.go(0,null,\'back\')',
+      prevCahier ? 'NAV.go(1,{cahier:' + prevCahier + '},\'back\')' : null,
+      nextCahier ? 'NAV.go(1,{cahier:' + nextCahier + '})' : null,
+      !prevCahier, !nextCahier
+    )
     + '<div class="pv-period">' + (meta.subtitle || '') + '</div>'
     + '<ul class="pv-list">'
     + chapitresHTML
@@ -2745,12 +2795,14 @@ function renderChapitre(cahierN, phaseN) {
   var phaseStops = stops.filter(function(s) { return s.p === phaseN; });
 
   /* FR-1.4 — highlight au retour : utiliser previousStopId s'il est défini (F-2) */
-  var activeStopId = NAV.previousStopId !== null ? NAV.previousStopId : NAV.state.stopId;
+  var activeStopId = (NAV.previousStopId !== null && NAV.previousStopId !== undefined)
+    ? NAV.previousStopId : NAV.state.stopId;
 
   var itemsHTML = phaseStops.map(function(s) {
     var seqNum = getStopSeqNum(cahierN, s.id);
     var numStr = seqNum !== null ? String(seqNum) : '';
-    var isActive = (s.id === activeStopId);
+    /* eslint-disable eqeqeq */
+    var isActive = activeStopId !== null && activeStopId !== undefined && s.id == activeStopId;
     return '<li class="pv-item' + (isActive ? ' active' : '') + '"'
       + ' style="border-left-color:' + color + '"'
       + ' onclick="NAV.go(3,{cahier:' + cahierN + ',chapitre:' + phaseN + ',stopId:' + s.id + '})">'
@@ -2770,23 +2822,40 @@ function renderChapitre(cahierN, phaseN) {
   var phaseIdx  = allPhases.indexOf(phaseN);
   var prevPhase = phaseIdx > 0 ? allPhases[phaseIdx - 1] : null;
   var nextPhase = phaseIdx < allPhases.length - 1 ? allPhases[phaseIdx + 1] : null;
-  var chapCtxNavHTML = '<div class="pv-ctx-nav">'
-    + '<button class="chap-ctx-prev"' + (!prevPhase ? ' disabled' : '')
-    + (prevPhase ? ' onclick="NAV.go(2,{cahier:' + cahierN + ',chapitre:' + prevPhase + '},\'back\')"' : '')
-    + '>&#9664; Chapitre précédent</button>'
-    + '<button class="chap-ctx-next"' + (!nextPhase ? ' disabled' : '')
-    + (nextPhase ? ' onclick="NAV.go(2,{cahier:' + cahierN + ',chapitre:' + nextPhase + '})"' : '')
-    + '>Chapitre suivant &#9654;</button>'
-    + '</div>';
 
-  return '<button class="pv-back"'
-    + ' onclick="NAV.go(1,{cahier:' + cahierN + '},\'back\')">'
-    + '&#8592; Cahier\u00a0' + cahierN
-    + '</button>'
-    + '<div class="pv-title" style="color:' + color + '">' + phaseName + '</div>'
+  /* Si dernier chapitre, ▶ = premier chapitre du cahier suivant (sans passer par photos) */
+  var prevFn, nextFn;
+  if (prevPhase) {
+    prevFn = 'NAV.go(2,{cahier:' + cahierN + ',chapitre:' + prevPhase + '},\'back\')';
+  } else if (cahierN > 1) {
+    /* Premier chapitre du cahier : ◀ = dernier chapitre du cahier précédent */
+    var prevCd = (cahierN-1===1?CAHIER_1_DATA:cahierN-1===2?CAHIER_2_DATA:cahierN-1===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
+    var prevAllPhases = Object.keys(prevCd.PN||{}).map(Number).sort(function(a,b){return a-b;});
+    prevCd.stops && prevCd.stops.forEach(function(s){if(s.p!=null&&prevAllPhases.indexOf(s.p)===-1)prevAllPhases.push(s.p);});
+    prevAllPhases.sort(function(a,b){return a-b;});
+    var prevLastPhase = prevAllPhases[prevAllPhases.length-1];
+    if (prevLastPhase != null) prevFn = 'NAV.go(2,{cahier:' + (cahierN-1) + ',chapitre:' + prevLastPhase + '},\'back\')';
+  }
+  if (nextPhase) {
+    nextFn = 'NAV.go(2,{cahier:' + cahierN + ',chapitre:' + nextPhase + '})';
+  } else if (cahierN < 4) {
+    /* Dernier chapitre du cahier : ▶ = premier chapitre du cahier suivant */
+    var nextCd = (cahierN+1===1?CAHIER_1_DATA:cahierN+1===2?CAHIER_2_DATA:cahierN+1===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
+    var nextAllPhases = Object.keys(nextCd.PN||{}).map(Number).sort(function(a,b){return a-b;});
+    nextCd.stops && nextCd.stops.forEach(function(s){if(s.p!=null&&nextAllPhases.indexOf(s.p)===-1)nextAllPhases.push(s.p);});
+    nextAllPhases.sort(function(a,b){return a-b;});
+    var nextFirstPhase = nextAllPhases[0];
+    if (nextFirstPhase != null) nextFn = 'NAV.go(2,{cahier:' + (cahierN+1) + ',chapitre:' + nextFirstPhase + '})';
+  }
+
+  return _renderNavBar(
+      phaseName,
+      'NAV.go(1,{cahier:' + cahierN + '},\'back\')',
+      prevFn || null, nextFn || null,
+      !prevFn, !nextFn
+    )
     + '<div class="pv-period">' + phaseStops.length + '\u00a0étape' + (phaseStops.length > 1 ? 's' : '') + '</div>'
-    + '<ul class="pv-list">' + itemsHTML + '</ul>'
-    + chapCtxNavHTML;
+    + '<ul class="pv-list">' + itemsHTML + '</ul>';
 }
 
 /* --- renderEtape(stop, PC, PN, cahierN) ---
@@ -2830,25 +2899,18 @@ function renderEtape(stop, PC, PN, cahierN) {
   /* Utiliser _seqIndex global pour prev/next */
   var isFirstGlobal = NAV.isFirst();
   var isLastGlobal  = NAV.isLast();
-  var ctxNavHTML = _renderCtxNav(
-    '&#9664; Précédent', 'Suivant &#9654;',
-    isFirstGlobal, isLastGlobal,
-    'NAV.prev()', 'NAV.next()'
-  );
 
-  return '<button class="pv-back"'
-    + ' onclick="NAV.go(2,{cahier:' + cahierN + ',chapitre:' + stop.p + '},\'back\')">'
-    + '&#8592; ' + phaseName
-    + '</button>'
-    + '<h2 style="font-size:1em;font-weight:700;color:#e0e0e0;margin-bottom:6px;line-height:1.35;">'
-    + stop.n
-    + '</h2>'
+  return _renderNavBar(
+      stop.n,
+      'NAV.go(2,{cahier:' + cahierN + ',chapitre:' + stop.p + '},\'back\')',
+      'NAV.prev()', 'NAV.next()',
+      isFirstGlobal, isLastGlobal
+    )
     + '<div class="pv-etape-phase" style="color:' + color + '">' + phaseName + '</div>'
     + dateHTML
     + descHTML
     + citationHTML
-    + refHTML
-    + ctxNavHTML;
+    + refHTML;
 }
 
 /* --- renderPhotos(cahierN) — FR-3.5 (task 3.5) ---
@@ -2886,10 +2948,11 @@ function renderPhotos(cahierN) {
     ? '<p style="color:#667788;font-size:.88em;padding:8px 4px;">Aucune photo disponible pour ce cahier.</p>'
     : '';
 
-  return '<button class="pv-back" onclick="NAV.go(1,{cahier:' + cahierN + '},\'back\')">'
-    + '&#8592; Cahier\u00a0' + cahierN + '\u00a0\u2014 ' + (meta.title || '')
-    + '</button>'
-    + '<div class="pv-title">Photos \u2014 ' + (meta.title || ('Cahier\u00a0' + cahierN)) + '</div>'
+  return _renderNavBar(
+      'Photos \u2014 ' + (meta.title || ('Cahier\u00a0' + cahierN)),
+      'NAV.go(1,{cahier:' + cahierN + '},\'back\')',
+      null, null
+    )
     + '<div class="pv-photos-grid">'
     + lieux_html
     + emptyHTML
@@ -2965,13 +3028,32 @@ function _renderLieuPhotoContent(lieu, cahierN, idx) {
         + '</div>'
     : '';
 
-  return '<button class="pv-back"'
-    + ' onclick="NAV.go(2,{cahier:' + cahierN + ',section:\'photos\'},\'back\')">'
-    + '&#8592; Photos \u2014 ' + (meta.title || ('Cahier\u00a0' + cahierN))
-    + '</button>'
-    + '<div class="pv-lieu-header">'
-    + '<div class="pv-lieu-title">' + lieu.loc + '</div>'
-    + '</div>'
+  /* Bouton retour : si on vient de la carte (previousContext), retourner au contexte précédent */
+  var backFn;
+  var ctx = NAV.previousContext;
+  if (ctx) {
+    if (ctx.level === 0) {
+      backFn = 'NAV.go(0,null,\'back-level\')';
+    } else if (ctx.level === 1) {
+      backFn = 'NAV.go(1,{cahier:' + ctx.cahier + '},\'back-level\')';
+    } else if (ctx.level === 2 && ctx.section === 'photos') {
+      backFn = 'NAV.go(2,{cahier:' + ctx.cahier + ',section:\'photos\'},\'back-level\')';
+    } else if (ctx.level === 2 && ctx.chapitre != null) {
+      backFn = 'NAV.go(2,{cahier:' + ctx.cahier + ',chapitre:' + ctx.chapitre + '},\'back-level\')';
+    } else if (ctx.level === 3 && ctx.stopId != null) {
+      backFn = 'NAV.go(3,{cahier:' + ctx.cahier + ',chapitre:' + ctx.chapitre + ',stopId:' + ctx.stopId + '},\'back-level\')';
+    } else {
+      backFn = 'NAV.go(2,{cahier:' + cahierN + ',section:\'photos\'},\'back-level\')';
+    }
+  } else {
+    backFn = 'NAV.go(2,{cahier:' + cahierN + ',section:\'photos\'},\'back-level\')';
+  }
+
+  return _renderNavBar(
+      lieu.loc,
+      backFn,
+      null, null
+    )
     + '<div class="pv-photo-wrap">'
     + imgHTML
     + '</div>'
@@ -3020,6 +3102,7 @@ function findLieuByCpaLoc(cahierN, cpaLoc) {
     '.va-cards{display:flex;flex-direction:column;gap:8px}',
     '.va-card{background:rgba(15,52,96,.45);border:1px solid #1a4a7a;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;overflow:hidden}',
     '.va-card:hover{background:rgba(26,74,122,.6);transform:translateY(-1px)}',
+    '.va-card.active{background:rgba(255,255,255,.12)!important;border-left:4px solid currentColor}',
     '.va-card-top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 4px}',
     '.va-card-num{font-size:.72em;font-weight:700;letter-spacing:.1em;opacity:.8}',
     '.va-card-pdf{color:#a0b4c8;opacity:.6;display:flex;align-items:center;transition:opacity .15s;text-decoration:none;flex-shrink:0}',
@@ -3031,6 +3114,15 @@ function findLieuByCpaLoc(cahierN, cpaLoc) {
   ].join('');
   document.head.appendChild(s);
 })();
+
+var _svgCahier = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"'
+  + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+  + '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'
+  + '<polyline points="14 2 14 8 20 8"/>'
+  + '<line x1="16" y1="13" x2="8" y2="13"/>'
+  + '<line x1="16" y1="17" x2="8" y2="17"/>'
+  + '<polyline points="10 9 9 9 8 9"/>'
+  + '</svg>';
 
 var _svgManuscrit = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"'
   + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
@@ -3046,22 +3138,30 @@ function renderAccueil() {
   var CAHIER_PERIODS = { 1:'Ao\u00fbt 1939 \u2013 Juin 1940', 2:'Mai \u2013 Juin 1940', 3:'Sept. \u2013 Oct. 1941', 4:'1940 \u2013 1945' };
   var CAHIER_DESCS   = {
     1: 'De la mobilisation dans les Pyr\u00e9n\u00e9es ari\u00e9geoises jusqu\u2019aux avant-postes face \u00e0 Pirmasens, puis la d\u00e9b\u00e2cle vers Verdun. La \u00ab\u00a0dr\u00f4le de guerre\u00a0\u00bb vue d\u2019en bas.',
-    2: 'Mai\u2013juin\u00a01940\u00a0: le repli \u00e0 travers la France en d\u00e9route, les routes embouteill\u00e9es, les ordres contradictoires, et finalement la capture.',
-    3: 'Nuit du 20\u00a0septembre\u00a01941\u00a0: Alban et Andr\u00e9 sautent dans le noir depuis leur Kommando. Deux semaines \u00e0 pied dans les Alpes autrichiennes, boussole et carte copi\u00e9e \u00e0 la main.',
+    2: 'Le repli \u00e0 travers la France en d\u00e9route, les routes embouteill\u00e9es, les ordres contradictoires, et finalement la capture.',
+    3: 'Alban et Andr\u00e9 sautent dans le noir depuis leur Kommando. Deux semaines \u00e0 pied dans les Alpes autrichiennes, boussole et carte copi\u00e9e \u00e0 la main.',
     4: 'R\u00e9flexions d\u2019un instituteur ari\u00e9geois prisonnier de guerre depuis le Stalag XVIII\u00a0D\u00a0: souvenirs, lectures, pens\u00e9es sur la guerre et la libert\u00e9.'
   };
+
+  var activeCahier = NAV.previousCahier;
 
   var cardsHtml = '';
   for (var n = 1; n <= 4; n++) {
     var meta = CAHIER_META[n];
     var col  = CAHIER_COLORS[n];
-    cardsHtml += '<div class="va-card" style="border-top:3px solid ' + col + '"'
+    var isActive = (activeCahier === n);
+    cardsHtml += '<div class="va-card' + (isActive ? ' active' : '') + '" style="border-top:3px solid ' + col + '"'
       + ' onclick="NAV.go(1,{cahier:' + n + '})">'
       + '<div class="va-card-top">'
       + '<div class="va-card-num" style="color:' + col + '">CAHIER ' + n + '</div>'
+      + '<div style="display:flex;align-items:center;gap:6px">'
+      + '<a class="va-card-pdf" href="' + meta.pdfTranscript + '" target="_blank"'
+      + ' title="Transcription (Google Docs)"'
+      + ' onclick="event.stopPropagation()">' + _svgCahier + '</a>'
       + '<a class="va-card-pdf" href="' + meta.pdfOriginal + '" target="_blank"'
       + ' title="Manuscrit original (Google Drive)"'
       + ' onclick="event.stopPropagation()">' + _svgManuscrit + '</a>'
+      + '</div>'
       + '</div>'
       + '<div class="va-card-body">'
       + '<div class="va-card-title">' + CAHIER_TITLES[n] + '</div>'
@@ -3075,12 +3175,9 @@ function renderAccueil() {
     + '<div class="va-title">Alban Rouzaud</div>'
     + '<div class="va-subtitle">\u00c9crits de Guerre \u2014 1939\u20131945</div>'
     + '<p class="va-bio">Instituteur \u00e0 Lavelanet (Ari\u00e8ge), Alban Rouzaud est mobilis\u00e9 en ao\u00fbt\u00a01939.'
-    + ' Il vit la \u00ab\u00a0dr\u00f4le de guerre\u00a0\u00bb en Alsace face \u00e0 Pirmasens, puis la d\u00e9b\u00e2cle de juin\u00a01940'
-    + ' jusqu\u2019\u00e0 sa capture. Prisonnier au Stalag XVIII\u00a0D de Marburg an der Drau (Slov\u00e9nie),'
-    + ' il s\u2019\u00e9vade en septembre\u00a01941 avec son camarade Andr\u00e9 depuis leur Arbeitskommando pr\u00e8s'
-    + ' de Weiz (Styrie), traversant les Alpes autrichiennes \u00e0 pied avant d\u2019\u00eatre arr\u00eat\u00e9 par des'
-    + ' carabiniers en Italie. Reconduit \u00e0 Marburg, il purge 21\u00a0jours de cachot, puis reprend son'
-    + ' existence de prisonnier jusqu\u2019\u00e0 la Lib\u00e9ration en\u00a01945.'
+    + ' Il vit la \u00ab\u00a0dr\u00f4le de guerre\u00a0\u00bb en Alsace, la d\u00e9b\u00e2cle de juin\u00a01940,'
+    + ' une \u00e9vasion \u00e0 travers les Alpes autrichiennes en\u00a01941,'
+    + ' et la captivit\u00e9 au Stalag XVIII\u00a0D de Marburg jusqu\u2019en\u00a01945.'
     + ' Ces quatre cahiers en sont le t\u00e9moignage.</p>'
     + '<div class="va-cards">' + cardsHtml + '</div>'
     + '</div>';
@@ -3091,6 +3188,33 @@ function renderAccueil() {
  * Génère une barre de navigation contextuelle ◀/▶.
  * prevFn / nextFn : chaîne JS inline pour onclick.
  */
+/* --- _renderNavBar(title, backFn, prevFn, nextFn, prevDisabled, nextDisabled) ---
+ * Barre de navigation : ◀  titre (= retour)  ▶
+ * backFn   : chaîne JS pour le clic sur le titre (retour)
+ * prevFn/nextFn : chaîne JS pour ◀/▶ (null = bouton absent)
+ */
+function _renderNavBar(title, backFn, prevFn, nextFn, prevDisabled, nextDisabled) {
+  var prev = prevFn
+    ? '<button class="pv-nav-btn"' + (prevDisabled ? ' disabled' : '')
+      + ' onclick="' + prevFn + '">&#9664;</button>'
+    : '<span style="width:28px;flex-shrink:0"></span>';
+  var next = nextFn
+    ? '<button class="pv-nav-btn"' + (nextDisabled ? ' disabled' : '')
+      + ' onclick="' + nextFn + '">&#9654;</button>'
+    : '<span style="width:28px;flex-shrink:0"></span>';
+  var _svgBack = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"'
+    + ' fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"'
+    + ' style="display:inline-block;vertical-align:middle;margin-right:4px;opacity:.7;flex-shrink:0">'
+    + '<line x1="12" y1="19" x2="12" y2="5"/>'
+    + '<polyline points="5 12 12 5 19 12"/>'
+    + '</svg>';
+  return '<div class="pv-nav-bar">'
+    + prev
+    + '<span class="pv-nav-title" onclick="' + backFn + '">' + _svgBack + title + '</span>'
+    + next
+    + '</div>';
+}
+
 function _renderCtxNav(prevLabel, nextLabel, prevDisabled, nextDisabled, prevFn, nextFn) {
   return '<div class="pv-ctx-nav">'
     + '<button class="nav-ctx-prev"' + (prevDisabled ? ' disabled' : '')
@@ -3189,21 +3313,6 @@ function attachSwipe(el, onLeft, onRight, onUp, onDown) {
 var Interactions = (function() {
 
   function init() {
-    /* --- Boutons ◀/▶ (FR-2.1) --- */
-    var btnPrev = document.getElementById('nav-prev');
-    var btnNext = document.getElementById('nav-next');
-
-    if (btnPrev) {
-      btnPrev.addEventListener('click', function() {
-        NAV.prev();
-      });
-    }
-    if (btnNext) {
-      btnNext.addEventListener('click', function() {
-        NAV.next();
-      });
-    }
-
     /* --- Swipe sur #panel-viewport (FR-2.2) ---
      * gauche → NAV.next(), droite → NAV.prev()
      * haut   → expand,    bas    → compact
@@ -3219,17 +3328,17 @@ var Interactions = (function() {
       );
     }
 
-    /* --- Swipe sur #panel-bar (barre compacte — FR-2.2) ---
-     * haut → expand, bas → compact
+    /* --- Swipe sur #panel (FR-2.2) ---
+     * haut → expand, bas → compact (swipe vertical sur tout le panneau)
      */
-    var panelBar = document.getElementById('panel-bar');
-    if (panelBar) {
+    var panel = document.getElementById('panel');
+    if (panel) {
       attachSwipe(
-        panelBar,
-        null,                                    /* gauche : ignoré */
-        null,                                    /* droite : ignoré */
-        function() { Panel.setExpanded(true);  }, /* haut  */
-        function() { Panel.setExpanded(false); }  /* bas   */
+        panel,
+        null,
+        null,
+        function() { Panel.setExpanded(true);  },
+        function() { Panel.setExpanded(false); }
       );
     }
   }
@@ -3249,7 +3358,12 @@ NAV.on('change', function(state) {
     ElevPanel.show(state.cahier || 1);
   } else {
     /* Ne masquer que si le profil était visible — évite des map.resize() inutiles */
-    if (_elevPanelVisible) {
+    /* Exception : si le profil est visible et qu'on navigue vers un stop du même cahier
+       (clic depuis le profil ou la carte), garder le profil ouvert */
+    var keepOpen = _elevPanelVisible
+      && (state.level === 2 || state.level === 3)
+      && state.cahier === _elevCurrentCahierN;
+    if (_elevPanelVisible && !keepOpen) {
       ElevPanel.hide();
     }
   }
@@ -3269,6 +3383,8 @@ map.on('style.load', function() {
   loadedCahiers.forEach(function(n) {
     try { renderLinesForCahier(n, getCahierData(n)); } catch(e){}
   });
+  // Re-synchroniser la visibilité selon l'état NAV courant
+  try { MapAdapter.onNavChange(NAV.state); } catch(e){}
   updatePitchInfo();
 });
 
@@ -3382,18 +3498,17 @@ function loadAllCahiers() {
         var data = getCahierData(n);
         renderLinesForCahier(n, data);
         renderMarkersForCahier(n, data);
+        renderSummaryMarkers(n, data);
         addCpaMarkersForCahier(n, data.CPA);
         loadedCahiers.add(n);
       }
     });
-    // S'assurer que C1-3 sont visibles pour la vue d'ensemble, C4 masqué
-    [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, true); });
-    setCahierVisibility(4, false);
+    // S'assurer que les 4 cahiers sont visibles pour la vue d'ensemble (géré par onNavChange)
     updateVueEnsembleBtn();
-    // Activer C1 au premier chargement (pour le profil altitude et le hash URL)
-    if (firstLoad) setActiveCahier(1, true);
-    // Vue d'ensemble : bbox englobant tous les cahiers (France → Italie)
-    map.fitBounds([[-1.0, 42.0], [16.5, 51.5]], { padding: 40, duration: 800 });
+    // Activer C1 au premier chargement (profil altitude et hash URL uniquement — pas de visibilité)
+    if (firstLoad) setActiveCahier(1, true, /*skipVisibility=*/true);
+    // Afficher directement les marqueurs résumé
+    showSummaryMarkers(true);
   }
   if (map.loaded()) { doLoad(); }
   else { map.once('load', doLoad); }
@@ -3421,7 +3536,7 @@ window.addEventListener('hashchange', function(){
   // CAHIER_N_DATA sont disponibles immédiatement ici.
   NAV.initSequence([CAHIER_1_DATA, CAHIER_2_DATA, CAHIER_3_DATA, CAHIER_4_DATA]);
   // Brancher MapAdapter sur NAV
-  NAV.on('change', function(state) { MapAdapter.syncToState(state); });
+  NAV.on('change', function(state) { MapAdapter.onNavChange(state); });
   // Initialiser le Panneau (task 3.1) : breadcrumb click + NAV wiring
   Panel.init();
   // Initialiser les interactions ◀/▶ et swipe (task 4.1)
@@ -3434,9 +3549,6 @@ window.addEventListener('hashchange', function(){
    * donc on appelle navigateTo directement pour le rendu initial. */
   Panel.setExpanded(true);
   Panel.navigateTo(renderAccueil, 'forward');
-
-  // Afficher le fil d'Ariane initial (niveau 0)
-  Panel.updateBreadcrumb(NAV.state);
 
   /* FR-1.4 / NFR-5 — Semer l'entrée initiale dans l'historique.
    * Sans cet appel, le premier popstate déclencherait une sortie de page. */
