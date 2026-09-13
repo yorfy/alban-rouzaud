@@ -23,10 +23,17 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 #elevpanel.hidden{display:none}
 #elevbar{display:flex;align-items:center;justify-content:space-between;padding:3px 10px;font-size:.82em;color:#a0b4c8}
 #elevbar b{color:#e0e0e0}
+#elev-close-btn{margin-left:8px;background:none;border:none;color:#a0b4c8;cursor:pointer;font-size:1em;padding:2px 6px;border-radius:4px;line-height:1;flex-shrink:0}
+#elev-close-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+/* Bouton profil altitude flottant sur la carte */
+#elevtoggle{position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:600;width:40px;height:22px;border-radius:6px 6px 0 0;background:rgba(15,22,40,.85);border:1px solid rgba(80,120,180,.4);border-bottom:none;color:#a0b4c8;font-size:.85em;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;box-shadow:0 -2px 6px rgba(0,0,0,.4)}
+#elevtoggle:hover{background:#1a4a7a;color:#fff}
+#elevtoggle.active{color:#fff;border-color:rgba(100,160,240,.7);background:rgba(26,74,122,.9)}
+#elevtoggle:disabled{opacity:.35;cursor:default}
 #elevcanvas{display:block;width:100%;height:196px}
 #elevtip{position:fixed;pointer-events:none;background:rgba(22,33,62,.97);color:#e0e0e0;padding:4px 9px;border-radius:4px;font-size:.8em;line-height:1.5;display:none;z-index:900;border:1px solid #1a4a7a}
 #coords{display:none}
-.maplibregl-ctrl-bottom-right{left:50%!important;right:auto!important;transform:translateX(-50%)}
+.maplibregl-ctrl-bottom-right{left:auto!important;right:0!important;transform:none!important}
 .maplibregl-ctrl-attrib{background:rgba(10,14,26,0.55)!important;color:#c0c8d8!important;font-size:.68em!important;opacity:.6;transition:opacity .2s}
 .maplibregl-ctrl-attrib:hover{opacity:1}
 .maplibregl-ctrl-attrib a{color:#a0c4e0!important}
@@ -53,13 +60,28 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 
 @media (max-width: 480px) and (orientation: portrait) {
   #panel-resize-handle {
-    bottom: 100%;
-    top: auto;
+    top: 0;
+    bottom: auto;
     right: auto;
     left: 0;
     width: 100%;
-    height: 12px;
+    height: 10px;
     cursor: row-resize;
+    /* Pill indicateur centré */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #panel-resize-handle::after {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(160, 180, 200, 0.3);
+  }
+  #panel-resize-handle:active::after {
+    background: rgba(100, 160, 240, 0.8);
   }
 }
 
@@ -152,20 +174,6 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   cursor: pointer;
 }
 .settings-section label:hover { color: #e0e0e0; }
-
-.settings-elev-btn {
-  width: 100%;
-  padding: 7px 10px;
-  background: #0f3460;
-  border: 1px solid #1a4a7a;
-  border-radius: 5px;
-  color: #a0b4c8;
-  font-size: .82em;
-  cursor: pointer;
-  text-align: left;
-  transition: background .15s, color .15s;
-}
-.settings-elev-btn:hover { background: #1a5a9a; color: #fff; }
 
 /* Mobile responsive : drawer plus compact */
 @media (max-width: 480px) and (orientation: portrait) {
@@ -277,12 +285,15 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
     height: auto;
     border-right: none;
     border-top: 2px solid #1a4a7a;
-    border-radius: 12px 12px 0 0;
     box-shadow: 0 -4px 24px rgba(0,0,0,.6);
     z-index: 200;
     flex-shrink: 0;
     order: 1;
   }
+
+  /* Profil altitude */
+  #elevpanel { height: 140px; }
+  #elevcanvas { height: 116px; }
 
   /* État compact : juste la barre */
   #panel.compact {
@@ -301,10 +312,6 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
     display: block;
   }
 
-  /* Profil altitude : ne pas afficher dans #elevpanel classique sur mobile
-     (sera intégré dans panel-viewport en vague 3) */
-  #elevpanel { height: 140px; }
-  #elevcanvas { height: 116px; }
 }
 
 /* Tablette (481px–900px) en paysage : réduire la largeur */
@@ -399,20 +406,18 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
             <label><input type="checkbox" id="ck-cpa" checked> 📷 Cartes postales</label>
             <label><input type="checkbox" id="ck-terrain" checked> 🏔 Terrain 3D</label>
           </div>
-          <div class="settings-section">
-            <div class="settings-section-title">Profil altitude</div>
-            <button id="elevtoggle" class="settings-elev-btn">&#9650; Afficher le profil</button>
-          </div>
         </div>
       </div>
 
       <div id="pitch-info">pitch: 45° | bear: 0°</div>
       <div id="coords">lat: &#8212; &nbsp;lng: &#8212;</div>
       <div id="elevtip"></div>
+      <!-- Bouton profil altitude flottant -->
+      <button id="elevtoggle" title="Profil d'altitude" aria-label="Profil d'altitude">&#9650;</button>
     </div>
   </div><!-- fin #top-row -->
   <div id="elevpanel" class="hidden">
-    <div id="elevbar"><span>Profil du parcours</span><span id="elevinfo"></span></div>
+    <div id="elevbar"><span>Profil du parcours</span><span id="elevinfo"></span><button id="elev-close-btn" title="Masquer le profil" aria-label="Masquer le profil">&#10005;</button></div>
     <canvas id="elevcanvas"></canvas>
   </div>
 </div>
@@ -879,6 +884,17 @@ var MapAdapter = (function() {
     return cd.stops || [];
   }
 
+  /* --- _fitPadding(base) — padding asymétrique en portrait mobile pour compenser la bottombar --- */
+  function _fitPadding(base) {
+    var isPortrait = window.matchMedia('(max-width:480px) and (orientation:portrait)').matches;
+    if (!isPortrait) return base;
+    var panel = document.getElementById('panel');
+    /* Utiliser offsetHeight si dispo et non nul, sinon fallback 60vh */
+    var panelH = panel ? panel.offsetHeight : 0;
+    if (panelH === 0) panelH = Math.round(window.innerHeight * 0.6);
+    return { top: base, bottom: panelH + 20, left: Math.round(base * 0.7), right: Math.round(base * 0.7) };
+  }
+
   /* --- fitCahier(n) — fitBounds sur tous les stops du cahier, padding 60 --- */
   function fitCahier(n) {
     var stops = _getStops(n);
@@ -991,7 +1007,7 @@ var MapAdapter = (function() {
     map.fitBounds(
       [[Math.min.apply(null,allLngs), Math.min.apply(null,allLats)],
        [Math.max.apply(null,allLngs), Math.max.apply(null,allLats)]],
-      { padding:60, duration:mapTransitionDuration }
+      { padding: _fitPadding(60), duration: mapTransitionDuration }
     );
   }
 
@@ -1313,6 +1329,12 @@ var map = new maplibregl.Map({
   attributionControl: { compact: true }
 });
 
+/* Forcer l'attribution repliée au chargement */
+map.once('load', function() {
+  var attrib = document.querySelector('.maplibregl-ctrl-attrib');
+  if (attrib) attrib.classList.remove('maplibregl-compact-show');
+});
+
 map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
 // =====================================================================
@@ -1321,7 +1343,7 @@ map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 (function() {
   var el = document.createElement('div');
   el.id = 'compass-widget';
-  el.style.cssText = 'position:absolute;top:18px;right:10px;z-index:600;cursor:pointer;'
+  el.style.cssText = 'position:absolute;top:8px;right:10px;z-index:600;cursor:pointer;'
     + 'width:64px;height:64px;'
     + 'filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));';
   el.title = 'Cliquer pour remettre nord';
@@ -1893,9 +1915,7 @@ function renderElevation(n) {
 
   if (data.noElevation || !data.elevProfile || !data.elevProfile.length) {
     elevPanel.classList.add('hidden');
-    elevToggle.style.opacity = '0.35';
-    elevToggle.style.cursor  = 'default';
-    elevToggle.disabled = true;
+    elevToggle.style.display = 'none';
     elevInfo.textContent = '';
     var ctx2 = canvas.getContext('2d');
     ctx2.clearRect(0, 0, canvas.width, canvas.height);
@@ -1903,8 +1923,7 @@ function renderElevation(n) {
     return;
   }
 
-  elevToggle.style.opacity = '';
-  elevToggle.style.cursor  = 'pointer';
+  elevToggle.style.display = '';
   elevToggle.disabled = false;
 
   // Flatten elevation points
@@ -1915,7 +1934,7 @@ function renderElevation(n) {
     });
   });
 
-  if (!_elevPts.length) { elevPanel.classList.add('hidden'); _elevPanelVisible = false; return; }
+  if (!_elevPts.length) { elevPanel.classList.add('hidden'); elevToggle.style.display = 'none'; _elevPanelVisible = false; return; }
 
   var maxD = _elevPts[_elevPts.length-1].d;
   var minA = Infinity, maxA = -Infinity;
@@ -2345,9 +2364,15 @@ function renderElevation(n) {
   elevToggle.onclick=function(){
     _elevPanelVisible=!_elevPanelVisible;
     elevPanel.classList.toggle('hidden',!_elevPanelVisible);
-    elevToggle.innerHTML=(_elevPanelVisible?'\u25bc':'\u25b2')+' Profil altitude';
-    if(_elevPanelVisible){setTimeout(function(){drawElev();map.resize();},50);}
-    else{map.resize();}
+    elevToggle.innerHTML=(_elevPanelVisible?'\u25bc':'\u25b2');
+    elevToggle.classList.toggle('active', _elevPanelVisible);
+    elevToggle.style.display = _elevPanelVisible ? 'none' : '';
+    _syncBottombarForElev(_elevPanelVisible);
+    if(_elevPanelVisible){
+      var sd=document.getElementById('settings-drawer');
+      if(sd) sd.classList.remove('open');
+      setTimeout(function(){drawElev();map.resize();},50);
+    } else{map.resize();}
   };
 
   if(_elevPanelVisible&&!elevPanel.classList.contains('hidden')){setTimeout(drawElev,50);}
@@ -2358,6 +2383,9 @@ function renderElevation(n) {
 }
 
 var _mapClickForElev = null;
+
+/* No-op — comportement du profil altitude géré par le flux normal du layout */
+function _syncBottombarForElev(elevVisible) {}
 
 /* ========== ElevPanel — profil altitude ========== */
 /* Design : § Decision Point 3 / § Profil altitude          */
@@ -2400,8 +2428,11 @@ var ElevPanel = (function() {
     /* Afficher le panneau */
     _elevPanelVisible = true;
     elevPanel.classList.remove('hidden');
+    _syncBottombarForElev(true);
     if (elevToggle) {
-      elevToggle.innerHTML = '\u25bc Profil altitude';
+      elevToggle.innerHTML = '\u25bc';
+      elevToggle.classList.add('active');
+      elevToggle.style.display = 'none';
     }
 
     /* Forcer le redessin si le panneau vient de s'ouvrir */
@@ -2422,8 +2453,11 @@ var ElevPanel = (function() {
 
     _elevPanelVisible = false;
     if (elevPanel) elevPanel.classList.add('hidden');
+    _syncBottombarForElev(false);
     if (elevToggle) {
-      elevToggle.innerHTML = '\u25b2 Profil altitude';
+      elevToggle.innerHTML = '\u25b2';
+      elevToggle.classList.remove('active');
+      elevToggle.style.display = '';
     }
     map.resize();
 
@@ -3530,6 +3564,14 @@ document.querySelectorAll('input[name="basemap"]').forEach(function(r){
   closeBtn.addEventListener('click', function() {
     drawer.classList.remove('open');
   });
+
+  /* Bouton ✕ sur la barre du profil altitude — fermer le profil directement */
+  var elevCloseBtn = document.getElementById('elev-close-btn');
+  if (elevCloseBtn) {
+    elevCloseBtn.addEventListener('click', function() {
+      ElevPanel.hide();
+    });
+  }
   /* Fermer en cliquant ailleurs */
   document.addEventListener('click', function(e) {
     if (!drawer.contains(e.target) && e.target !== btn) {
@@ -3823,18 +3865,21 @@ var PanelResize = (function() {
     document.addEventListener('mouseup',   _onEnd);
     document.addEventListener('touchend',  _onEnd);
 
-    /* Restaurer depuis localStorage */
-    try {
-      var saved = localStorage.getItem('panelWidth');
-      if (saved) {
-        var v = parseInt(saved, 10);
-        var panel = _getPanel();
-        if (!isNaN(v) && panel) {
-          panel.style.width    = v + 'px';
-          panel.style.minWidth = v + 'px';
+    /* Restaurer depuis localStorage — uniquement en mode desktop */
+    var isPortraitMobile = window.matchMedia('(max-width:480px) and (orientation:portrait)').matches;
+    if (!isPortraitMobile) {
+      try {
+        var saved = localStorage.getItem('panelWidth');
+        if (saved) {
+          var v = parseInt(saved, 10);
+          var panel = _getPanel();
+          if (!isNaN(v) && panel) {
+            panel.style.width    = v + 'px';
+            panel.style.minWidth = v + 'px';
+          }
         }
-      }
-    } catch(e3) {}
+      } catch(e3) {}
+    }
   }
 
   return { init: init, _onStart: _onStart, _onMove: _onMove, _onEnd: _onEnd };
