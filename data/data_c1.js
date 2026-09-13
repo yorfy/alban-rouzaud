@@ -40,6 +40,9 @@ var CAHIER_1_DATA = {
   {id:8,p:3,n:"Ringendorf (repos)",lat:48.80,lng:7.4833,
    d:"Village alsacien. Le lieutenant y était « si pimpant dans son costume fantoche surmonté d'un képi flamboyant ». Relève de garde courtelinesque.",
    q:"Alors qu'il était si pimpant à Ringendorf…"},
+  {id:11,p:3,n:"Village de Sy (patrouille nocturne)",lat:49.516,lng:4.870,
+   d:"Village abandonné. Patrouille de nuit. Cadavres, vaches estropiées. G… abat un soldat allemand au revolver. Riberot et Redon blessés. Le lieutenant tué.",
+   q:"G… a tiré en criant : « C'en est un ! »"},
   {id:9,p:3,n:"Avant-postes (face à Pirmasens)",lat:49.07,lng:7.55,
    d:"Colline boisée, tranchées, barbelés. No man's land. Cabanas bégaie, Daydé pose des collets à lièvre, G… raconte ses aventures espagnoles. Nuits de bombardement.",
    q:"Les faubourgs de Pirmasens se perdaient derrière l'horizon."},
@@ -47,9 +50,6 @@ var CAHIER_1_DATA = {
    d:"Ville allemande visible depuis les avant-postes. « Les ceux d'en face. » De courtes rafales rappellent leur présence.",
    q:"Tant qu'ils emmerderont les autres… qu'on pensait.",
    type:"mention"},
-  {id:11,p:3,n:"Village de Sy (patrouille nocturne)",lat:49.04,lng:7.52,
-   d:"Village abandonné. Patrouille de nuit. Cadavres, vaches estropiées. G… abat un soldat allemand au revolver. Riberot et Redon blessés. Le lieutenant tué.",
-   q:"G… a tiré en criant : « C'en est un ! »"},
   {id:12,p:4,n:"Alsace (fin de la drôle de guerre)",lat:48.8564,lng:7.3192,
    date:"10 mai 1940",
    d:"10 mai 1940. « Les Allemands ont envahi la Hollande. » Les piqûres sont interrompues. Fin de neuf mois d'attente.",
@@ -71,7 +71,7 @@ var CAHIER_1_DATA = {
       title:"Toulouse — Gare Matabiau, CPA",
       desc:"La gare de Toulouse d'où Alban et ses camarades partent rejoindre leurs régiments en septembre 1939. « Le grand troupeau »." }
   ]},
-  { lat:48.8564, lng:7.3192, loc:"La Petite-Pierre (Bas-Rhin)", p:3, stopId:7, cpa:[
+  { lat:49.19371, lng:7.60941, loc:"Avant-postes (face à Pirmasens)", p:3, stopId:9, cpa:[
     { img:"cartes_postales/pirmasens_1905.jpg",
       title:"Pirmasens (Allemagne) — CPA 1905",
       desc:"Pirmasens, la ville allemande visible depuis les avant-postes d'Alban Rouzaud. « Les ceux d'en face. » La drôle de guerre vue depuis la ligne Maginot." }
@@ -83,14 +83,6 @@ var CAHIER_1_DATA = {
     { img:"cartes_postales/verdun_ruines_1914.jpg",
       title:"Verdun en ruines — CPA 1914",
       desc:"Les ruines de Verdun, symbole de 1914-1918. En juin 1940, l'histoire se répète tragiquement." }
-  ]},
-  { lat:48.178, lng:6.451, loc:"Épinal (Vosges)", p:4, cpa:[
-    { img:"cartes_postales/bundesarchiv_prisonniers_francais_1940.jpg",
-      title:"Prisonniers français — juin 1940 (Bundesarchiv)",
-      desc:"Photo d'archives allemandes (Bundesarchiv) montrant des prisonniers français en juin 1940. Alban Rouzaud sera capturé à Épinal en juillet 1940." },
-    { img:"cartes_postales/french_weeps_1940.jpg",
-      title:"Soldat français pleurant l'armistice — juin 1940",
-      desc:"« Une main qui ne fait pas l'aumône. Une main qui donne simplement. » La capture à Épinal." }
   ]}
 ],
   staticRoutes: [

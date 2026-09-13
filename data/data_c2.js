@@ -120,6 +120,11 @@ var CAHIER_2_DATA = {
     { img:"cartes_postales/mort_homme_memorial.jpg",
       title:"Mémorial du Mort-Homme — squelette drapé (1922)",
       desc:"Le monument inauguré en 1922 au sommet de la butte : un squelette drapé dans un linceul tenant le drapeau français, sculpté par Jacques Froment-Meurice. Alban Rouzaud passe devant ce mémorial en juin 1940 — 18 ans après son inauguration, la France est de nouveau en débâcle. <a href=\"https://fr.wikipedia.org/wiki/Le_Mort-Homme\" target=\"_blank\" style=\"color:#c8a96e\">↗ Wikipedia : Le Mort-Homme</a>" }
+  ]},
+  { lat:48.1722, lng:6.4497, loc:"Épinal (Vosges)", p:8, stopId:121, cpa:[
+    { img:"cartes_postales/bundesarchiv_prisonniers_francais_1940.jpg",
+      title:"Prisonniers français — juin 1940 (Bundesarchiv)",
+      desc:"Photo d'archives allemandes (Bundesarchiv) montrant des prisonniers français en juin 1940. Alban Rouzaud sera capturé à Épinal en juillet 1940." }
   ]}
 ],
   staticRoutes: [
