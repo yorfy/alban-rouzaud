@@ -1926,11 +1926,13 @@ function renderElevation(n) {
   // --- Step marks ---
   function ha15(a,b){ var dx=a[0]-b[0],dy=a[1]-b[1]; return dx*dx+dy*dy; }
   var stepN2=0;
+  var stepN2=0;
   var SYM={depart:'\u2605',capture:'\u25a0',frontiere:'\u2691',retour:'\u21ba',bivouac:'\u26fa',kommando:'\u2302',ferme:'\u2691'};
   var sortedPhases = Object.keys(data.PC).sort(function(a,b){return+a-+b;});
   sortedPhases.forEach(function(p){
     data.S.filter(function(x){return x.p==p;}).forEach(function(st){
       stepN2++;
+      if(st.id==20||st.id==21||st.id==22)return;
       var bi=-1,bd=Infinity;
       for(var k=0;k<_elevPts.length;k++){var dd=ha15([st.lat,st.lng],[_elevPts[k].lat,_elevPts[k].lng]);if(dd<bd){bd=dd;bi=k;}}
       if(bi<0||bd>0.0025)return;
@@ -1985,8 +1987,8 @@ function renderElevation(n) {
     {dist:265.7, a:[1941,10,3,15,30]},                             // 17 Frontière — 3/10 vendredi ✓
     {dist:266.1, a:[1941,10,3,15,35]},                             // 33 Baraque lisière
     {dist:273.7, a:[1941,10,3,19,0]},                              // 18 Versant italien — vendredi soir
-    {dist:278.5, a:[1941,10,4,12,0]},                              // Versant — samedi repos
-    {dist:288.5, a:[1941,10,4,21,0],  d:[1941,10,5,4,0]},         // nuit de marche italienne sam→dim
+    {dist:278.5, a:[1941,10,4,12,0]},                              // Versant — samedi repos au soleil
+    {dist:283.0, a:[1941,10,4,19,30], d:[1941,10,5,4,0]},         // nuit de marche italienne — sam. crépuscule→dim.
     {dist:309.9, a:[1941,10,5,8,0]}                                // 19 Arrestation — dimanche 5/10 ✓
   ] : [];
 
