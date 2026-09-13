@@ -1940,34 +1940,55 @@ function renderElevation(n) {
   _elevStepMarks.sort(function(a,b){return a.d-b.d;});
 
   // --- Time / weather engine (C3 only) ---
-  var STEP_TIME = n===3 ? {
-    32:{a:[1941,9,20,22,0]},1:{a:[1941,9,20,22,45]},2:{a:[1941,9,21,1,0]},
-    3:{a:[1941,9,21,1,20]},27:{a:[1941,9,21,2,30]},
-    25:{a:[1941,9,21,3,0],d:[1941,9,21,7,30]},4:{a:[1941,9,21,9,0]},
-    5:{a:[1941,9,21,20,0],d:[1941,9,22,6,30]},23:{a:[1941,9,22,10,0]},
-    28:{a:[1941,9,22,13,0]},29:{a:[1941,9,22,15,0],d:[1941,9,22,16,0]},
-    6:{a:[1941,9,22,17,0]},26:{a:[1941,9,22,19,30],d:[1941,9,23,6,30]},
-    7:{a:[1941,9,24,13,0]},30:{a:[1941,9,25,19,0],d:[1941,9,26,5,30]},
-    31:{a:[1941,9,26,6,0]},8:{a:[1941,9,26,8,0]},9:{a:[1941,9,26,16,0]},
-    10:{a:[1941,9,26,21,0]},43:{a:[1941,9,26,23,30],d:[1941,9,27,7,0]},
-    35:{a:[1941,9,27,18,0]},34:{a:[1941,9,27,20,0],d:[1941,9,28,17,0]},
-    11:{a:[1941,9,28,22,30]},12:{a:[1941,9,29,2,30]},13:{a:[1941,9,30,14,0]},
-    14:{a:[1941,10,1,18,0],d:[1941,10,2,6,30]},15:{a:[1941,10,2,11,0]},
-    16:{a:[1941,10,2,19,30],d:[1941,10,3,6,30]},17:{a:[1941,10,3,15,30]},
-    33:{a:[1941,10,3,15,35]},18:{a:[1941,10,3,19,0],d:[1941,10,4,20,0]},
-    19:{a:[1941,10,5,8,0]}
-  } : {};
+  // Toutes les ancres temporelles sont dans NIGHT_STOPS_C3 par distance.
+  // STEP_TIME est vide : on n'ancre plus par id de stop.
+  var STEP_TIME = {};
 
   var NIGHT_STOPS_C3 = n===3 ? [
-    {dist:61.0,  a:[1941,9,23,18,30],d:[1941,9,24,6,30]},
-    {dist:73.0,  a:[1941,9,24,18,30],d:[1941,9,25,6,30]},
-    {dist:115.1, a:[1941,9,26,20,0], d:[1941,9,26,22,0]},
-    {dist:117.2, a:[1941,9,26,23,0], d:[1941,9,27,7,0]},
-    {dist:120.9, a:[1941,9,27,8,0],  d:[1941,9,27,11,0]},
-    {dist:138.9, a:[1941,9,27,19,0], d:[1941,9,28,7,0]},
-    {dist:140.0, a:[1941,9,28,7,0],  d:[1941,9,29,20,0]},
-    {dist:173.0, a:[1941,9,29,3,0],  d:[1941,9,30,7,30]},
-    {dist:205.0, a:[1941,9,30,19,0], d:[1941,10,1,6,30]}
+    {dist:0.0,   a:[1941,9,20,22,0]},                              // 32 Ferme Grabner
+    {dist:1.2,   a:[1941,9,20,22,45]},                             // 1  Kommando départ
+    {dist:6.7,   a:[1941,9,21,1,0]},                               // 2  Weiz traversée
+    {dist:8.0,   a:[1941,9,21,1,20]},                              // 3  Forêt NO Weiz
+    {dist:12.6,  a:[1941,9,21,2,30]},                              // 27 Pancarte Arbeits
+    {dist:13.1,  a:[1941,9,21,3,0],   d:[1941,9,21,7,30]},        // 25 Bivouac nuit 1
+    {dist:16.3,  a:[1941,9,21,9,0]},                               // 4  Raabklamm
+    {dist:28.3,  a:[1941,9,21,20,0],  d:[1941,9,22,6,30]},        // 5  Bivouac nuit 2
+    {dist:32.9,  a:[1941,9,22,10,0]},                              // 23 Cascade
+    {dist:36.7,  a:[1941,9,22,13,0]},                              // 28 Village traversé
+    {dist:42.2,  a:[1941,9,22,15,0]},                              // 29 Pentes abruptes
+    {dist:45.8,  a:[1941,9,22,17,0]},                              // 6  Pont Frohnleiten
+    {dist:49.0,  a:[1941,9,22,19,30], d:[1941,9,23,6,30]},        // 26 Bivouac nuit 3
+    {dist:58.0,  a:[1941,9,23,14,0]},                              // phase 4 — milieu journée 23/9
+    {dist:61.0,  a:[1941,9,23,19,30], d:[1941,9,24,7,0]},         // bivouac nuit J3->J4 (après crépuscule)
+    {dist:67.4,  a:[1941,9,24,13,0]},                              // 7  Montagnes abreuvoirs
+    {dist:74.0,  a:[1941,9,24,19,0],  d:[1941,9,25,7,0]},         // bivouac nuit — abreuvoirs J4
+    {dist:81.0,  a:[1941,9,25,13,0]},                              // abreuvoirs J5 — mi-journée
+    {dist:88.8,  a:[1941,9,25,19,0],  d:[1941,9,26,5,30]},        // 30 Grange à foin
+    {dist:94.2,  a:[1941,9,26,6,0]},                               // 31 Village carrefour
+    {dist:96.4,  a:[1941,9,26,8,0]},                               // 8  Bords de la Mur
+    {dist:110.3, a:[1941,9,26,16,0]},                              // 9  Forêt le long Mur
+    {dist:114.8, a:[1941,9,26,21,0],  d:[1941,9,26,22,0]},        // 10 Gare Judenburg
+    {dist:116.3, a:[1941,9,26,23,30], d:[1941,9,27,7,0]},         // 43 Grange
+    {dist:119.4, a:[1941,9,27,8,0],   d:[1941,9,27,11,0]},        // 44 Feu de camp
+    {dist:139.0, a:[1941,9,27,19,0],  d:[1941,9,28,7,0]},         // 35 Baraque à foin
+    {dist:140.3, a:[1941,9,28,8,0],   d:[1941,9,29,20,0]},        // 34 Dimanche pêcheurs — journée repos + départ lundi soir
+    {dist:149.4, a:[1941,9,29,22,30]},                             // 11 Accident vélo
+    {dist:162.4, a:[1941,9,30,2,30]},                              // 12 Tunnel gardé
+    {dist:163.5, a:[1941,9,30,3,30],  d:[1941,9,30,7,30]},        // repos dans un taillis après tunnel
+    {dist:182.0, a:[1941,9,30,14,0]},                              // milieu journée 30/9 — avant St. Veit
+    {dist:194.9, a:[1941,9,30,19,0]},                              // 13 St. Veit (le soir)
+    {dist:198.5, a:[1941,9,30,20,30], d:[1941,10,1,8,0]},         // bivouac nuit J9->J10 — après St. Veit
+    {dist:203.5, a:[1941,10,1,19,30], d:[1941,10,2,8,0]},         // bivouac nuit J10->J11
+    {dist:221.5, a:[1941,10,1,15,0]},                              // orage + grange — avant le lac
+    {dist:231.3, a:[1941,10,1,18,0],  d:[1941,10,2,6,30]},        // 14 Lac d'Ossiach (bivouac grange)
+    {dist:245.8, a:[1941,10,2,11,0]},                              // 15 Villach
+    {dist:256.4, a:[1941,10,2,19,30], d:[1941,10,3,6,30]},        // 16 Dernier bivouac
+    {dist:265.7, a:[1941,10,3,15,30]},                             // 17 Frontière
+    {dist:266.1, a:[1941,10,3,15,35]},                             // 33 Baraque lisière
+    {dist:273.7, a:[1941,10,3,19,0]},                              // 18 Versant italien — vendredi soir
+    {dist:278.5, a:[1941,10,4,12,0]},                              // 18 Versant — samedi repos
+    {dist:288.5, a:[1941,10,4,21,0],  d:[1941,10,5,4,0]},         // nuit du sam. au dim. — marche nocturne
+    {dist:309.9, a:[1941,10,5,8,0]}                                // 19 Arrestation — dimanche matin
   ] : [];
 
   var WEATHER = n===3 ? {
@@ -2095,17 +2116,9 @@ function renderElevation(n) {
   // Build timed array for C3 (empty for other cahiers)
   var timed = [];
   if (n===3) {
-    data.S.forEach(function(st) {
-      var tt = STEP_TIME[st.id]; if(!tt) return;
-      var bi=-1,bd=Infinity;
-      for(var k=0;k<_elevPts.length;k++){var dd=ha15([st.lat,st.lng],[_elevPts[k].lat,_elevPts[k].lng]);if(dd<bd){bd=dd;bi=k;}}
-      if(bi<0||bd>0.0025)return;
-      function toDate(arr){return new Date(arr[0],arr[1]-1,arr[2],arr[3],arr[4]);}
-      timed.push({d:_elevPts[bi].d,arr:toDate(tt.a),dep:tt.d?toDate(tt.d):toDate(tt.a)});
-    });
     NIGHT_STOPS_C3.forEach(function(ns){
       function toDateArr(arr){return new Date(arr[0],arr[1]-1,arr[2],arr[3],arr[4]);}
-      timed.push({d:ns.dist,arr:toDateArr(ns.a),dep:toDateArr(ns.d)});
+      timed.push({d:ns.dist,arr:toDateArr(ns.a),dep:ns.d?toDateArr(ns.d):toDateArr(ns.a)});
     });
     timed.sort(function(a,b){return a.d-b.d;});
   }
