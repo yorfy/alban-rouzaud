@@ -253,15 +253,25 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
    ===================================================================== */
 
 @media (max-width: 480px) and (orientation: portrait) {
-  /* Réorienter le body en colonne */
-  body { flex-direction: column !important; }
+  /* Réorienter body + layout en colonne */
+  body          { flex-direction: column !important; }
+  #layout       { flex-direction: column !important; }
+  #top-row      { flex-direction: column !important; flex: 1; min-height: 0; }
 
-  /* Le panneau passe en bottombar fixe */
+  /* La carte pousse vers le haut et prend l'espace restant */
+  #map-wrap {
+    flex: 1 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    order: 0;
+  }
+
+  /* Le panneau passe en bottombar dans le flux (pas fixed) */
   #panel {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
+    position: relative !important;
+    bottom: auto;
+    left: auto;
+    right: auto;
     width: 100% !important;
     min-width: 0 !important;
     height: auto;
@@ -269,7 +279,9 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
     border-top: 2px solid #1a4a7a;
     border-radius: 12px 12px 0 0;
     box-shadow: 0 -4px 24px rgba(0,0,0,.6);
-    z-index: 2000;
+    z-index: 200;
+    flex-shrink: 0;
+    order: 1;
   }
 
   /* État compact : juste la barre */
@@ -281,18 +293,13 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
     display: none;
   }
 
-  /* État expanded : 60vh */
+  /* État expanded : 60vh max, redimensionnable par drag */
   #panel.expanded {
     height: 60vh;
   }
   #panel.expanded #panel-viewport {
     display: block;
   }
-
-  /* La carte occupe toute la hauteur — le panneau flotte par-dessus */
-  #map-wrap { height: 100vh; }
-
-  /* Masquer le sbtoggle desktop sur mobile — supprimé (tâche 5.1) */
 
   /* Profil altitude : ne pas afficher dans #elevpanel classique sur mobile
      (sera intégré dans panel-viewport en vague 3) */
@@ -572,7 +579,8 @@ var NAV = (function() {
       if (ids.cahier   != null) _state.cahier   = ids.cahier;
       if (ids.chapitre != null) _state.chapitre = ids.chapitre;
       if (ids.stopId   != null) _state.stopId   = ids.stopId;
-      /* Sauvegarder le contexte précédent si on arrive sur une CPA depuis la carte */
+      /* Sauvegarder le contexte précédent si on arrive sur une CPA depuis la carte
+         (avant d'effacer stopId pour que le retour revienne bien à l'étape précédente) */
       if (ids.cpaLoc != null && _state.cpaLoc == null) {
         _state._previousContext = {
           level:    _state.level,
@@ -582,6 +590,8 @@ var NAV = (function() {
           section:  _state.section
         };
       }
+      /* Si on navigue vers une CPA, effacer le stopId pour que flyToCPA soit appelé */
+      if (ids.cpaLoc != null) _state.stopId = null;
       /* Conserver cpaLoc si fourni (pour CPA sans stopId) */
       _state.cpaLoc = ids.cpaLoc || null;
       /* section : ne pas effacer (le lieu-photo est dans la section photos) */
@@ -1083,6 +1093,44 @@ var MapAdapter = (function() {
     }
   }
 
+  /* --- syncLayersOnly(state) — ré-applique visibilité des couches après style.load
+   *     sans aucun effet de bord : pas de flyTo, fitBounds, showOverview, showCahier --- */
+  function syncLayersOnly(state) {
+    if (!map) return;
+    var level = state.level;
+
+    if (level === 0) {
+      /* Overview : tracés en couleur cahier, summary markers visibles */
+      [1,2,3,4].forEach(function(n) {
+        var visible = loadedCahiers.has(n) && (n !== 4);
+        ['route-c'+n+'-solid','route-c'+n+'-dashed'].forEach(function(id) {
+          if (!map.getLayer(id)) return;
+          map.setLayoutProperty(id, 'visibility', visible ? 'visible' : 'none');
+          if (visible) map.setPaintProperty(id, 'line-color', CAHIER_META[n].color);
+        });
+      });
+
+    } else if (level >= 1 && state.cahier != null) {
+      var n = state.cahier;
+      /* Masquer les autres cahiers, afficher le cahier actif en couleur phase */
+      [1,2,3,4].forEach(function(c) {
+        ['route-c'+c+'-solid','route-c'+c+'-dashed'].forEach(function(id) {
+          if (!map.getLayer(id)) return;
+          if (c === n) {
+            map.setLayoutProperty(id, 'visibility', 'visible');
+            map.setPaintProperty(id, 'line-color', ['get','color']);
+          } else {
+            map.setLayoutProperty(id, 'visibility', 'none');
+          }
+        });
+      });
+      /* Restaurer le marqueur actif si level 3 */
+      if (level === 3 && state.stopId != null) {
+        setActiveMarker('c' + n + '_' + state.stopId);
+      }
+    }
+  }
+
   /* Interface publique */
   return {
     fitCahier:      fitCahier,
@@ -1093,6 +1141,7 @@ var MapAdapter = (function() {
     showTracksOnly: showTracksOnly,
     showMarkersOnly:showMarkersOnly,
     syncToState:    onNavChange,
+    syncLayersOnly: syncLayersOnly,
     onNavChange:    onNavChange
   };
 })();
@@ -1240,7 +1289,7 @@ function makeRasterStyle(tiles, attribution) {
 }
 var STYLES = {
   ofm:       'https://tiles.openfreemap.org/styles/liberty',
-  osm:       makeRasterStyle(['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],       '&copy; OpenStreetMap contributors'),
+  osm:       makeRasterStyle(['https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png','https://b.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png','https://c.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'], '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles: openstreetmap.fr'),
   topo:      makeRasterStyle(['https://tile.opentopomap.org/{z}/{x}/{y}.png'],         '&copy; OpenTopoMap contributors (CC-BY-SA)'),
   ign1950:   makeRasterStyle(['https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN50.1950&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'], '&copy; IGN — Carte 1:50 000 (1950)'),
   etatmajor: makeRasterStyle(['https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'], '&copy; IGN — État-Major (1820-1866)'),
@@ -3383,8 +3432,8 @@ map.on('style.load', function() {
   loadedCahiers.forEach(function(n) {
     try { renderLinesForCahier(n, getCahierData(n)); } catch(e){}
   });
-  // Re-synchroniser la visibilité selon l'état NAV courant
-  try { MapAdapter.onNavChange(NAV.state); } catch(e){}
+  // Re-synchroniser la visibilité des couches uniquement (sans flyTo ni sélection de marqueur)
+  try { MapAdapter.syncLayersOnly(NAV.state); } catch(e){}
   updatePitchInfo();
 });
 
@@ -3440,6 +3489,8 @@ document.getElementById('ck-cpa').addEventListener('change',function(){
   }
 });
 document.querySelectorAll('input[name="basemap"]').forEach(function(r){
+  /* Synchroniser le radio coché avec currentBasemap au chargement */
+  r.checked = (r.value === currentBasemap);
   r.addEventListener('change',function(){
     currentBasemap=this.value;
     map.setStyle(STYLES[currentBasemap]);
