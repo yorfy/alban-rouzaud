@@ -1,5 +1,5 @@
 <map version="1.0.1">
-  <node TEXT="ECRITS_DE_GUERRE_v2.html" ID="root" COLOR="#000000" STYLE="fork">
+  <node TEXT="ECRITS_DE_GUERRE.html" ID="root" COLOR="#000000" STYLE="fork">
 
     <!-- CAHIER 1 -->
     <node TEXT="Cahier 1 — La Guerre" ID="c1" COLOR="#f5a623" STYLE="fork" POSITION="right">
