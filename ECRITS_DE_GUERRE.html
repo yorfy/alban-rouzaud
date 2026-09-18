@@ -11,7 +11,11 @@
    BASE
    ===================================================================== */
 *{margin:0;padding:0;box-sizing:border-box}
+/* Empêche le pull-to-refresh et le rebond de page sur mobile */
+html,body{overscroll-behavior-y:none}
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden;isolation:isolate}
+/* Mobile : taille de police de base agrandie — tout le texte en em grandit proportionnellement */
+@media (max-width: 480px){body{font-size:1.5rem}}
 #layout{display:flex;flex-direction:column;flex:1;min-height:0;position:relative;z-index:1}
 #top-row{display:flex;flex:1;overflow:hidden;min-height:0;position:relative}
 #map-wrap{flex:1;position:relative}
@@ -229,6 +233,9 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   overflow-x: hidden;
   position: relative;
   position: relative;
+  /* Contient le scroll dans le panneau : pas de pull-to-refresh ni de déplacement de la fenêtre en fin de course */
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
   /* Scrollbar style */
   scrollbar-gutter: stable;
   scrollbar-width: thin;
@@ -3446,13 +3453,15 @@ var Interactions = (function() {
         viewport,
         function() { NAV.next(); },              /* gauche */
         function() { NAV.prev(); },              /* droite */
-        function() { Panel.setExpanded(true);  }, /* haut   */
-        function() { Panel.setExpanded(false); }  /* bas    */
+        null,                                    /* haut  — désactivé : conflit avec le scroll de lecture */
+        null                                     /* bas   — désactivé : conflit avec le scroll de lecture */
       );
     }
 
     /* --- Swipe sur #panel (FR-2.2) ---
-     * haut → expand, bas → compact (swipe vertical sur tout le panneau)
+     * Swipe vertical DÉSACTIVÉ : il entrait en conflit avec le scroll de lecture
+     * (le touchend du viewport remonte au parent #panel et le repliait).
+     * Ouvrir / redimensionner le panneau se fait via #panel-resize-handle (drag).
      */
     var panel = document.getElementById('panel');
     if (panel) {
@@ -3460,8 +3469,8 @@ var Interactions = (function() {
         panel,
         null,
         null,
-        function() { Panel.setExpanded(true);  },
-        function() { Panel.setExpanded(false); }
+        null,
+        null
       );
     }
   }
