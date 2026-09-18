@@ -327,9 +327,11 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 
 }
 
-/* Tablette (481px–900px) en paysage : réduire la largeur */
+/* Tablette (481px–900px) en paysage : largeur confortable (40% de l'écran) */
 @media (max-width: 900px) and (orientation: landscape) {
-  #panel { width: 260px; min-width: 260px; }
+  #panel { width: 40vw; min-width: 300px; max-width: 50vw; }
+  /* Même agrandissement de police qu'en portrait */
+  body { font-size: 1.5rem; }
 }
 
 /* =====================================================================
@@ -3885,7 +3887,8 @@ var PanelResize = (function() {
     if (!panel) return;
     var val = _mobile ? parseInt(panel.style.height) : parseInt(panel.style.width);
     if (!isNaN(val)) {
-      try { localStorage.setItem('panelWidth', String(val)); } catch(e2) {}
+      /* Clés séparées : hauteur en portrait mobile, largeur sinon (paysage/desktop) */
+      try { localStorage.setItem(_mobile ? 'panelH' : 'panelW', String(val)); } catch(e2) {}
     }
   }
 
@@ -3900,41 +3903,38 @@ var PanelResize = (function() {
     document.addEventListener('mouseup',   _onEnd);
     document.addEventListener('touchend',  _onEnd);
 
-    /* Nettoyer le style inline au changement d'orientation :
-     * en quittant le portrait, height/width inline doivent être remis à zéro
-     * pour que le CSS desktop reprenne la main. */
-    var _mql = window.matchMedia('(max-width:480px) and (orientation:portrait)');
-    function _onOrientationChange() {
+    /* Applique la taille stockée adaptée au régime courant.
+     * portrait mobile  → hauteur (clé panelH), largeur inline nettoyée
+     * paysage / desktop → largeur (clé panelW), hauteur inline nettoyée */
+    function _applyStored(isPortrait) {
       var panel = _getPanel();
       if (!panel) return;
-      if (!_mql.matches) {
-        /* On vient de quitter le mode portrait → nettoyer height inline */
-        panel.style.height = '';
+      if (isPortrait) {
+        panel.style.width = ''; panel.style.minWidth = '';
+        try {
+          var h = parseInt(localStorage.getItem('panelH'), 10);
+          if (!isNaN(h)) panel.style.height = _clampMobile(h) + 'px';
+        } catch(e2) {}
       } else {
-        /* On vient d'entrer en portrait → nettoyer width inline */
-        panel.style.width    = '';
-        panel.style.minWidth = '';
+        panel.style.height = '';
+        try {
+          var w = parseInt(localStorage.getItem('panelW'), 10);
+          if (!isNaN(w)) { var cw = _clampDesktop(w); panel.style.width = cw + 'px'; panel.style.minWidth = cw + 'px'; }
+        } catch(e3) {}
       }
       var m = _getMap();
-      if (m) try { m.resize(); } catch(e2) {}
+      if (m) try { m.resize(); } catch(e4) {}
+    }
+
+    /* Au changement d'orientation : réappliquer la taille du nouveau régime */
+    var _mql = window.matchMedia('(max-width:480px) and (orientation:portrait)');
+    function _onOrientationChange() {
+      _applyStored(_mql.matches);
     }
     _mql.addEventListener('change', _onOrientationChange);
 
-    /* Restaurer depuis localStorage — uniquement en mode desktop */
-    var isPortraitMobile = window.matchMedia('(max-width:480px) and (orientation:portrait)').matches;
-    if (!isPortraitMobile) {
-      try {
-        var saved = localStorage.getItem('panelWidth');
-        if (saved) {
-          var v = parseInt(saved, 10);
-          var panel = _getPanel();
-          if (!isNaN(v) && panel) {
-            panel.style.width    = v + 'px';
-            panel.style.minWidth = v + 'px';
-          }
-        }
-      } catch(e3) {}
-    }
+    /* Restauration initiale selon le régime courant */
+    _applyStored(_mql.matches);
   }
 
   return { init: init, _onStart: _onStart, _onMove: _onMove, _onEnd: _onEnd };
