@@ -346,7 +346,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   #elevbar{font-size:.75em}
 
   /* ---- layerswitch / elevtoggle — géré par settings-drawer ---- */
-  #exag-pill{right:16px}
+  /* #exag-pill : pas d'override — reste centré sous la boussole (right:42px) */
 }
 
 /* --- Très petit (≤ 380px) --- */
@@ -3812,6 +3812,49 @@ window.addEventListener('popstate', function(e) {
       hideIndicator();
     }
   });
+
+  // --- Mobile : drag vertical SUR LE PILL pour ajuster l'exagération ---
+  // (le clic milieu n'existe pas au toucher). Un vrai drag (>8px) annule
+  // le tap-toggle en préventant le click synthétique via preventDefault.
+  (function() {
+    var pillEl = document.getElementById('exag-pill');
+    if (!pillEl) return;
+    var tActive = false, tStartY = 0, tStartExag = 1.0, tMoved = false;
+
+    pillEl.addEventListener('touchstart', function(e) {
+      if (!terrainOn) return;              // rien à régler si terrain off
+      if (e.touches.length !== 1) return;
+      tActive    = true;
+      tMoved     = false;
+      tStartY    = e.touches[0].clientY;
+      tStartExag = terrainExaggeration;
+      showIndicator(tStartY);
+    }, { passive: true });
+
+    pillEl.addEventListener('touchmove', function(e) {
+      if (!tActive) return;
+      var y  = e.touches[0].clientY;
+      var dy = tStartY - y;                // haut = augmenter
+      if (Math.abs(dy) > 8) tMoved = true;
+      var v = Math.min(5.0, Math.max(0.2, tStartExag + dy * 0.025));
+      v = Math.round(v * 10) / 10;
+      if (v !== terrainExaggeration) {
+        terrainExaggeration = v;
+        applyTerrain();
+        updateExagBtn();
+      }
+      showIndicator(y);
+      e.preventDefault();                  // empêche le scroll de la carte pendant le réglage
+    }, { passive: false });
+
+    pillEl.addEventListener('touchend', function(e) {
+      if (!tActive) return;
+      tActive = false;
+      hideIndicator();
+      /* Si on a réglé (drag), annuler le click synthétique qui togglerait le terrain */
+      if (tMoved) e.preventDefault();
+    }, { passive: false });
+  })();
 
   // Double-clic sur exag-pill pour remettre l'exagération à ×1.0
   document.getElementById('exag-pill').addEventListener('dblclick', function() {
