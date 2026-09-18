@@ -188,10 +188,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 /* Mobile responsive : drawer plus compact */
 @media (max-width: 480px) and (orientation: portrait) {
   #settings-btn { top: 12px; left: 12px; }
-  #settings-drawer { top: 56px; left: 12px; width: 220px; }
+  #settings-drawer { top: 56px; left: 12px; width: min(88vw, 340px); }
 }
 @media (max-width: 900px) and (orientation: landscape) {
-  #settings-drawer { width: 200px; }
+  #settings-drawer { width: min(60vw, 320px); }
 }
 /* Marqueurs CPA */
 .cpa-inner{width:26px;height:26px;border-radius:50%;background:#c8a96e;border:2px solid rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.5);transition:transform .12s,border-color .12s,background .12s;transform-origin:center center;position:relative}
