@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>Alban Rouzaud — Écrits de Guerre 1939–1945</title>
 <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css"/>
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
@@ -16,6 +16,11 @@ html,body{overscroll-behavior-y:none}
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden;isolation:isolate}
 /* Mobile : taille de police de base agrandie — tout le texte en em grandit proportionnellement */
 @media (max-width: 480px){body{font-size:1.5rem}}
+/* Mobile : hauteur dynamique (suit la barre d'URL du navigateur) + safe-area en bas */
+@media (max-width: 480px){
+  body{height:100dvh}
+  #panel.expanded{padding-bottom:env(safe-area-inset-bottom,0px)}
+}
 #layout{display:flex;flex-direction:column;flex:1;min-height:0;position:relative;z-index:1}
 #top-row{display:flex;flex:1;overflow:hidden;min-height:0;position:relative}
 #map-wrap{flex:1;position:relative}
