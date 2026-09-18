@@ -59,7 +59,7 @@ var CAHIER_4_DATA = {
     lat: 47.237, lng: 15.687,
     date: "1940 – 1941",
     d: "Les Kommandos agricoles de Styrie, région des « Baouah » (paysans autrichiens). Alban décrit en détail la cohabitation avec les fermiers, le travail dans les fermes, les repas en commun, et la philosophie du bon prisonnier : « le Baouah aime le prisonnier français. » C'est depuis ces Kommandos que l'évasion du Cahier 3 a été préparée.",
-    q: "Le Baouah n'en revient pas et congratule : « Gut arbeit ! Gut arbeit ! » — À la façon dont on dit : ça va ? le prisonnier réplique : Ja gueule.",
+    q: "Le Baouah n'en revient pas et congratule : « Gut arbeit ! Gut arbeit ! » — À la façon dont on dit : ça va ? le prisonnier réplique : Ta gueule.",
     type: "kommando"
   },
 
@@ -80,7 +80,7 @@ var CAHIER_4_DATA = {
     n: "Lavelanet (Ariège) — Pays natal",
     lat: 42.9372, lng: 1.8478,
     date: "Évoqué dans les réflexions",
-    d: "Lavelanet, en Ariège, est le berceau d'Alban Rouzaud, instituteur ariégeois. Non mentionné explicitement dans le Cahier 4 mais présent en filigrane dans toutes ses réflexions sur la paix, le retour et la vie ordinaire. La mention des « pentes enneigées » et des cahiers vierges dans le texte « Histoire de Pages » renvoie à son monde pyrénéen.",
+    d: "Lavelanet, en Ariège, est le berceau d'Alban Rouzaud, employé à la Société Générale. Non mentionné explicitement dans le Cahier 4 mais présent en filigrane dans toutes ses réflexions sur la paix, le retour et la vie ordinaire. La mention des « pentes enneigées » et des cahiers vierges dans le texte « Histoire de Pages » renvoie à son monde pyrénéen.",
     q: "Les feuilles blanches, je pourrais les comparer à un magnifique panorama de pentes enneigées devant lesquels je reste en contemplation.",
     type: "mention"
   },

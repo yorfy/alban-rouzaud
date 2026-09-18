@@ -8,130 +8,185 @@
 <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
 <style>
 /* =====================================================================
-   BASE — copié intégralement depuis ALBAN_ROUZAUD_3_EVASION_MARKERS.html
+   BASE
    ===================================================================== */
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;height:100vh;display:flex;flex-direction:column;overflow:hidden;isolation:isolate}
-/* ---- HEADER style browser ---- */
-#header-border{height:6px;background:#16213e;flex-shrink:0;position:relative;z-index:100;transition:background .2s}
-#map-wrap{flex:1;position:relative;z-index:1;padding-top:8px;background:#16213e}
-#map{width:100%;height:100%;position:relative;z-index:1}
-/* Onglets style Chrome */
-#header{background:#0a0f1e;padding:0;border-bottom:none;display:flex;align-items:flex-end;gap:0;flex-shrink:0;height:40px;position:relative;z-index:100}
-#header-nav{display:flex;align-items:center;gap:2px;padding:0 12px 0 8px;height:100%;flex-shrink:0;z-index:1}
-#btn-home,#btn-overview{background:none;border:none;color:#aaa;padding:0 7px;height:32px;font-size:1em;cursor:pointer;flex-shrink:0;transition:background .15s,color .15s;display:flex;align-items:center;border-radius:4px}
-#btn-home:hover,#btn-overview:hover{background:rgba(255,255,255,.1);color:#fff}
-#cahier-tabs{display:flex;align-items:flex-end;gap:0;flex-shrink:0;height:100%;z-index:1;padding:6px 4px 0 0}
-.ctab{
-  position:relative;
-  background:#0a1628;
-  border:none;
-  color:#aaa;
-  padding:0 14px;
-  font-size:.82em;
-  cursor:pointer;
-  white-space:nowrap;
-  overflow:hidden;
-  text-overflow:ellipsis;
-  width:148px;
-  flex:0 0 148px;
-  height:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  border-radius:8px 8px 0 0;
-  transition:background .15s,color .15s;
-  box-shadow:none;
-  z-index:1;
-}
-.ctab:hover{background:#1a3a6a;color:#ddd}
-.ctab:hover + .ctab-sep{opacity:0}
-.ctab-sep:has(+ .ctab:hover){opacity:0}
-.ctab.active{background:#16213e;color:#fff;font-weight:500;z-index:3;box-shadow:none}
-.ctab-sep{width:1px;height:55%;background:#2a3a5a;align-self:center;flex-shrink:0;transition:opacity .15s}
-.ctab-sep.hidden{opacity:0}
-/* Titre à droite */
-#header-info{position:absolute;left:315px;right:0;top:0;bottom:0;display:flex;align-items:center;justify-content:center;pointer-events:none;z-index:0;padding:0 16px;transition:left .25s}
-#header-title{font-size:.92em;color:#c0cce0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:500}
-#header-controls{display:flex;gap:6px;align-items:center;flex-shrink:0;padding-right:8px;z-index:1}
-.hbtn{background:#0f3460;border:1px solid #1a4a7a;color:#a0b4c8;padding:5px 11px;border-radius:5px;font-size:.85em;cursor:pointer;transition:background .2s}
-.hbtn:hover,.hbtn.active{background:#1a5a9a;color:#fff}
-.hbtn:disabled{opacity:.35;cursor:default}
 #layout{display:flex;flex-direction:column;flex:1;min-height:0;position:relative;z-index:1}
 #top-row{display:flex;flex:1;overflow:hidden;min-height:0;position:relative}
-#sbtoggle{position:absolute;top:8px;left:315px;height:calc(100% - 8px);width:10px;z-index:1100;background:#0f3460;color:#cddaeb;border:none;border-left:1px solid #1a4a7a;border-right:1px solid #1a4a7a;padding:0;font-size:.55em;display:flex;align-items:center;justify-content:center;cursor:pointer;box-shadow:2px 0 6px rgba(0,0,0,.35);transition:left .25s}
-#sbtoggle:hover{background:#15497a;color:#fff}
-#sidebar.collapsed~#sbtoggle{left:0}
-#sidebar{width:315px;min-width:315px;background:#16213e;overflow-y:auto;padding:8px 15px 15px;border-right:none;transition:width .25s,min-width .25s,padding .25s;scrollbar-gutter:stable}
-#sidebar::-webkit-scrollbar{width:6px}
-#sidebar::-webkit-scrollbar-track{background:#0f1628;margin-top:8px}
-#sidebar::-webkit-scrollbar-thumb{background:#1a4a7a;border-radius:3px}
-#sidebar::-webkit-scrollbar-thumb:hover{background:#2a6aaa}
-#sidebar{scrollbar-color:#1a4a7a #0f1628;scrollbar-width:thin}
-#sidebar.collapsed{width:0;min-width:0;padding:0;overflow:hidden;border-right-width:0}
 #map-wrap{flex:1;position:relative}
 #map{width:100%;height:100%}
-.legend{background:#0f3460;border-radius:8px;padding:12px 15px;margin-bottom:15px}
-.legend h3{font-size:1em;margin-bottom:8px;color:#e94560}
-.legend p{font-size:.88em;color:#8899aa;line-height:1.5}
-.grp{margin-bottom:14px}
-.grp-t{font-size:1.05em;font-weight:700;padding:8px 12px;border-radius:6px;cursor:pointer;display:flex;align-items:center;gap:8px;transition:background .2s}
-.grp-t:hover{filter:brightness(1.2)}
-.grp-dot{width:14px;height:14px;border-radius:50%;flex-shrink:0;border:2px solid rgba(255,255,255,.3)}
-.grp-s{padding:6px 0 0 24px;overflow:hidden;max-height:0;transition:max-height .25s ease}
-.si{padding:7px 10px;margin:3px 0;border-radius:4px;cursor:pointer;font-size:.95em;transition:background .2s;border-left:3px solid transparent}
-.si:hover{background:rgba(255,255,255,.08)}
-.si .sn{font-weight:600;color:#fff}
-.si .sd{color:#8899aa;font-size:.9em;margin-top:2px}
-.si .sr{color:#667788;font-size:.82em;margin-top:2px;font-style:italic}
 /* Marqueurs HTML */
 .mlk-pin{display:block}
-/* Popup MapLibre */
-.maplibregl-popup-content{background:#16213e!important;color:#e0e0e0;border-radius:8px;border:1px solid #0f3460;padding:12px 16px;max-width:520px;font-family:'Segoe UI',Tahoma,sans-serif;font-size:1.1em}
-.maplibregl-popup-tip{border-top-color:#0f3460!important;border-bottom-color:#0f3460!important}
-.maplibregl-popup-close-button{color:#a0b4c8!important;font-size:1.2em}
-.pt{font-weight:700;font-size:1.25em;margin-bottom:6px}
-.pp{font-size:1em;color:#a0b4c8;margin-bottom:7px}
-.px{font-size:1.05em;color:#a0b4c8;line-height:1.6}
-.pq{font-style:italic;border-left:3px solid #e94560;padding-left:8px;margin-top:6px;font-size:1em;color:#8899aa}
 /* Profil altitude */
 #elevpanel{height:220px;background:#0f1628;border-top:2px solid #0f3460;flex-shrink:0;box-shadow:0 -4px 16px rgba(0,0,0,.5);display:flex;flex-direction:column}
 #elevpanel.hidden{display:none}
 #elevbar{display:flex;align-items:center;justify-content:space-between;padding:3px 10px;font-size:.82em;color:#a0b4c8}
 #elevbar b{color:#e0e0e0}
+#elev-close-btn{margin-left:8px;background:none;border:none;color:#a0b4c8;cursor:pointer;font-size:1em;padding:2px 6px;border-radius:4px;line-height:1;flex-shrink:0}
+#elev-close-btn:hover{background:rgba(255,255,255,.1);color:#fff}
+/* Bouton profil altitude flottant sur la carte */
+#elevtoggle{position:absolute;bottom:0;left:50%;transform:translateX(-50%);z-index:600;width:40px;height:22px;border-radius:6px 6px 0 0;background:rgba(15,22,40,.85);border:1px solid rgba(80,120,180,.4);border-bottom:none;color:#a0b4c8;font-size:.85em;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .15s,color .15s;box-shadow:0 -2px 6px rgba(0,0,0,.4)}
+#elevtoggle:hover{background:#1a4a7a;color:#fff}
+#elevtoggle.active{color:#fff;border-color:rgba(100,160,240,.7);background:rgba(26,74,122,.9)}
+#elevtoggle:disabled{opacity:.35;cursor:default}
 #elevcanvas{display:block;width:100%;height:196px}
-#elevtoggle{position:absolute;right:10px;bottom:10px;z-index:600;background:#0f3460;color:#a0b4c8;border:1px solid #1a4a7a;border-radius:6px;padding:5px 11px;font-size:.82em;cursor:pointer}
 #elevtip{position:fixed;pointer-events:none;background:rgba(22,33,62,.97);color:#e0e0e0;padding:4px 9px;border-radius:4px;font-size:.8em;line-height:1.5;display:none;z-index:900;border:1px solid #1a4a7a}
 #coords{display:none}
-.maplibregl-ctrl-bottom-right{left:50%!important;right:auto!important;transform:translateX(-50%)}
+.maplibregl-ctrl-bottom-right{left:auto!important;right:0!important;transform:none!important}
 .maplibregl-ctrl-attrib{background:rgba(10,14,26,0.55)!important;color:#c0c8d8!important;font-size:.68em!important;opacity:.6;transition:opacity .2s}
 .maplibregl-ctrl-attrib:hover{opacity:1}
 .maplibregl-ctrl-attrib a{color:#a0c4e0!important}
-#layerswitch{position:absolute;top:18px;left:20px;z-index:500;background:#16213e;border:1px solid #0f3460;border-radius:6px;font-size:.82em;color:#a0b4c8}
-#layerswitch-header{padding:7px 10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;user-select:none}
-#layerswitch-header b{color:#e0e0e0}
-#layerswitch-header span{font-size:.8em;opacity:.6}
-#layerswitch-body{padding:0 10px 8px;border-top:1px solid #1a4a7a}
-#layerswitch label{display:flex;align-items:center;gap:6px;margin:3px 0;cursor:pointer;padding-top:3px}
+.maplibregl-ctrl-attrib-button{outline:none!important}
 #pitch-info{display:none}
 #exag-pill{position:absolute;top:84px;right:42px;transform:translateX(50%);z-index:600;background:rgba(15,22,40,.78);border:1px solid rgba(80,120,180,.40);border-radius:5px;color:#c8d8f0;font-size:.75em;font-variant-numeric:tabular-nums;padding:3px 8px;cursor:pointer;user-select:none;letter-spacing:.02em;transition:background .2s,color .2s;white-space:nowrap}
 #exag-pill:hover{background:rgba(26,74,122,.85);color:#fff}
 #exag-pill.active{color:#fff;border-color:rgba(100,160,240,.6)}
+
+/* =====================================================================
+   HANDLE DE REDIMENSIONNEMENT (A-1)
+   ===================================================================== */
+#panel-resize-handle {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 6px;
+  height: 100%;
+  cursor: col-resize;
+  z-index: 300;
+  background: transparent;
+  transition: background .15s;
+}
+#panel-resize-handle:hover { background: rgba(100,160,240,.15); }
+
+@media (max-width: 480px) and (orientation: portrait) {
+  #panel-resize-handle {
+    top: 0;
+    bottom: auto;
+    right: auto;
+    left: 0;
+    width: 100%;
+    height: 10px;
+    cursor: row-resize;
+    /* Pill indicateur centré */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  #panel-resize-handle::after {
+    content: '';
+    display: block;
+    width: 32px;
+    height: 3px;
+    border-radius: 2px;
+    background: rgba(160, 180, 200, 0.3);
+  }
+  #panel-resize-handle:active::after {
+    background: rgba(100, 160, 240, 0.8);
+  }
+}
+
+/* =====================================================================
+   SETTINGS — bouton ⚙ et drawer
+   ===================================================================== */
+#settings-btn {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 600;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #16213e;
+  border: 1px solid #1a4a7a;
+  color: #a0b4c8;
+  font-size: 1.1em;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background .15s, color .15s;
+  box-shadow: 0 2px 8px rgba(0,0,0,.5);
+}
+#settings-btn:hover { background: #1a4a7a; color: #fff; }
+
+#settings-drawer {
+  position: absolute;
+  top: 60px;
+  left: 16px;
+  z-index: 700;
+  width: 240px;
+  background: #16213e;
+  border: 1px solid #1a4a7a;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0,0,0,.6);
+  display: none;
+  flex-direction: column;
+  overflow: hidden;
+  max-height: calc(100vh - 120px);
+  overflow-y: auto;
+}
+#settings-drawer.open { display: flex; }
+
+#settings-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid #1a4a7a;
+  background: #0f1628;
+}
+#settings-header span { font-size: .88em; font-weight: 600; color: #e0e0e0; }
+#settings-close {
+  background: none;
+  border: none;
+  color: #a0b4c8;
+  cursor: pointer;
+  font-size: .9em;
+  padding: 2px 4px;
+  border-radius: 4px;
+  transition: background .15s;
+}
+#settings-close:hover { background: rgba(255,255,255,.1); color: #fff; }
+
+#settings-body { padding: 6px 0; }
+
+.settings-section {
+  padding: 6px 12px 8px;
+  border-bottom: 1px solid rgba(26,74,122,.5);
+}
+.settings-section:last-child { border-bottom: none; }
+
+.settings-section-title {
+  font-size: .72em;
+  font-weight: 700;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: #4a7aaa;
+  margin-bottom: 5px;
+}
+.settings-section label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: .82em;
+  color: #a0b4c8;
+  padding: 3px 0;
+  cursor: pointer;
+}
+.settings-section label:hover { color: #e0e0e0; }
+
+/* Mobile responsive : drawer plus compact */
+@media (max-width: 480px) and (orientation: portrait) {
+  #settings-btn { top: 12px; left: 12px; }
+  #settings-drawer { top: 56px; left: 12px; width: 220px; }
+}
+@media (max-width: 900px) and (orientation: landscape) {
+  #settings-drawer { width: 200px; }
+}
 /* Marqueurs CPA */
 .cpa-inner{width:26px;height:26px;border-radius:50%;background:#c8a96e;border:2px solid rgba(255,255,255,0.85);display:flex;align-items:center;justify-content:center;font-size:13px;line-height:1;cursor:pointer;box-shadow:0 1px 4px rgba(0,0,0,0.5);transition:transform .12s,border-color .12s,background .12s;transform-origin:center center;position:relative}
 .cpa-badge{position:absolute;top:-5px;right:-5px;background:#e94560;color:#fff;font-size:8px;font-weight:700;font-family:Arial,sans-serif;width:14px;height:14px;border-radius:50%;display:flex;align-items:center;justify-content:center;border:1px solid #fff;pointer-events:none}
-.cpa-popup .maplibregl-popup-content{background:#0f1628!important;border:1px solid #c8a96e!important;padding:0!important;max-width:420px!important;border-radius:8px!important;overflow:hidden}
-.cpa-popup .maplibregl-popup-close-button{color:#c8a96e!important;z-index:2}
-.cpa-popup-img{width:100%;max-height:240px;object-fit:cover;display:block;cursor:zoom-in}
-.cpa-popup-nav{display:flex;align-items:center;justify-content:space-between;background:#0a0e1a;padding:3px 6px}
-.cpa-popup-nav span{font-size:.72em;color:#667788}
-.cpa-popup-nav button{background:none;border:none;color:#c8a96e;font-size:.95em;cursor:pointer;padding:2px 5px;border-radius:3px}
-.cpa-popup-nav button:hover{background:rgba(200,169,110,0.2)}
-.cpa-popup-nav button:disabled{opacity:.25;cursor:default}
-.cpa-popup-body{padding:11px 13px}
-.cpa-popup-title{font-size:1.15em;font-weight:700;color:#c8a96e;margin-bottom:3px;line-height:1.3}
-.cpa-popup-loc{font-size:.98em;color:#667788;margin-bottom:4px}
-.cpa-popup-desc{font-size:1.08em;color:#8899aa;line-height:1.55}
 /* Lightbox CPA */
 #cpa-lb{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.94);z-index:10000;flex-direction:column;align-items:center;justify-content:center;padding:20px}
 #cpa-lb.open{display:flex}
@@ -147,262 +202,142 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 .cpa-lb-arrow.hidden{display:none}
 
 /* =====================================================================
-   NOUVEAUX STYLES — page de garde, onglets cahiers
+   PANNEAU — structure principale (task 3.1)
    ===================================================================== */
 
-/* Onglets cahiers — styles dans la section header */
+/* --- Layout global --- */
+/* Override body flex pour accueillir le panneau latéral */
+#panel {
+  width: 315px;
+  min-width: 315px;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  background: #16213e;
+  border-right: 1px solid #1a4a7a;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 200;
+  transition: width .25s, min-width .25s;
+}
 
-/* Page de garde */
-#coverpage{position:fixed;inset:0;background:linear-gradient(160deg,#0a0f1e 0%,#0f1628 60%,#0a1830 100%);z-index:5000;display:flex;align-items:center;justify-content:center;padding:20px;overflow-y:auto;transition:opacity .3s}
-#coverpage.hidden{display:none}
-#cover-inner{max-width:1120px;width:100%;text-align:center}
-#cover-inner h1{font-size:2em;color:#fff;margin-bottom:6px;letter-spacing:.02em}
-.cover-years{font-size:1em;color:#e94560;margin-bottom:12px;letter-spacing:.1em}
-.cover-subtitle{font-size:1.15em;color:#c8d8f0;letter-spacing:.18em;text-transform:uppercase;margin-bottom:4px;font-weight:300}
-.cover-bio{font-size:.95em;color:#a0b4c8;line-height:1.65;max-width:1088px;margin:0 auto 24px;text-align:justify}
-#cover-cahiers{display:flex;gap:16px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-/* Structure interne de chaque carte */
-.cover-card{background:rgba(15,52,96,.55);border:1px solid #1a4a7a;border-radius:10px;width:260px;display:flex;flex-direction:column;text-align:left;overflow:hidden;transition:border-color .2s,transform .15s}
-.cover-card:hover{transform:translateY(-3px)}
-.cover-card[data-n="1"]{border-top:3px solid #f5a623}
-.cover-card[data-n="2"]{border-top:3px solid #e94560}
-.cover-card[data-n="3"]{border-top:3px solid #2ecc71}
-.cover-card[data-n="4"]{border-top:3px solid #3498db}
-/* En-tête de la carte : numéro + icône manuscrit */
-.cover-card-head{display:flex;align-items:center;justify-content:space-between;padding:18px 16px 8px}
-.cover-num{font-size:.75em;font-weight:700;letter-spacing:.1em;opacity:.7}
-.cover-card[data-n="1"] .cover-num{color:#f5a623}
-.cover-card[data-n="2"] .cover-num{color:#e94560}
-.cover-card[data-n="3"] .cover-num{color:#2ecc71}
-.cover-card[data-n="4"] .cover-num{color:#3498db}
-.cover-orig{text-decoration:none;opacity:.6;transition:opacity .2s;cursor:pointer;display:flex;align-items:center;color:#a0b4c8}
-.cover-orig:hover{opacity:1}
-/* Lien principal (transcription PDF) */
-.cover-card-link{display:block;padding:0 16px 16px;text-decoration:none;color:inherit;flex:1}
-.cover-card-link h2{font-size:1em;color:#fff;margin:4px 0 3px}
-.cover-period{font-size:.78em;color:#8899aa;margin-bottom:6px}
-.cover-card-link p{font-size:.82em;color:#a0b4c8;line-height:1.45}
-.cover-card-link:hover .cover-pdf-hint{color:#a0b4c8}
-/* Pied de carte : supprimé */
-#btn-entrer{display:inline-flex;align-items:center;gap:10px;background:linear-gradient(135deg,#1a4a7a,#0f3460);border:1px solid #2a6aaa;color:#fff;padding:12px 36px;border-radius:8px;font-size:1.05em;cursor:pointer;letter-spacing:.06em;transition:background .2s,transform .15s,box-shadow .2s;box-shadow:0 2px 12px rgba(0,0,0,.4)}
-#btn-entrer:hover{background:linear-gradient(135deg,#2a6aaa,#1a4a7a);transform:translateY(-2px);box-shadow:0 4px 20px rgba(0,0,0,.5)}
+/* Zone de rendu des vues — scrollable */
+#panel-viewport {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  position: relative;
+  position: relative;
+  /* Scrollbar style */
+  scrollbar-gutter: stable;
+  scrollbar-width: thin;
+  scrollbar-color: #1a4a7a #0f1628;
+}
+#panel-viewport::-webkit-scrollbar { width: 6px; }
+#panel-viewport::-webkit-scrollbar-track { background: #0f1628; }
+#panel-viewport::-webkit-scrollbar-thumb { background: #1a4a7a; border-radius: 3px; }
 
+/* Vues créées dynamiquement par navigateTo() */
+.panel-view {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  min-height: 100%;
+  padding: 8px 12px 16px;
+  box-sizing: border-box;
+}
+
+/* État compact du panneau */
+#panel.compact {
+  /* Sur desktop : on laisse la largeur mais le viewport se réduit au zéro */
+}
+#panel.compact #panel-viewport {
+  display: none;
+}
+
+/* =====================================================================
+   PANNEAU RESPONSIVE — portrait mobile (≤ 480px ET portrait)
+   ===================================================================== */
+
+@media (max-width: 480px) and (orientation: portrait) {
+  /* Réorienter body + layout en colonne */
+  body          { flex-direction: column !important; }
+  #layout       { flex-direction: column !important; }
+  #top-row      { flex-direction: column !important; flex: 1; min-height: 0; }
+
+  /* La carte pousse vers le haut et prend l'espace restant */
+  #map-wrap {
+    flex: 1 !important;
+    height: auto !important;
+    min-height: 0 !important;
+    order: 0;
+  }
+
+  /* Le panneau passe en bottombar dans le flux (pas fixed) */
+  #panel {
+    position: relative !important;
+    bottom: auto;
+    left: auto;
+    right: auto;
+    width: 100% !important;
+    min-width: 0 !important;
+    height: auto;
+    border-right: none;
+    border-top: 2px solid #1a4a7a;
+    box-shadow: 0 -4px 24px rgba(0,0,0,.6);
+    z-index: 200;
+    flex-shrink: 0;
+    order: 1;
+  }
+
+  /* Profil altitude */
+  #elevpanel { height: 140px; }
+  #elevcanvas { height: 116px; }
+
+  /* État compact : juste la barre */
+  #panel.compact {
+    height: 48px;
+    overflow: hidden;
+  }
+  #panel.compact #panel-viewport {
+    display: none;
+  }
+
+  /* État expanded : 60vh max, redimensionnable par drag */
+  #panel.expanded {
+    height: 60vh;
+  }
+  #panel.expanded #panel-viewport {
+    display: block;
+  }
+
+}
+
+/* Tablette (481px–900px) en paysage : réduire la largeur */
+@media (max-width: 900px) and (orientation: landscape) {
+  #panel { width: 260px; min-width: 260px; }
+}
 
 /* =====================================================================
    RESPONSIVE — tablette & mobile
    ===================================================================== */
 
-/* --- Tablette (≤ 900px) : sidebar + onglets se rétrécissent --- */
-@media(max-width:900px){
-  .ctab{width:120px;flex:0 0 120px;font-size:.78em;padding:0 10px}
-  #header-info{left:260px}
-}
-
-/* --- Mobile (≤ 768px) : sidebar en tiroir bottom, onglets scrollables --- */
+/* --- Mobile (≤ 768px) : ajustements profil altitude --- */
 @media(max-width:768px){
-
-  /* ---- Page de garde ---- */
-  /* align-items:flex-start permet le scroll quand le contenu dépasse */
-  #coverpage{align-items:flex-start;padding:24px 16px 32px}
-  #cover-inner{padding-top:8px}
-  #cover-cahiers{flex-direction:column;align-items:center}
-  .cover-card{width:100%;max-width:420px}
-  #cover-inner h1{font-size:1.5em}
-  .cover-bio{font-size:.88em;text-align:left}
-  #btn-entrer{padding:10px 24px;font-size:.95em}
-
-  /* ---- Header ---- */
-  #header{height:44px}
-  #header-info{display:none}
-  /* Onglets : scroll horizontal */
-  #cahier-tabs{overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-right:0;flex-shrink:1;min-width:0}
-  #cahier-tabs::-webkit-scrollbar{display:none}
-  .ctab{width:auto;flex:0 0 auto;min-width:80px;max-width:none;font-size:.75em;padding:0 12px}
-  .ctab-sep{flex-shrink:0}
-
-  /* ---- sbtoggle desktop : caché ---- */
-  #sbtoggle{display:none}
-
-  /* ---- Sidebar → tiroir bottom ---- */
-  #sidebar{
-    /* Détacher du flux normal */
-    position:fixed;
-    bottom:0;left:0;right:0;
-    width:100%!important;
-    min-width:0!important;
-    max-height:60vh;
-    height:60vh;
-    border-right:none;
-    border-top:2px solid #1a4a7a;
-    border-radius:12px 12px 0 0;
-    box-shadow:0 -4px 24px rgba(0,0,0,.6);
-    z-index:2000;
-    overflow-y:auto;
-    padding:16px 15px 30px!important;
-    /* Fermé par défaut */
-    transform:translateY(100%);
-    transition:transform .3s ease;
-    scrollbar-gutter:auto;
-  }
-  #sidebar.drawer-open{
-    transform:translateY(0);
-  }
-  /* La classe 'collapsed' reste inopérante sur mobile (override) */
-  #sidebar.collapsed{
-    width:100%!important;
-    min-width:0!important;
-    padding:16px 15px 30px!important;
-    overflow-y:auto;
-  }
-
-  /* Poignée visuelle en haut du tiroir */
-  #sidebar::before{
-    content:'';
-    display:block;
-    width:40px;height:4px;
-    background:#3a5a8a;
-    border-radius:2px;
-    margin:0 auto 12px;
-  }
-
-  /* ---- FAB pour ouvrir/fermer le tiroir ---- */
-  #sb-fab{
-    display:flex;
-    position:fixed;
-    bottom:20px;right:16px;
-    z-index:2100;
-    width:44px;height:44px;
-    background:#0f3460;
-    border:1px solid #1a4a7a;
-    border-radius:50%;
-    color:#c0cce0;
-    font-size:1.1em;
-    align-items:center;justify-content:center;
-    cursor:pointer;
-    box-shadow:0 2px 12px rgba(0,0,0,.5);
-    transition:background .2s,transform .2s;
-  }
-  #sb-fab:hover{background:#1a5a9a}
-  #sb-fab.open{transform:rotate(180deg)}
-
-  /* ---- Overlay : supprimé — fermeture via clic sur la carte ---- */
-  #sb-overlay{display:none!important}
-
   /* ---- Profil altitude réduit ---- */
   #elevpanel{height:140px}
   #elevcanvas{height:116px}
   #elevbar{font-size:.75em}
 
-  /* ---- layerswitch : déplacer pour ne pas masquer le FAB ---- */
-  #layerswitch{top:12px;left:10px;font-size:.78em}
-  #elevtoggle{right:60px;bottom:14px}
-  #exag-pill{right:60px}
+  /* ---- layerswitch / elevtoggle — géré par settings-drawer ---- */
+  #exag-pill{right:16px}
 }
 
 /* --- Très petit (≤ 380px) --- */
 @media(max-width:380px){
-  #cover-inner h1{font-size:1.25em}
-  .ctab{min-width:70px;font-size:.7em}
-}
-
-/* =====================================================================
-   NAV PANEL — navigation arborescente
-   ===================================================================== */
-
-/* Fil d'Ariane */
-#nav-breadcrumb {
-  font-size: .75em;
-  color: #667788;
-  padding: 6px 0 10px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  border-bottom: 1px solid #1a4a7a;
-  margin-bottom: 10px;
-}
-
-/* Grille de flèches */
-#nav-arrows {
-  display: grid;
-  grid-template-columns: 40px 1fr 40px;
-  grid-template-rows: 40px auto 40px;
-  gap: 4px;
-  margin: 12px 0;
-  align-items: center;
-  justify-items: center;
-}
-.nav-arrow {
-  width: 36px; height: 36px;
-  border-radius: 6px;
-  background: #0f3460;
-  border: 1px solid #1a4a7a;
-  color: #a0b4c8;
-  font-size: 1.1em;
-  cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  transition: background .15s, color .15s;
-  user-select: none;
-}
-.nav-arrow:hover:not(:disabled) { background: #1a5a9a; color: #fff; }
-.nav-arrow:disabled { opacity: .25; cursor: default; }
-#nav-center { grid-column: 2; grid-row: 2; font-size: 1.4em; }
-
-/* Contenu du nœud */
-#nav-node-content {
-  flex: 1;
-  overflow-y: auto;
-  min-height: 60px;
-}
-#nav-node-content .node-title {
-  font-size: 1.05em;
-  font-weight: 700;
-  color: #fff;
-  margin-bottom: 4px;
-}
-#nav-node-content .node-period {
-  font-size: .8em;
-  color: #e94560;
-  margin-bottom: 8px;
-}
-#nav-node-content .node-desc {
-  font-size: .9em;
-  color: #a0b4c8;
-  line-height: 1.55;
-  text-align: justify;
-  margin-bottom: 8px;
-}
-#nav-node-content .node-quote {
-  font-style: italic;
-  border-left: 3px solid #e94560;
-  padding-left: 8px;
-  color: #8899aa;
-  font-size: .9em;
-  margin-bottom: 8px;
-}
-#nav-node-content .node-route {
-  font-size: .82em;
-  color: #667788;
-  font-style: italic;
-}
-
-/* Items enfants */
-.nav-child-item {
-  padding: 7px 10px;
-  margin: 3px 0;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: .93em;
-  border-left: 3px solid transparent;
-  transition: background .15s;
-  color: #e0e0e0;
-}
-.nav-child-item:hover { background: rgba(255,255,255,.08); }
-.nav-child-item .ci-num { color: #667788; font-size: .85em; margin-right: 4px; }
-
-/* Mobile: tap-friendly */
-@media(max-width:768px) {
-  .nav-arrow { width: 44px; height: 44px; font-size: 1.3em; }
-  #nav-arrows { grid-template-columns: 44px 1fr 44px; grid-template-rows: 44px auto 44px; }
+  /* (rien à ce stade) */
 }
 </style>
 <script src="data/data_c1.js"></script>
@@ -412,173 +347,78 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 </head>
 <body>
 
-<!-- ===================================================================
-     PAGE DE GARDE
-     =================================================================== -->
-<div id="coverpage">
-  <div id="cover-inner">
-    <h1>Alban Rouzaud</h1>
-    <div class="cover-subtitle">Écrits de Guerre</div>
-    <div class="cover-years">1939 — 1945</div>
-    <p class="cover-bio">
-      Instituteur à Lavelanet (Ariège), Alban Rouzaud est mobilisé en août&nbsp;1939. Il vit la
-      «&nbsp;drôle de guerre&nbsp;» en Alsace, la débâcle de juin&nbsp;1940, une évasion à travers
-      les Alpes autrichiennes en&nbsp;1941, et la captivité au Stalag XVIII&nbsp;D de Marburg
-      jusqu'en&nbsp;1945. Ces quatre cahiers en sont le témoignage.
-    </p>
-    <div id="cover-cahiers">
+<!-- coverpage supprimé (tâche 5.1) — contenu migré dans renderAccueil() -->
 
-      <!-- CAHIER 1 -->
-      <div class="cover-card" data-n="1" onclick="navigateTo(TREE_ROOT.children[0]);closeCover()" style="cursor:pointer">
-        <div class="cover-card-head">
-          <div class="cover-num">CAHIER 1</div>
-          <a class="cover-orig" href="https://drive.google.com/file/d/1eEFtKvP_8kEG_qQVTPKMJxi6TKhQs4-I/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
-        </div>
-        <a class="cover-card-link" href="https://docs.google.com/document/d/1cuSB04MSC8-Fyp5qBXDpXo0cc8VR9cs4/edit?usp=drive_link" target="_blank">
-          <h2>La Guerre</h2>
-          <div class="cover-period">Août 1939 – Juin 1940</div>
-          <p>De la mobilisation dans les Pyrénées ariégeoises jusqu'aux avant-postes face à Pirmasens, puis la débâcle vers Verdun. La «&#160;drôle de guerre&#160;» vue d'en bas.</p>
-        </a>
-      </div>
-
-      <!-- CAHIER 2 -->
-      <div class="cover-card" data-n="2" onclick="navigateTo(TREE_ROOT.children[1]);closeCover()" style="cursor:pointer">
-        <div class="cover-card-head">
-          <div class="cover-num">CAHIER 2</div>
-          <a class="cover-orig" href="https://drive.google.com/file/d/1JKTnWPOrwgF-Oi9N0_5aGpOe_2UbRlX9/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
-        </div>
-        <a class="cover-card-link" href="https://docs.google.com/document/d/1CJ_H8KuLxS6C2K5QgyMGPXW4mBOQLGyT/edit?usp=drive_link" target="_blank">
-          <h2>Journal non écrit d'un fantassin en repli stratégique</h2>
-          <div class="cover-period">Mai – Juin 1940</div>
-          <p>Le repli à travers la France en déroute, les routes embouteillées, les ordres contradictoires, et finalement la capture.</p>
-        </a>
-      </div>
-
-      <!-- CAHIER 3 -->
-      <div class="cover-card" data-n="3" onclick="navigateTo(TREE_ROOT.children[2]);closeCover()" style="cursor:pointer">
-        <div class="cover-card-head">
-          <div class="cover-num">CAHIER 3</div>
-          <a class="cover-orig" href="https://drive.google.com/file/d/1mRKi9u4zP9oXgVjFl_Fuj4GTTESVpxIA/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
-        </div>
-        <a class="cover-card-link" href="https://docs.google.com/document/d/1LlsB4U3KwqlwQ5cNaj8wKaccrTnL7hu0/edit?usp=drive_link" target="_blank">
-          <h2>L'Évasion</h2>
-          <div class="cover-period">Sept. – Oct. 1941</div>
-          <p>Alban et André sautent dans le noir depuis leur Kommando. Deux semaines à pied dans les Alpes autrichiennes, boussole et carte copiée à la main.</p>
-        </a>
-      </div>
-
-      <!-- CAHIER 4 -->
-      <div class="cover-card" data-n="4" onclick="navigateTo(TREE_ROOT.children[3]);closeCover()" style="cursor:pointer">
-        <div class="cover-card-head">
-          <div class="cover-num">CAHIER 4</div>
-          <a class="cover-orig" href="https://drive.google.com/file/d/1ZW2hv8iLNkZE0e73iSyS1fN-bNBj3H_X/view?usp=sharing" target="_blank" title="PDF original (manuscrit scanné)"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg></a>
-        </div>
-        <a class="cover-card-link" href="https://docs.google.com/document/d/12HeGY9vhKJKc71NK3ajLXALOVU3sg5kk/edit?usp=drive_link" target="_blank">
-          <h2>Captivité, récits et réflexions</h2>
-          <div class="cover-period">1940 – 1945</div>
-          <p>Écrites depuis le Stalag XVIII&#160;D et les Kommandos de Styrie, les réflexions d'un instituteur ariégeois prisonnier — ses souvenirs, ses lectures, ses pensées sur la guerre et la liberté.</p>
-        </a>
-      </div>
-
-    </div>
-    <button id="btn-entrer" onclick="navigateTo(TREE_ROOT.children[0]);closeCover()"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"/><line x1="9" y1="3" x2="9" y2="18"/><line x1="15" y1="6" x2="15" y2="21"/></svg>Carte interactive</button>
-  </div>
-</div>
-
-<!-- ===================================================================
-     HEADER
-     =================================================================== -->
-<div id="header">
-  <div id="header-nav">
-    <button id="btn-home" onclick="navigateTo(TREE_ROOT)" title="Vue globale — navigation arborescente">
-      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
-    </button>
-    <button id="btn-overview" onclick="loadAllCahiers()" title="Vue d'ensemble — tous les cahiers">
-      <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3"/><path d="M21 8V5a2 2 0 0 0-2-2h-3"/><path d="M3 16v3a2 2 0 0 0 2 2h3"/><path d="M16 21h3a2 2 0 0 0 2-2v-3"/></svg>
-    </button>
-  </div>
-  <div id="cahier-tabs">
-    <button class="ctab" data-n="1" onclick="navigateTo(TREE_ROOT.children[0])">La Guerre</button>
-    <div class="ctab-sep"></div>
-    <button class="ctab" data-n="2" onclick="navigateTo(TREE_ROOT.children[1])">Journal non écrit…</button>
-    <div class="ctab-sep"></div>
-    <button class="ctab" data-n="3" onclick="navigateTo(TREE_ROOT.children[2])">L'Évasion</button>
-    <div class="ctab-sep"></div>
-    <button class="ctab" data-n="4" onclick="navigateTo(TREE_ROOT.children[3])">Captivité…</button>
-  </div>
-  <div id="header-info">
-    <div id="header-title">Alban Rouzaud — Écrits de Guerre 1939–1945</div>
-  </div>
-  <div id="header-controls"></div>
-</div>
-<div id="header-border"></div>
+<!-- header, header-border, cahier-tabs supprimés (tâche 5.1) -->
 
 <!-- ===================================================================
      LAYOUT PRINCIPAL
      =================================================================== -->
 <div id="layout">
   <div id="top-row">
-    <div id="sidebar">
-      <div class="legend">
-        <h3 style="cursor:pointer;display:flex;align-items:center;gap:8px;"
-            onclick="var b=document.getElementById('legend-body');b.style.display=b.style.display==='none'?'block':'none';">
-          <span style="width:18px;height:18px;border-radius:50%;border:1.5px solid #e94560;color:#e94560;font-size:.8em;font-weight:700;font-style:italic;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0;font-family:serif;">i</span>
-          <span style="flex:1">À propos</span>
-          <span id="legend-links" style="display:flex;gap:6px;margin-left:auto"></span>
-        </h3>
-        <div id="legend-body" style="display:none">
-          <p id="legend-subtitle" style="color:#c0cce0;font-size:.9em;margin-bottom:6px;font-style:italic"></p>
-        </div>
-      </div>
-      <div id="nav-breadcrumb"></div>
-      <div id="nav-node-content"></div>
-      <div id="nav-arrows" style="display:grid;grid-template-columns:40px 1fr 40px;grid-template-rows:40px auto 40px;gap:4px;margin:12px 0;align-items:center;justify-items:center;">
-        <button id="nav-arrow-up"    class="nav-arrow" style="grid-column:2;grid-row:1">↑</button>
-        <button id="nav-arrow-left"  class="nav-arrow" style="grid-column:1;grid-row:2">←</button>
-        <div    id="nav-center"                         style="grid-column:2;grid-row:2"></div>
-        <button id="nav-arrow-right" class="nav-arrow" style="grid-column:3;grid-row:2">→</button>
-        <button id="nav-arrow-down"  class="nav-arrow" style="grid-column:2;grid-row:3">↓</button>
-      </div>
+
+    <!-- ===================================================================
+         PANNEAU — sidebar desktop / bottombar portrait mobile
+         =================================================================== -->
+    <div id="panel" class="expanded">
+      <!-- Zone de rendu des vues (navigateTo) -->
+      <div id="panel-viewport"></div>
+      <!-- Handle de redimensionnement (A-1) -->
+      <div id="panel-resize-handle"></div>
     </div>
-    <button id="sbtoggle">&#9668;</button>
-    <!-- FAB mobile : ouvre le tiroir sidebar -->
-    <button id="sb-fab" aria-label="Ouvrir la liste des étapes" style="display:none">
-      <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-    </button>
-    <!-- Overlay derrière le tiroir -->
-    <div id="sb-overlay"></div>
+
+    <!-- sidebar, sbtoggle, sb-fab, sb-overlay supprimés (tâche 5.1) -->
     <div id="map-wrap">
       <div id="map"></div>
-      <div id="layerswitch">
-        <div id="layerswitch-header"
-             onclick="var b=document.getElementById('layerswitch-body');var a=document.getElementById('layerswitch-arrow');b.style.display=b.style.display==='none'?'block':'none';a.textContent=b.style.display==='none'?'▶':'▼';">
-          <b>Fond de carte</b><span id="layerswitch-arrow">&#9654;</span>
+      <!-- Bouton ⚙ settings flottant -->
+      <button id="settings-btn" title="Paramètres de la carte" aria-label="Paramètres de la carte">&#9881;</button>
+
+      <!-- Drawer settings — s'ouvre au clic sur #settings-btn -->
+      <div id="settings-drawer">
+        <div id="settings-header">
+          <span>Paramètres</span>
+          <button id="settings-close" aria-label="Fermer">&#10005;</button>
         </div>
-        <div id="layerswitch-body" style="display:none">
-          <label><input type="radio" name="basemap" value="ofm" checked> 🗺 OpenFreeMap</label>
-          <label><input type="radio" name="basemap" value="osm"> 🌍 OpenStreetMap</label>
-          <label><input type="radio" name="basemap" value="topo"> ⛰️ OpenTopoMap</label>
-          <label><input type="radio" name="basemap" value="ign1950"> 🗺️ IGN Carte 1:50 000 (1950)</label>
-          <label><input type="radio" name="basemap" value="etatmajor"> 🏰 IGN État-Major (1820-1866)</label>
-          <label><input type="radio" name="basemap" value="basegris"> 🗾 Basemap.at Gris</label>
-          <label><input type="radio" name="basemap" value="terrain"> 🏔️ Basemap.at Terrain</label>
-          <label><input type="radio" name="basemap" value="ortho"> 🎞️ Basemap.at Ortho</label>
-          <label><input type="radio" name="basemap" value="satellite"> 🌐 Satellite Esri</label>
-          <hr style="border-color:#1a4a7a;margin:5px 0">
-          <label><input type="checkbox" id="ck-cadastre"> 🏛️ Cadastre franciscain (~1830)</label>
-          <label><input type="checkbox" id="ck-hillshade" checked> Ombrage terrain</label>
-          <hr style="border-color:#1a4a7a;margin:5px 0">
-          <label><input type="checkbox" id="ck-cpa" checked> &#128247; Cartes postales</label>
+        <div id="settings-body">
+          <div class="settings-section">
+            <div class="settings-section-title">Fond de carte</div>
+            <label><input type="radio" name="basemap" value="ofm" checked> 🗺 OpenFreeMap</label>
+            <label><input type="radio" name="basemap" value="osm"> 🌍 OpenStreetMap</label>
+            <label><input type="radio" name="basemap" value="topo"> ⛰️ OpenTopoMap</label>
+            <label><input type="radio" name="basemap" value="ign1950"> 🗺️ IGN 1:50 000 (1950)</label>
+            <label><input type="radio" name="basemap" value="etatmajor"> 🏰 IGN État-Major (1820-1866)</label>
+            <label><input type="radio" name="basemap" value="basegris"> 🗾 Basemap.at Gris</label>
+            <label><input type="radio" name="basemap" value="terrain"> 🏔️ Basemap.at Terrain</label>
+            <label><input type="radio" name="basemap" value="ortho"> 🎞️ Basemap.at Ortho</label>
+            <label><input type="radio" name="basemap" value="satellite"> 🌐 Satellite Esri</label>
+            <label style="display:flex;align-items:center;justify-content:space-between;gap:6px">Transitions carte
+              <select id="ck-transition" style="background:#0f1628;border:1px solid #1a4a7a;color:#a0b4c8;border-radius:4px;padding:2px 4px;font-size:.8em">
+                <option value="0">Instantané</option>
+                <option value="400">Rapide</option>
+                <option value="1200" selected>Normal</option>
+                <option value="2000">Lent</option>
+              </select>
+            </label>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Overlays</div>
+            <label><input type="checkbox" id="ck-cadastre"> 🏛️ Cadastre franciscain (~1830)</label>
+            <label><input type="checkbox" id="ck-hillshade" checked> Ombrage terrain</label>
+            <label><input type="checkbox" id="ck-cpa" checked> 📷 Cartes postales</label>
+            <label><input type="checkbox" id="ck-terrain" checked> 🏔 Terrain 3D</label>
+          </div>
         </div>
       </div>
+
       <div id="pitch-info">pitch: 45° | bear: 0°</div>
       <div id="coords">lat: &#8212; &nbsp;lng: &#8212;</div>
-      <button id="elevtoggle">&#9650; Profil altitude</button>
       <div id="elevtip"></div>
+      <!-- Bouton profil altitude flottant -->
+      <button id="elevtoggle" title="Profil d'altitude" aria-label="Profil d'altitude">&#9650;</button>
     </div>
   </div><!-- fin #top-row -->
   <div id="elevpanel" class="hidden">
-    <div id="elevbar"><span>Profil du parcours</span><span id="elevinfo"></span></div>
+    <div id="elevbar"><span>Profil du parcours</span><span id="elevinfo"></span><button id="elev-close-btn" title="Masquer le profil" aria-label="Masquer le profil">&#10005;</button></div>
     <canvas id="elevcanvas"></canvas>
   </div>
 </div>
@@ -621,21 +461,731 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
      MOTEUR PRINCIPAL
      =================================================================== -->
 <script>
+/* ========== NAV — état global et séquence plate ========== */
+/* Design : Decision Point 1 — État objet centralisé + callbacks    */
+/* Spec   : carte-responsive-nav / task 1.1                          */
+var NAV = (function() {
+
+  /* État interne — jamais muté directement de l'extérieur */
+  var _state = {
+    cahier:                   null,   // 1–4 | null
+    chapitre:                 null,   // numéro de phase | null
+    stopId:                   null,   // id du stop actif | null
+    _previousStopId:          null,   // stopId conservé pendant la transition niveau 3→2 (F-2)
+    _pendingHighlightChapitre: null,  // chapitre à mettre en surbrillance après next() depuis dernier item (D-2)
+    _previousCahier:          null,   // cahier conservé pendant la transition niveau 1→0 (highlight retour accueil)
+    _previousContext:         null,   // contexte complet avant go(3, cpaLoc) depuis carte (retour photo)
+    cpaLoc:                   null,   // loc du lieu CPA actif (si pas de stopId) | null
+    section:                  null,   // 'photos' | null — section de niveau 2
+    level:                    0,      // 0–3
+    panelExpanded:            true,
+    panelMode:                'nav',  // 'nav' | 'elev'
+    direction:                null    // 'forward' | 'back' | null — renseigné par go()
+  };
+
+  /* Listeners enregistrés par on('change', cb) */
+  var _listeners = [];
+
+  /* --- Utilitaire : copie superficielle de l'état --- */
+  function _copy() {
+    return {
+      cahier:        _state.cahier,
+      chapitre:      _state.chapitre,
+      stopId:        _state.stopId,
+      cpaLoc:        _state.cpaLoc,
+      section:       _state.section,
+      level:         _state.level,
+      panelExpanded: _state.panelExpanded,
+      panelMode:     _state.panelMode,
+      direction:     _state.direction
+    };
+  }
+
+  /* --- Émet l'événement 'change' à tous les abonnés --- */
+  function _emit(event) {
+    if (event !== 'change') return;
+    var snapshot = _copy();
+    for (var i = 0; i < _listeners.length; i++) {
+      try { _listeners[i](snapshot); } catch(e) {}
+    }
+    /* NOTE: _previousStopId et _pendingHighlightChapitre sont intentionnellement
+       conservés après l'émission — ils sont nettoyés au début du prochain go()
+       pour que les fonctions de rendu appelées par les listeners puissent les lire. */
+  }
+
+  /* --- Abonnement --- */
+  function on(event, cb) {
+    if (event !== 'change') return;
+    if (typeof cb !== 'function') return;
+    _listeners.push(cb);
+  }
+
+  /* --- Désabonnement --- */
+  function off(event, cb) {
+    if (event !== 'change') return;
+    for (var i = _listeners.length - 1; i >= 0; i--) {
+      if (_listeners[i] === cb) { _listeners.splice(i, 1); return; }
+    }
+  }
+
+  /* --- Navigation principale ---
+   * level    : 0–3
+   * ids      : objet optionnel { cahier, chapitre, stopId }
+   * direction: 'forward' | 'back' (défaut : 'forward')
+   * _fromSeq : usage interne — true quand appelé par next()/prev()
+   */
+  function go(level, ids, direction, _fromSeq) {
+    /* Validation : aller au niveau 0 depuis le niveau 0 = no-op */
+    if (level === 0 && _state.level === 0) return;
+
+    /* Normalisation */
+    level     = Math.max(0, Math.min(3, level));
+    ids       = ids || {};
+    direction = (direction === 'back') ? 'back' : 'forward';
+
+    /* Nettoyer les marqueurs transitoires de la nav précédente (F-2, D-2) */
+    _state._previousStopId           = null;
+    _state._pendingHighlightChapitre = null;
+    _state._previousCahier           = null;
+    _state._previousContext          = null;
+
+    var prevLevel = _state.level;
+
+    /* Mise à jour de l'état selon le niveau cible */
+    _state.level     = level;
+    _state.direction = direction;
+
+    if (level === 0) {
+      /* Retour accueil : sauvegarder le cahier avant de le nullifier */
+      _state._previousCahier = _state.cahier;
+      _state.cahier   = null;
+      _state.chapitre = null;
+      _state.stopId   = null;
+      _state.cpaLoc   = null;
+      _state.section  = null;
+    } else if (level === 1) {
+      /* Niveau cahier : sauvegarder le chapitre avant de l'effacer (pour highlight au retour) */
+      if (ids.cahier != null) _state.cahier = ids.cahier;
+      _state._pendingHighlightChapitre = _state.chapitre;
+      _state.chapitre = null;
+      _state.stopId   = null;
+      _state.cpaLoc   = null;
+      _state.section  = null;
+    } else if (level === 2) {
+      /* Niveau chapitre / photos : stop effacé — conserver le stopId précédent (F-2) */
+      if (ids.cahier   != null) _state.cahier   = ids.cahier;
+      if (ids.chapitre != null) _state.chapitre = ids.chapitre;
+      /* Sauvegarder le stopId avant de l'effacer (pour highlight au retour) */
+      _state._previousStopId = _state.stopId;
+      _state.stopId  = null;
+      _state.cpaLoc  = null;
+      _state.section = ids.section || null;
+    } else if (level === 3) {
+      /* Niveau étape / lieu-photo */
+      if (ids.cahier   != null) _state.cahier   = ids.cahier;
+      if (ids.chapitre != null) _state.chapitre = ids.chapitre;
+      if (ids.stopId   != null) _state.stopId   = ids.stopId;
+      /* Sauvegarder le contexte précédent si on arrive sur une CPA depuis la carte
+         (avant d'effacer stopId pour que le retour revienne bien à l'étape précédente) */
+      if (ids.cpaLoc != null && _state.cpaLoc == null) {
+        _state._previousContext = {
+          level:    _state.level,
+          cahier:   _state.cahier,
+          chapitre: _state.chapitre,
+          stopId:   _state.stopId,
+          section:  _state.section
+        };
+      }
+      /* Si on navigue vers une CPA, effacer le stopId pour que flyToCPA soit appelé */
+      if (ids.cpaLoc != null) _state.stopId = null;
+      /* Conserver cpaLoc si fourni (pour CPA sans stopId) */
+      _state.cpaLoc = ids.cpaLoc || null;
+      /* section : ne pas effacer (le lieu-photo est dans la section photos) */
+    }
+
+    /* Synchroniser _seqIndex si l'appel vient de l'extérieur */
+    if (!_fromSeq) {
+      _syncSeqIndex(_state.stopId, _state.cahier);
+    }
+
+    /* Raffiner la direction : back-level si on remonte dans la hiérarchie */
+    if (direction === 'back' && _state.level < prevLevel) {
+      _state.direction = 'back-level';
+    }
+
+    _emit('change');
+  }
+
+  /* --- Mode panneau : 'nav' | 'elev' --- */
+  function setMode(mode) {
+    if (mode !== 'nav' && mode !== 'elev') return;
+    _state.panelMode = mode;
+    _emit('change');
+  }
+
+  /* --- Toggle expanded/compact du panneau --- */
+  function setExpanded(expanded) {
+    var next = !!expanded;
+    if (_state.panelExpanded === next) return; /* idempotent — pas d'émission si inchangé */
+    _state.panelExpanded = next;
+    _emit('change');
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* --- Séquence plate et navigation ◀/▶ (task 1.2) --------------- */
+  /* ------------------------------------------------------------------ */
+
+  /* Séquence plate — null jusqu'à initSequence() */
+  var _seq      = null;
+  var _seqIndex = -1;   // -1 = aucun item actif
+
+  /* buildFlatSequence(cahiersData)
+   * cahiersData : [CAHIER_1_DATA, CAHIER_2_DATA, CAHIER_3_DATA, CAHIER_4_DATA]
+   * Retourne Array<{type:'stop'|'cpa', cahier:1-4, data:stopObj|lieuObj}>
+   *
+   * Algorithme par cahier :
+   *   Pour chaque phase N dans l'ordre :
+   *     a) Tous les stops dont stop.p === N (dans l'ordre du tableau)
+   *     b) Lieux CPA dont lieu.stopId correspond à un stop de cette phase
+   *        (groupés et ordonnés selon la position du stop de rattachement)
+   *     c) Lieux CPA dont lieu.p === N et sans stopId
+   *   Après toutes les phases :
+   *     Lieux CPA sans p ni stopId
+   */
+  function buildFlatSequence(cahiersData) {
+    var seq = [];
+
+    for (var ci = 0; ci < cahiersData.length; ci++) {
+      var cahierN = ci + 1;
+      var data    = cahiersData[ci];
+      if (!data) continue;
+
+      var stops  = data.stops  || [];
+      var lieux  = data.cpa    || data.lieux || [];
+      var phases = data.PN     || {};
+
+      /* Collecter les numéros de phases dans l'ordre d'apparition dans PN */
+      var phaseNums = [];
+      var seen = {};
+      /* D'abord les phases définies dans PN */
+      for (var pKey in phases) {
+        if (phases.hasOwnProperty(pKey)) {
+          var n = parseInt(pKey, 10);
+          if (!seen[n]) { seen[n] = true; phaseNums.push(n); }
+        }
+      }
+      /* Ajouter les phases présentes dans les stops mais absentes de PN */
+      for (var si = 0; si < stops.length; si++) {
+        var sp = stops[si].p;
+        if (sp != null && !seen[sp]) { seen[sp] = true; phaseNums.push(sp); }
+      }
+      phaseNums.sort(function(a, b) { return a - b; });
+
+      /* Index des lieux déjà placés */
+      var placedLieux = {};
+
+      for (var pi = 0; pi < phaseNums.length; pi++) {
+        var phaseN = phaseNums[pi];
+
+        /* a) Stops de cette phase dans l'ordre */
+        var phaseStops = [];
+        for (var si2 = 0; si2 < stops.length; si2++) {
+          if (stops[si2].p === phaseN) phaseStops.push(stops[si2]);
+        }
+        for (var si3 = 0; si3 < phaseStops.length; si3++) {
+          seq.push({ type: 'stop', cahier: cahierN, data: phaseStops[si3] });
+
+          /* b) Lieux CPA rattachés à ce stop précis (stopId) */
+          var stopId = phaseStops[si3].id;
+          for (var li = 0; li < lieux.length; li++) {
+            if (lieux[li].stopId === stopId && !placedLieux[li]) {
+              seq.push({ type: 'cpa', cahier: cahierN, data: lieux[li] });
+              placedLieux[li] = true;
+            }
+          }
+        }
+
+        /* c) Lieux CPA dont p === phaseN et sans stopId */
+        for (var li2 = 0; li2 < lieux.length; li2++) {
+          if (lieux[li2].p === phaseN &&
+              (lieux[li2].stopId == null) &&
+              !placedLieux[li2]) {
+            seq.push({ type: 'cpa', cahier: cahierN, data: lieux[li2] });
+            placedLieux[li2] = true;
+          }
+        }
+      }
+
+      /* Après toutes les phases : lieux sans p ni stopId */
+      for (var li3 = 0; li3 < lieux.length; li3++) {
+        if (!placedLieux[li3] &&
+            (lieux[li3].p     == null) &&
+            (lieux[li3].stopId == null)) {
+          seq.push({ type: 'cpa', cahier: cahierN, data: lieux[li3] });
+          placedLieux[li3] = true;
+        }
+      }
+    }
+
+    return seq;
+  }
+
+  /* --- Initialisation de la séquence (appelé après chargement des data) --- */
+  function initSequence(cahiersData) {
+    _seq      = buildFlatSequence(cahiersData);
+    _seqIndex = -1;
+  }
+
+  /* --- Synchronise _seqIndex quand NAV.go() est appelé manuellement --- */
+  function _syncSeqIndex(newStopId, newCahier) {
+    if (!_seq) return;
+    if (newStopId == null) { _seqIndex = -1; return; }
+    for (var i = 0; i < _seq.length; i++) {
+      var item = _seq[i];
+      if (item.cahier === newCahier &&
+          item.type === 'stop' &&
+          item.data.id === newStopId) {
+        _seqIndex = i;
+        return;
+      }
+    }
+    /* stopId non trouvé — laisser _seqIndex à -1 */
+    _seqIndex = -1;
+  }
+
+  /* --- Construit les ids à passer à go() depuis un item de la séquence --- */
+  function _itemToGoArgs(item) {
+    if (item.type === 'stop') {
+      var stop = item.data;
+      return {
+        level: 3,
+        ids:   { cahier: item.cahier, chapitre: stop.p, stopId: stop.id }
+      };
+    } else {
+      /* CPA : niveau 3, on utilise l'id du lieu (lat/lng identifier) —
+         NAV.state.stopId portera null pour CPA pur ; on l'identifie
+         via state.cahier + state.cpaLoc */
+      var lieu = item.data;
+      return {
+        level: 3,
+        ids:   { cahier: item.cahier, chapitre: lieu.p || null, stopId: null, cpaLoc: lieu.loc }
+      };
+    }
+  }
+
+  /* --- Navigation ▶ --- */
+  function next() {
+    if (!_seq || _seq.length === 0) return;
+    var skipCpa = (_state.cpaLoc == null); /* sauter les CPA sauf si déjà sur une CPA */
+    var idx = _seqIndex;
+    /* Trouver le prochain item valide */
+    var target = -1;
+    for (var i = idx + 1; i < _seq.length; i++) {
+      if (!skipCpa || _seq[i].type === 'stop') { target = i; break; }
+    }
+    if (target === -1) {
+      /* Plus d'item valide — remonter au niveau 1 (cahier) avec highlight du chapitre */
+      var lastItem = _seq[_seq.length - 1];
+      if (lastItem) {
+        _state._pendingHighlightChapitre = lastItem.type === 'stop'
+          ? lastItem.data.p
+          : (lastItem.data.p || null);
+        go(1, { cahier: lastItem.cahier }, 'forward', true);
+      }
+      return;
+    }
+    _seqIndex = target;
+    var args = _itemToGoArgs(_seq[_seqIndex]);
+    go(args.level, args.ids, 'forward', true);
+  }
+
+  /* --- Navigation ◀ --- */
+  function prev() {
+    if (!_seq || _seq.length === 0) return;
+    if (_seqIndex === -1) return;
+    var skipCpa = (_state.cpaLoc == null);
+    var idx = _seqIndex;
+    /* Trouver le précédent item valide */
+    var target = -1;
+    for (var i = idx - 1; i >= 0; i--) {
+      if (!skipCpa || _seq[i].type === 'stop') { target = i; break; }
+    }
+    if (target === -1) {
+      /* Plus d'item valide — remonter au niveau 2 (chapitre) avec highlight */
+      var firstItem = _seq[0];
+      if (firstItem && firstItem.type === 'stop') {
+        go(2, { cahier: firstItem.cahier, chapitre: firstItem.data.p }, 'back', true);
+      }
+      return;
+    }
+    _seqIndex = target;
+    var args = _itemToGoArgs(_seq[_seqIndex]);
+    go(args.level, args.ids, 'back', true);
+  }
+
+  /* --- Prédicats pour désactiver les boutons ◀/▶ --- */
+  function isFirst() {
+    return !_seq || _seq.length === 0 || _seqIndex <= 0;
+  }
+
+  function isLast() {
+    return !_seq || _seq.length === 0 || _seqIndex >= _seq.length - 1;
+  }
+
+  /* Interface publique */
+  return {
+    /* Propriété en lecture seule — retourne une copie de l'état */
+    get state() { return _copy(); },
+
+    /* previousStopId — stopId conservé pendant la transition niveau 3→2 (F-2) */
+    get previousStopId() { return _state._previousStopId; },
+
+    /* previousCahier — cahier conservé pendant la transition niveau 1→0 */
+    get previousCahier() { return _state._previousCahier; },
+
+    /* previousContext — contexte complet avant go(3, cpaLoc) depuis carte */
+    get previousContext() { return _state._previousContext; },
+
+    /* pendingHighlightChapitre — chapitre à mettre en surbrillance (D-2) */
+    get pendingHighlightChapitre() { return _state._pendingHighlightChapitre; },
+
+    on:             on,
+    off:            off,
+    go:             go,
+    setMode:        setMode,
+    setExpanded:    setExpanded,
+    next:           next,
+    prev:           prev,
+    initSequence:   initSequence,
+    isFirst:        isFirst,
+    isLast:         isLast,
+
+    /* Exposé pour tests et débogage */
+    _emit:               _emit,
+    _syncSeqIndex:       _syncSeqIndex,
+    _buildFlatSequence:  buildFlatSequence,
+    get _seqIndex()      { return _seqIndex; },
+    set _seqIndex(v)     { _seqIndex = v; },
+    get _seq()           { return _seq; }
+  };
+})();
+/* ========== /NAV ========== */
+
+/* ========== MapAdapter ========== */
+/* Design : Decision Point 3 — Module MapAdapter (seam carte)       */
+/* Spec   : carte-responsive-nav / task 2.1                          */
+var MapAdapter = (function() {
+
+  /* stopId actuellement actif — null si aucun */
+  var _activeStopId = null;
+
+  /* --- Utilitaire : récupère les stops d'un cahier --- */
+  function _getStops(cahierN) {
+    var cd = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
+    return cd.stops || [];
+  }
+
+  /* --- _fitPadding(base) — padding asymétrique en portrait mobile pour compenser la bottombar --- */
+  function _fitPadding(base) {
+    var isPortrait = window.matchMedia('(max-width:480px) and (orientation:portrait)').matches;
+    if (!isPortrait) return base;
+    var panel = document.getElementById('panel');
+    /* Utiliser offsetHeight si dispo et non nul, sinon fallback 60vh */
+    var panelH = panel ? panel.offsetHeight : 0;
+    if (panelH === 0) panelH = Math.round(window.innerHeight * 0.6);
+    return { top: base, bottom: panelH + 20, left: Math.round(base * 0.7), right: Math.round(base * 0.7) };
+  }
+
+  /* --- fitCahier(n) — fitBounds sur tous les stops du cahier, padding 60 --- */
+  function fitCahier(n) {
+    var stops = _getStops(n);
+    if (!stops.length) return;
+    var lngs = stops.map(function(s){return s.lng;});
+    var lats = stops.map(function(s){return s.lat;});
+    map.fitBounds(
+      [[Math.min.apply(null,lngs), Math.min.apply(null,lats)],
+       [Math.max.apply(null,lngs), Math.max.apply(null,lats)]],
+      { padding:60, duration:mapTransitionDuration }
+    );
+  }
+
+  /* --- fitChapitre(n, phaseN) — fitBounds sur les stops de la phase, padding 80 --- */
+  function fitChapitre(n, phaseN) {
+    var stops = _getStops(n).filter(function(s){ return s.p === phaseN; });
+    if (!stops.length) { fitCahier(n); return; }
+    var lngs = stops.map(function(s){return s.lng;});
+    var lats = stops.map(function(s){return s.lat;});
+    map.fitBounds(
+      [[Math.min.apply(null,lngs), Math.min.apply(null,lats)],
+       [Math.max.apply(null,lngs), Math.max.apply(null,lats)]],
+      { padding:80, duration:mapTransitionDuration }
+    );
+  }
+
+  /* --- flyToStop(stop) — zoom max(actuel, 13), durée mapTransitionDuration --- */
+  function flyToStop(stop) {
+    map.flyTo({
+      center:   [stop.lng, stop.lat],
+      zoom:     Math.max(map.getZoom(), 13),
+      duration: mapTransitionDuration
+    });
+  }
+
+  /* --- flyToCPA(lieu) — zoom max(actuel, 12) --- */
+  function flyToCPA(lieu) {
+    map.flyTo({
+      center:   [lieu.lng, lieu.lat],
+      zoom:     Math.max(map.getZoom(), 12),
+      duration: 900
+    });
+  }
+
+  /* --- setActiveMarker(stopId) — met à jour le visuel du marqueur actif ---
+   * stopId = null → désactive le marqueur précédent uniquement
+   * Utilise stopMarkerIndex pour retrouver l'élément DOM du marker.
+   * L'élément inner (premier enfant de .mlk-pin) a transition:transform .15s.
+   * État actif   = scale(1.35) translateY(-4px) + drop-shadow renforcé
+   * État normal  = '' (reset)
+   */
+  function setActiveMarker(stopId) {
+    /* Réinitialiser le précédent marqueur actif */
+    if (_activeStopId != null && stopMarkerIndex[_activeStopId]) {
+      var prev = stopMarkerIndex[_activeStopId].marker;
+      var prevEl = prev.getElement();
+      if (prevEl && prevEl.firstChild) {
+        prevEl.firstChild.style.transform = '';
+        prevEl.firstChild.style.filter    = 'drop-shadow(0 2px 4px rgba(0,0,0,0.55))';
+      }
+    }
+    _activeStopId = stopId || null;
+    /* Activer le nouveau marqueur */
+    if (_activeStopId != null && stopMarkerIndex[_activeStopId]) {
+      var curr = stopMarkerIndex[_activeStopId].marker;
+      var currEl = curr.getElement();
+      if (currEl && currEl.firstChild) {
+        currEl.firstChild.style.transform = 'scale(1.35) translateY(-4px)';
+        currEl.firstChild.style.filter    = 'drop-shadow(0 6px 14px rgba(0,0,0,0.75))';
+      }
+      /* Remonter au premier plan dans le DOM */
+      if (currEl && currEl.parentNode) currEl.parentNode.appendChild(currEl);
+    }
+  }
+
+  /* --- showTracksOnly(n) — tracés visibles, marqueurs PIN masqués ---
+   * Utilisé pour C2 et C3 au niveau 0 (FR-5.3)
+   */
+  function showTracksOnly(n) {
+    /* Masquer les marqueurs PIN */
+    if (htmlMarkers[n]) {
+      htmlMarkers[n].forEach(function(m){ try { m.remove(); } catch(e){} });
+    }
+    /* Afficher les tracés */
+    ['route-c'+n+'-solid', 'route-c'+n+'-dashed'].forEach(function(id) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'visible');
+    });
+  }
+
+  /* --- showMarkersOnly(n) — marqueurs PIN visibles, tracés masqués ---
+   * Utilisé pour C1 et C4 au niveau 0 (FR-5.3)
+   */
+  function showMarkersOnly(n) {
+    /* Afficher les marqueurs PIN */
+    if (htmlMarkers[n]) {
+      htmlMarkers[n].forEach(function(m){ try { m.addTo(map); } catch(e){} });
+    }
+    /* Masquer les tracés */
+    ['route-c'+n+'-solid', 'route-c'+n+'-dashed'].forEach(function(id) {
+      if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
+    });
+  }
+
+  /* --- _fitAllLoaded() — fitBounds sur l'ensemble des cahiers chargés --- */
+  function _fitAllLoaded() {
+    if (!loadedCahiers || loadedCahiers.size === 0) return;
+    var allLngs = [], allLats = [];
+    loadedCahiers.forEach(function(n) {
+      _getStops(n).forEach(function(s){ allLngs.push(s.lng); allLats.push(s.lat); });
+    });
+    if (!allLngs.length) return;
+    map.fitBounds(
+      [[Math.min.apply(null,allLngs), Math.min.apply(null,allLats)],
+       [Math.max.apply(null,allLngs), Math.max.apply(null,allLats)]],
+      { padding: _fitPadding(60), duration: mapTransitionDuration }
+    );
+  }
+
+  /* =====================================================================
+   * showOverview() — efface tout, affiche summary markers + tracés couleur cahier
+   * showCahier(n)  — efface tout, affiche marqueurs + tracés couleur phase de n
+   * ===================================================================== */
+
+  function showOverview() {
+    /* 1. Retirer tous les marqueurs individuels et CPA de tous les cahiers */
+    [1,2,3,4].forEach(function(n) {
+      if (htmlMarkers[n]) htmlMarkers[n].forEach(function(m){ try{m.remove();}catch(e){} });
+      if (cpaMarkers[n])  cpaMarkers[n].forEach(function(m){ try{m.remove();}catch(e){} });
+    });
+    /* 2. Tracés : visibles en couleur cahier pour C1/C2/C3, masqués pour C4 */
+    [1,2,3,4].forEach(function(n) {
+      var visible = loadedCahiers.has(n) && (n !== 4);
+      var vis = visible ? 'visible' : 'none';
+      var col = CAHIER_META[n].color;
+      ['route-c'+n+'-solid','route-c'+n+'-dashed'].forEach(function(id) {
+        if (!map.getLayer(id)) return;
+        map.setLayoutProperty(id, 'visibility', vis);
+        if (visible) map.setPaintProperty(id, 'line-color', col);
+      });
+    });
+    /* 3. Summary markers */
+    showSummaryMarkers(true);
+    setActiveMarker(null);
+    _fitAllLoaded();
+  }
+
+  function showCahier(n) {
+    /* 1. Retirer summary markers */
+    showSummaryMarkers(false);
+    /* 2. Masquer tous les cahiers sauf n */
+    [1,2,3,4].forEach(function(c) {
+      if (c === n) return;
+      if (htmlMarkers[c]) htmlMarkers[c].forEach(function(m){ try{m.remove();}catch(e){} });
+      if (cpaMarkers[c])  cpaMarkers[c].forEach(function(m){ try{m.remove();}catch(e){} });
+      ['route-c'+c+'-solid','route-c'+c+'-dashed'].forEach(function(id) {
+        if (map.getLayer(id)) map.setLayoutProperty(id, 'visibility', 'none');
+      });
+    });
+    /* 3. Afficher le cahier n en couleur phase */
+    var solidId  = 'route-c'+n+'-solid';
+    var dashedId = 'route-c'+n+'-dashed';
+    if (map.getLayer(solidId)) {
+      map.setPaintProperty(solidId, 'line-color', ['get','color']);
+      map.setPaintProperty(solidId, 'line-width', 4);
+      map.setPaintProperty(solidId, 'line-opacity', 0.85);
+      map.setLayoutProperty(solidId, 'visibility', 'visible');
+    }
+    if (map.getLayer(dashedId)) {
+      map.setPaintProperty(dashedId, 'line-color', ['get','color']);
+      map.setLayoutProperty(dashedId, 'visibility', 'visible');
+    }
+    if (htmlMarkers[n]) {
+      /* Ajouter en sens inverse : stop 1 ajouté en dernier → devant */
+      htmlMarkers[n].slice().reverse()
+        .forEach(function(m){ try{m.addTo(map);}catch(e){} });
+    }
+    if (cpaGlobalVisible && cpaMarkers[n]) cpaMarkers[n].forEach(function(m){ try{m.addTo(map);}catch(e){} });
+    /* Mettre à jour le profil altitude pour ce cahier */
+    if (activeCahier !== n) renderElevation(n);
+    activeCahier = n;
+  }
+
+  /* --- onNavChange(state) — aiguillage carte selon l'état NAV ---  */
+  function onNavChange(state) {
+    if (!map) return;
+    var level = state.level;
+
+    if (level === 0) {
+      showOverview();
+      /* Masquer le bouton profil altitude — pas pertinent en vue d'ensemble */
+      var et = document.getElementById('elevtoggle');
+      if (et) et.style.display = 'none';
+
+    } else if (level === 1) {
+      if (state.cahier != null) {
+        showCahier(state.cahier);
+        fitCahier(state.cahier);
+      }
+
+    } else if (level === 2) {
+      if (state.cahier != null) {
+        showCahier(state.cahier);
+        fitChapitre(state.cahier, state.chapitre);
+      }
+
+    } else if (level === 3) {
+      if (state.cahier != null) showCahier(state.cahier);
+      if (state.stopId != null) {
+        var entry = stopMarkerIndex['c' + state.cahier + '_' + state.stopId];
+        if (entry) flyToStop(entry.marker.getLngLat());
+        setActiveMarker('c' + state.cahier + '_' + state.stopId);
+      } else if (state.cpaLoc != null) {
+        var cahierN = state.cahier;
+        var cd = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
+        var lieux = cd.cpa || cd.lieux || [];
+        for (var i = 0; i < lieux.length; i++) {
+          if (lieux[i].loc === state.cpaLoc) { flyToCPA(lieux[i]); break; }
+        }
+        setActiveMarker(null);
+      }
+    }
+  }
+
+  /* --- syncLayersOnly(state) — ré-applique visibilité des couches après style.load
+   *     sans aucun effet de bord : pas de flyTo, fitBounds, showOverview, showCahier --- */
+  function syncLayersOnly(state) {
+    if (!map) return;
+    var level = state.level;
+
+    if (level === 0) {
+      /* Overview : tracés en couleur cahier, summary markers visibles */
+      [1,2,3,4].forEach(function(n) {
+        var visible = loadedCahiers.has(n) && (n !== 4);
+        ['route-c'+n+'-solid','route-c'+n+'-dashed'].forEach(function(id) {
+          if (!map.getLayer(id)) return;
+          map.setLayoutProperty(id, 'visibility', visible ? 'visible' : 'none');
+          if (visible) map.setPaintProperty(id, 'line-color', CAHIER_META[n].color);
+        });
+      });
+
+    } else if (level >= 1 && state.cahier != null) {
+      var n = state.cahier;
+      /* Masquer les autres cahiers, afficher le cahier actif en couleur phase */
+      [1,2,3,4].forEach(function(c) {
+        ['route-c'+c+'-solid','route-c'+c+'-dashed'].forEach(function(id) {
+          if (!map.getLayer(id)) return;
+          if (c === n) {
+            map.setLayoutProperty(id, 'visibility', 'visible');
+            map.setPaintProperty(id, 'line-color', ['get','color']);
+          } else {
+            map.setLayoutProperty(id, 'visibility', 'none');
+          }
+        });
+      });
+      /* Restaurer le marqueur actif si level 3 */
+      if (level === 3 && state.stopId != null) {
+        setActiveMarker('c' + n + '_' + state.stopId);
+      }
+    }
+  }
+
+  /* Interface publique */
+  return {
+    fitCahier:      fitCahier,
+    fitChapitre:    fitChapitre,
+    flyToStop:      flyToStop,
+    flyToCPA:       flyToCPA,
+    setActiveMarker:setActiveMarker,
+    showTracksOnly: showTracksOnly,
+    showMarkersOnly:showMarkersOnly,
+    syncToState:    onNavChange,
+    syncLayersOnly: syncLayersOnly,
+    onNavChange:    onNavChange
+  };
+})();
+/* ========== /MapAdapter ========== */
+
 // =====================================================================
 // ÉTAT GLOBAL — modèle accumulatif
 // =====================================================================
 var loadedCahiers = new Set();  // cahiers dont les données sont sur la carte
-var activeCahier  = null;       // cahier dont sidebar + profil sont affichés
-var TREE_ROOT     = null;       // racine de l'arbre hiérarchique global
-var activeNode    = null;       // nœud actuellement sélectionné dans l'arbre
+var activeCahier  = null;       // cahier actif (pour l'élévation)
 var htmlMarkers   = {1:[],2:[],3:[],4:[]};
-var htmlMarkersInner = {1:[],2:[],3:[],4:[]};
 var cpaMarkers    = {1:[],2:[],3:[],4:[]};
 var terrainOn           = true;
 var terrainExaggeration = 1.0;
 var hillshadeOn         = true;
 var currentBasemap = 'ofm';
 var cpaGlobalVisible = true;
+var mapTransitionDuration = 1200; // durée des transitions MapLibre en ms (E-1)
 
 // =====================================================================
 // CADASTRE FRANCISCAIN (~1820-1860) — overlay transparent
@@ -664,9 +1214,8 @@ function addCadastre() {
   });
 }
 
-// stopPopupData per notebook: { stopId: { stop, pinHeight } }
-var stopPopupData = {};
-var activePopup   = null;
+// Index stopId → { marker, cahier } — alimenté par renderMarkersForCahier
+var stopMarkerIndex = {};
 
 // =====================================================================
 // MÉTADONNÉES PAR CAHIER
@@ -707,7 +1256,7 @@ var CAHIER_META = {
   4: {
     title:       'Captivit\u00e9',
     subtitle:    '1940\u20131945 \u2014 R\u00e9flexions depuis le Stalag XVIII D',
-    resume:      'Écrites depuis le Stalag XVIII\u00a0D de Marburg an der Drau (Slovénie) et les Kommandos de Styrie, les réflexions d\u2019un instituteur ariégeois prisonnier de guerre\u00a0: ses souvenirs, ses lectures, ses pensées sur la guerre, la liberté et le retour. Un témoignage intérieur sur cinq années de captivité.',
+    resume:      'Écrites depuis le Stalag XVIII\u00a0D de Marburg an der Drau (Slovénie) et les Kommandos de Styrie, les réflexions d\u2019un prisonnier de guerre\u00a0: ses souvenirs, ses lectures, ses pensées sur la guerre, la liberté et le retour. Un témoignage intérieur sur cinq années de captivité.',
     pdfTranscript: 'https://docs.google.com/document/d/12HeGY9vhKJKc71NK3ajLXALOVU3sg5kk/edit?usp=drive_link',
     pdfOriginal:   'https://drive.google.com/file/d/1ZW2hv8iLNkZE0e73iSyS1fN-bNBj3H_X/view?usp=sharing',
     color:       '#3498db',
@@ -746,304 +1295,9 @@ function getCahierData(n) {
     color:       meta.color,
     title:       meta.title,
     subtitle:    meta.subtitle,
-    bounds:      cd.bounds || null
+    bounds:      cd.bounds || null,
+    pins:        cd.pins   || {}
   };
-}
-
-// =====================================================================
-// TREE — buildTree / findNodeById / getCahierN
-// =====================================================================
-function buildTree() {
-  var root = { id:'root', type:'root', label:'Alban Rouzaud', parent:null, children:[], bounds:null };
-
-  [1,2,3,4].forEach(function(n) {
-    var data = getCahierData(n);
-    var meta = CAHIER_META[n];
-    var cahierNode = {
-      id: 'c'+n, type:'cahier', label:'Cahier '+n+' — '+meta.title,
-      parent: root, children: [],
-      cahierN: n, meta: meta,
-      bounds: (data.bounds && data.bounds.cahier) || meta.bbox || null
-    };
-    root.children.push(cahierNode);
-
-    var seqN = 0;
-    Object.keys(data.PC).sort(function(a,b){return+a-+b;}).forEach(function(p) {
-      var phaseNode = {
-        id: 'c'+n+'_p'+p, type:'phase',
-        label: data.PN[p] || 'Phase '+p,
-        parent: cahierNode, children: [],
-        phaseKey: p, color: data.PC[p], cahierN: n,
-        bounds: (data.bounds && data.bounds.phases && data.bounds.phases[p]) || null
-      };
-      cahierNode.children.push(phaseNode);
-
-      var stopsInPhase = (data.stops || data.S || []).filter(function(s){ return String(s.p) == String(p); });
-      stopsInPhase.forEach(function(s) {
-        seqN++;
-        phaseNode.children.push({
-          id: 'c'+n+'_p'+p+'_s'+s.id, type:'stop',
-          label: s.n,
-          parent: phaseNode, children: [],
-          stop: s, cahierN: n, seqN: seqN,
-          bounds: [[s.lng, s.lat],[s.lng, s.lat]]
-        });
-      });
-    });
-  });
-
-  return root;
-}
-
-function findNodeById(root, id) {
-  if (root.id === id) return root;
-  for (var i=0; i<root.children.length; i++) {
-    var found = findNodeById(root.children[i], id);
-    if (found) return found;
-  }
-  return null;
-}
-
-function getCahierN(node) {
-  var cur = node;
-  while (cur) {
-    if (cur.type === 'cahier') return cur.cahierN;
-    cur = cur.parent;
-  }
-  return null;
-}
-
-// =====================================================================
-// RENDER PANEL — renderBreadcrumb / renderArrows / renderCenterIndicator / renderNodeContent / renderPanel
-// =====================================================================
-
-// Task 4.1 — renderBreadcrumb
-function renderBreadcrumb(node) {
-  var parts = [], cur = node;
-  while (cur) { parts.unshift(cur.label); cur = cur.parent; }
-  document.getElementById('nav-breadcrumb').textContent = parts.join(' › ');
-}
-
-// Task 4.2 — renderArrows + setArrow
-function setArrow(dir, targetNode) {
-  var btn = document.getElementById('nav-arrow-'+dir);
-  if (!btn) return;
-  if (targetNode) {
-    btn.disabled = false;
-    btn.onclick = function() { navigateTo(targetNode); };
-  } else {
-    btn.disabled = true;
-    btn.onclick = null;
-  }
-}
-
-function renderArrows(node) {
-  var siblings = node.parent ? node.parent.children : [];
-  var idx = siblings.indexOf(node);
-  setArrow('up',    idx > 0 ? siblings[idx-1] : null);
-  setArrow('down',  idx < siblings.length-1 ? siblings[idx+1] : null);
-  setArrow('left',  node.parent || null);
-  setArrow('right', node.children.length > 0 ? node.children[0] : null);
-}
-
-// Task 4.3 — renderCenterIndicator
-function renderCenterIndicator(node) {
-  var el = document.getElementById('nav-center');
-  if (!el) return;
-  var icons = { root:'🌍', cahier:'📖', phase:'📍', stop:'✦' };
-  el.textContent = icons[node.type] || '●';
-}
-
-// Task 4.4/4.5/4.6/4.7 — renderNodeContent
-function renderNodeContent(node) {
-  var el = document.getElementById('nav-node-content');
-  if (!el) return;
-  el.innerHTML = '';
-
-  if (node.type === 'root') {
-    // Task 4.4 — root view
-    var h = '<div class="node-title">Alban Rouzaud — Écrits de Guerre 1939–1945</div>';
-    h += '<div class="node-desc">Instituteur à Lavelanet (Ariège), Alban Rouzaud est mobilisé en août 1939. Il vit la « drôle de guerre » en Alsace, la débâcle de juin 1940, une évasion à travers les Alpes autrichiennes en 1941, et la captivité au Stalag XVIII D de Marburg jusqu\'en 1945. Ces quatre cahiers en sont le témoignage.</div>';
-    h += '<div style="margin-top:8px">';
-    node.children.forEach(function(child) {
-      var meta = child.meta || {};
-      var n = child.cahierN || (node.children.indexOf(child) + 1);
-      h += '<div class="nav-child-item" data-n="'+n+'" onclick="navigateTo(TREE_ROOT.children['+node.children.indexOf(child)+'])">'
-        + '<span class="ci-num">📖</span>'
-        + '<strong style="color:'+(meta.color||'#fff')+'">' + child.label + '</strong>'
-        + (meta.subtitle ? '<div style="font-size:.8em;color:#8899aa;margin-top:2px">'+meta.subtitle+'</div>' : '')
-        + '</div>';
-    });
-    h += '</div>';
-    el.innerHTML = h;
-    // Highlight markers on hover
-    el.querySelectorAll('.nav-child-item[data-n]').forEach(function(item) {
-      var n = parseInt(item.getAttribute('data-n'));
-      item.addEventListener('mouseenter', function() {
-        (htmlMarkersInner[n] || []).forEach(function(inner) {
-          inner.style.transform = 'scale(1.25) translateY(-4px)';
-          inner.style.filter = 'drop-shadow(0 6px 12px rgba(0,0,0,0.8))';
-        });
-      });
-      item.addEventListener('mouseleave', function() {
-        (htmlMarkersInner[n] || []).forEach(function(inner) {
-          inner.style.transform = '';
-          inner.style.filter = 'drop-shadow(0 2px 4px rgba(0,0,0,0.55))';
-        });
-      });
-    });
-
-  } else if (node.type === 'cahier') {
-    // Task 4.5 — cahier view
-    var meta = node.meta || {};
-    var h = '<div class="node-title" style="color:'+(meta.color||'#fff')+'">' + node.label + '</div>';
-    if (meta.subtitle) h += '<div class="node-period">' + meta.subtitle + '</div>';
-    if (meta.resume)   h += '<div class="node-desc">' + meta.resume + '</div>';
-    h += '<div style="margin-top:8px">';
-    node.children.forEach(function(phaseNode) {
-      var nStops = phaseNode.children.length;
-      h += '<div class="nav-child-item" onclick="navigateTo(findNodeById(TREE_ROOT,\''+phaseNode.id+'\'))">'
-        + '<span class="ci-num" style="background:'+(phaseNode.color||'#888')+'22;padding:1px 4px;border-radius:3px;color:'+(phaseNode.color||'#888')+'">'+phaseNode.label+'</span>'
-        + (nStops > 0 ? '<span style="color:#667788;font-size:.8em;margin-left:6px">'+nStops+' étape'+(nStops>1?'s':'')+'</span>' : '')
-        + '</div>';
-    });
-    h += '</div>';
-    el.innerHTML = h;
-
-  } else if (node.type === 'phase') {
-    // Task 4.6 — phase view
-    var h = '<div class="node-title" style="color:'+(node.color||'#fff')+'">' + node.label + '</div>';
-    h += '<div style="margin-top:8px">';
-    node.children.forEach(function(stopNode) {
-      h += '<div class="nav-child-item" onclick="navigateTo(findNodeById(TREE_ROOT,\''+stopNode.id+'\'))">'
-        + '<span class="ci-num">'+stopNode.seqN+'.</span> '
-        + stopNode.label
-        + '</div>';
-    });
-    h += '</div>';
-    el.innerHTML = h;
-
-  } else if (node.type === 'stop') {
-    // Task 4.7 — stop view
-    var s = node.stop;
-    var data = getCahierData(node.cahierN);
-    var h = '<div class="node-title"><span style="color:'+(data.PC[s.p]||'#888');
-    h += ';font-size:.85em;font-weight:normal">'+node.seqN+'.</span> '+s.n+'</div>';
-    if (s.date) h += '<div class="node-period">📅 '+s.date+'</div>';
-    if (s.d)    h += '<div class="node-desc">'+s.d+'</div>';
-    if (s.q)    h += '<div class="node-quote">«\u00a0'+s.q+'\u00a0»</div>';
-    if (s.r)    h += '<div class="node-route">🛣️ '+s.r+'</div>';
-    // CPA button
-    var hasCPA = false;
-    if (data.CPA) {
-      data.CPA.forEach(function(cpaStop) {
-        if (cpaStop.stopId == s.id || cpaStop.p == s.p) {
-          // Check by stopId first, then proximity
-          if (cpaStop.stopId == s.id) hasCPA = true;
-        }
-      });
-    }
-    if (hasCPA) {
-      h += '<div style="margin-top:8px"><button class="hbtn" onclick="(function(){';
-      h += 'var cpaList=getCahierData('+node.cahierN+').CPA;';
-      h += 'var idx=cpaList.findIndex(function(c){return c.stopId=='+s.id+';});';
-      h += 'if(idx>=0)cpaLbOpenItem(\'c'+node.cahierN+'_\'+idx,0);';
-      h += '})()">📷 Cartes postales</button></div>';
-    }
-    el.innerHTML = h;
-  }
-}
-
-// Task 4.8 — renderPanel
-function renderPanel(node) {
-  renderBreadcrumb(node);
-  renderCenterIndicator(node);
-  renderNodeContent(node);
-  renderArrows(node);
-}
-
-// =====================================================================
-// NAVIGATE — flyToNode / updateHashForNode / restoreFromHash / navigateTo
-// =====================================================================
-
-// Task 5.1 — flyToNode
-function flyToNode(node) {
-  switch (node.type) {
-    case 'stop':
-      var s = node.stop;
-      if (activePopup) { try { activePopup.remove(); } catch(e){} activePopup = null; }
-      map.flyTo({
-        center:   [s.lng, s.lat],
-        zoom:     Math.max(map.getZoom(), 11),
-        duration: 1200,
-        padding:  { top:300, bottom:50, left:0, right:0 }
-      });
-      map.once('moveend', function() {
-        var data = getCahierData(node.cahierN);
-        openStopPopup(s, 46, data.PC, data.PN);
-      });
-      break;
-
-    case 'phase':
-    case 'cahier':
-      if (node.bounds) {
-        var pitch = (node.type === 'cahier' && node.meta && node.meta.initialView)
-                    ? (node.meta.initialView.pitch || 0) : 0;
-        map.fitBounds(node.bounds, { padding:80, duration:800, pitch:pitch });
-      }
-      break;
-
-    case 'root':
-      var loaded = Array.from(loadedCahiers);
-      if (!loaded.length) break;
-      var union = loaded.reduce(function(acc, n) {
-        var data = getCahierData(n);
-        var bb = (data.bounds && data.bounds.cahier) || CAHIER_META[n].bbox;
-        if (!bb) return acc;
-        if (!acc) return bb;
-        return [[Math.min(acc[0][0],bb[0][0]),Math.min(acc[0][1],bb[0][1])],
-                [Math.max(acc[1][0],bb[1][0]),Math.max(acc[1][1],bb[1][1])]];
-      }, null);
-      if (union) map.fitBounds(union, { padding:80, duration:1200 });
-      break;
-  }
-}
-
-// Task 5.2 — updateHashForNode
-function updateHashForNode(node) {
-  history.replaceState(null, '', node.type === 'root' ? '#' : '#' + node.id);
-}
-
-// Task 5.3 — restoreFromHash
-function restoreFromHash() {
-  var h = location.hash.replace('#', '');
-  if (!h) return;
-  if (!TREE_ROOT) return;
-  var node = findNodeById(TREE_ROOT, h);
-  if (node) navigateTo(node);
-}
-
-// Task 5.4 — navigateTo
-function navigateTo(node, opts) {
-  opts = opts || {};
-  activeNode = node;
-
-  // 1. Ensure the right cahier is loaded on the map
-  var cahierN = getCahierN(node);
-  if (cahierN && !loadedCahiers.has(cahierN)) {
-    loadCahier(cahierN);            // loads data + markers + sets active
-  } else if (cahierN) {
-    setActiveCahier(cahierN, true); // update tab + elevation (noFit=true)
-  }
-
-  // 2. Update the panel
-  renderPanel(node);
-
-  // 3. Cartographic transition (unless skipFly)
-  if (!opts.skipFly) flyToNode(node);
-
-  // 4. Update URL hash
-  updateHashForNode(node);
 }
 
 // =====================================================================
@@ -1061,7 +1315,7 @@ function makeRasterStyle(tiles, attribution) {
 }
 var STYLES = {
   ofm:       'https://tiles.openfreemap.org/styles/liberty',
-  osm:       makeRasterStyle(['https://tile.openstreetmap.org/{z}/{x}/{y}.png'],       '&copy; OpenStreetMap contributors'),
+  osm:       makeRasterStyle(['https://a.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png','https://b.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png','https://c.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png'], '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, tiles: openstreetmap.fr'),
   topo:      makeRasterStyle(['https://tile.opentopomap.org/{z}/{x}/{y}.png'],         '&copy; OpenTopoMap contributors (CC-BY-SA)'),
   ign1950:   makeRasterStyle(['https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.MAPS.SCAN50.1950&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'], '&copy; IGN — Carte 1:50 000 (1950)'),
   etatmajor: makeRasterStyle(['https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.ETATMAJOR40&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}'], '&copy; IGN — État-Major (1820-1866)'),
@@ -1085,6 +1339,12 @@ var map = new maplibregl.Map({
   attributionControl: { compact: true }
 });
 
+/* Forcer l'attribution repliée au chargement */
+map.once('load', function() {
+  var attrib = document.querySelector('.maplibregl-ctrl-attrib');
+  if (attrib) attrib.classList.remove('maplibregl-compact-show');
+});
+
 map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 
 // =====================================================================
@@ -1093,7 +1353,7 @@ map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
 (function() {
   var el = document.createElement('div');
   el.id = 'compass-widget';
-  el.style.cssText = 'position:absolute;top:18px;right:10px;z-index:600;cursor:pointer;'
+  el.style.cssText = 'position:absolute;top:8px;right:10px;z-index:600;cursor:pointer;'
     + 'width:64px;height:64px;'
     + 'filter:drop-shadow(0 2px 6px rgba(0,0,0,0.6));';
   el.title = 'Cliquer pour remettre nord';
@@ -1136,6 +1396,7 @@ map.addControl(new maplibregl.ScaleControl({ unit: 'metric' }), 'bottom-left');
     terrainOn = !terrainOn;
     applyTerrain();
     updateExagBtn();
+    syncTerrainUI();
   });
 })();
 
@@ -1163,6 +1424,13 @@ function updateExagBtn() {
   var svgMtn = '<svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:middle;margin-right:3px"><polygon points="3 20 9 8 13 14 17 9 21 20"/></svg>';
   btn.innerHTML = svgMtn + terrainExaggeration.toFixed(1);
   btn.classList.toggle('active', terrainOn);
+}
+
+/* syncTerrainUI() — synchronise la pill exag et la checkbox ck-terrain (E-2) */
+function syncTerrainUI() {
+  updateExagBtn();
+  var cb = document.getElementById('ck-terrain');
+  if (cb) cb.checked = terrainOn;
 }
 function applyHillshade() {
   addTerrainSource();
@@ -1288,24 +1556,6 @@ function makePinEl(color, iconSvg, small) {
 }
 
 // =====================================================================
-// POPUP COMMUNE
-// =====================================================================
-function openStopPopup(stop, ph, PC, PN) {
-  if (activePopup) { try { activePopup.remove(); } catch(e){} activePopup = null; }
-  var h = '<div class="pt">'+stop.n+'</div>'
-    +'<div class="pp" style="color:'+(PC[stop.p]||'#888')+';">'+(PN[stop.p]||'')+'</div>'
-    +(stop.date ? '<div class="pp" style="color:#e94560;font-size:.9em;">\uD83D\uDCC5 '+stop.date+'</div>' : '')
-    +'<div class="px">'+(stop.d||'')+'</div>'
-    +(stop.q ? '<div class="pq">&laquo;&nbsp;'+stop.q+'&nbsp;&raquo;</div>' : '')
-    +(stop.r ? '<div class="px" style="margin-top:4px;color:#667788;font-style:italic">'+stop.r+'</div>' : '');
-  activePopup = new maplibregl.Popup({ offset:[0,-(ph||46)], maxWidth:'520px', closeOnClick:true })
-    .setLngLat([stop.lng, stop.lat])
-    .setHTML(h)
-    .addTo(map);
-  activePopup.on('close', function(){ activePopup = null; });
-}
-
-// =====================================================================
 // renderMarkersForCahier(n, data)
 // =====================================================================
 function renderMarkersForCahier(n, data) {
@@ -1318,25 +1568,102 @@ function renderMarkersForCahier(n, data) {
     var el = makePinEl(color, iconSvg, small);
     el.title = s.n;
     var pinH = 46;
-    var markerInner = el.firstElementChild;
     var marker = new maplibregl.Marker({ element:el, anchor:'bottom' })
-      .setLngLat([s.lng, s.lat])
-      .addTo(map);
-    htmlMarkersInner[n].push(markerInner);
+      .setLngLat([s.lng, s.lat]);
+    /* Les marqueurs naissent détachés — setActiveCahier les ajoute à la carte */
     (function(stop, ph, cahierN) {
-      var key = 'c'+cahierN+'_'+stop.id;
-      stopPopupData[key] = { stop:stop, ph:ph, PC:data.PC, PN:data.PN };
+      // Indexer le marker par stopId pour MapAdapter.setActiveMarker
+      stopMarkerIndex['c' + cahierN + '_' + stop.id] = { marker:marker, cahier:cahierN };
       el.addEventListener('click', function(e) {
         e.stopPropagation();
-        if (TREE_ROOT) {
-          var nodeId = 'c'+cahierN+'_p'+stop.p+'_s'+stop.id;
-          var node = findNodeById(TREE_ROOT, nodeId);
-          if (node) { navigateTo(node, {skipFly:true}); return; }
-        }
-        openStopPopup(stop, ph, data.PC, data.PN);
+        /* FR-7 : plus de Popup — naviguer vers la vue-étape dans le Panneau */
+        NAV.go(3, { cahier: cahierN, chapitre: stop.p, stopId: stop.id });
+        Panel.setExpanded(true);
       });
     })(s, pinH, n);
     htmlMarkers[n].push(marker);
+  });
+}
+
+// =====================================================================
+// renderSummaryMarkers(n, data) — marqueurs résumé (un par chapitre, niveau 0)
+// =====================================================================
+var summaryMarkers = {1:[],2:[],3:[],4:[]};
+
+/* Tooltip custom — partagé par tous les summary markers */
+var _summaryTooltip = (function() {
+  var t = document.createElement('div');
+  t.style.cssText = 'position:fixed;z-index:9000;background:rgba(15,22,40,.97);'
+    + 'color:#e0e0e0;border:1px solid #1a4a7a;border-radius:5px;'
+    + 'padding:4px 10px;font-size:.82em;pointer-events:none;'
+    + 'white-space:nowrap;display:none;';
+  document.body.appendChild(t);
+  return t;
+})();
+function _summaryTooltipPosition(e) {
+  _summaryTooltip.style.left = (e.clientX + 12) + 'px';
+  _summaryTooltip.style.top  = (e.clientY - 28) + 'px';
+}
+
+function renderSummaryMarkers(n, data) {
+  var color = CAHIER_META[n].color;
+  var pins  = data.pins || {};
+  var phases = Object.keys(data.PC).sort(function(a,b){return+a-+b;});
+
+  phases.forEach(function(p) {
+    /* Position : pin explicite ou centre du bounds.phase */
+    var pos = pins[p];
+    if (!pos) {
+      var bb = data.bounds && data.bounds.phases && data.bounds.phases[p];
+      if (bb) {
+        pos = { lat: (bb[0][1]+bb[1][1])/2, lng: (bb[0][0]+bb[1][0])/2 };
+      }
+    }
+    if (!pos) return;
+
+    /* Élément visuel : disque coloré sans numéro */
+    var wrap = document.createElement('div');
+    wrap.style.cssText = 'width:18px;height:18px;display:flex;align-items:center;justify-content:center;';
+    var el = document.createElement('div');
+    el.style.cssText = 'width:14px;height:14px;border-radius:50%;'
+      + 'background:'+color+';border:2px solid rgba(255,255,255,0.85);'
+      + 'box-shadow:0 1px 4px rgba(0,0,0,0.55);cursor:pointer;'
+      + 'transition:transform .12s,box-shadow .12s;transform-origin:center center;';
+    var label = data.PN[p] || ('Chapitre '+p);
+    wrap.appendChild(el);
+    wrap.addEventListener('mouseenter', function(e) {
+      el.style.transform = 'scale(1.5)';
+      el.style.boxShadow = '0 3px 8px rgba(0,0,0,0.7)';
+      _summaryTooltip.textContent = label;
+      _summaryTooltip.style.display = 'block';
+      _summaryTooltipPosition(e);
+    });
+    wrap.addEventListener('mousemove', _summaryTooltipPosition);
+    wrap.addEventListener('mouseleave', function() {
+      el.style.transform = '';
+      el.style.boxShadow = '0 1px 4px rgba(0,0,0,0.55)';
+      _summaryTooltip.style.display = 'none';
+    });
+    wrap.addEventListener('click', function(e) {
+      e.stopPropagation();
+      _summaryTooltip.style.display = 'none';
+      showSummaryMarkers(false);
+      loadCahier(n);
+      NAV.go(2, { cahier: n, chapitre: parseInt(p) });
+    });
+
+    var marker = new maplibregl.Marker({ element: wrap, anchor: 'center' })
+      .setLngLat([pos.lng, pos.lat]);
+    /* Naît détaché — showSummaryMarkers l'ajoute au niveau 0 */
+    summaryMarkers[n].push(marker);
+  });
+}
+
+function showSummaryMarkers(visible) {
+  [1,2,3,4].forEach(function(n) {
+    summaryMarkers[n].forEach(function(m) {
+      try { if (visible) { m.addTo(map); } else { m.remove(); } } catch(e){}
+    });
   });
 }
 
@@ -1366,15 +1693,17 @@ function renderLinesForCahier(n, data) {
   map.addSource(solidId,  { type:'geojson', data:solidGJ  });
   map.addSource(dashedId, { type:'geojson', data:dashedGJ });
 
+  /* Vue résumé (niveau 0) : couleur uniforme du cahier */
+  var cahierColor = CAHIER_META[n].color;
   map.addLayer({
     id:solidId, type:'line', source:solidId,
     layout:{ 'line-join':'round','line-cap':'round' },
-    paint:{ 'line-color':['get','color'], 'line-width':4, 'line-opacity':0.85 }
+    paint:{ 'line-color':cahierColor, 'line-width':3.5, 'line-opacity':0.9 }
   });
   map.addLayer({
     id:dashedId, type:'line', source:dashedId,
     layout:{ 'line-join':'round','line-cap':'round' },
-    paint:{ 'line-color':['get','color'], 'line-width':2.5, 'line-opacity':0.75, 'line-dasharray':[3,3] }
+    paint:{ 'line-color':cahierColor, 'line-width':2.5, 'line-opacity':0.75, 'line-dasharray':[3,3] }
   });
 }
 
@@ -1414,47 +1743,18 @@ function addCpaMarkersForCahier(n, cpaList) {
     if (!window._CPA_REGISTRY) window._CPA_REGISTRY = {};
     window._CPA_REGISTRY[regKey] = stop.cpa;
 
-    var popup = new maplibregl.Popup({
-      offset:[0,-20], maxWidth:'260px', closeOnClick:true, className:'cpa-popup'
-    });
-
-    (function(s, p, sIdx, cKey) {
-      var idx = 0;
-      function renderPopup() {
-        var item = s.cpa[idx];
-        var prev = idx===0?' disabled':'', next = idx===s.cpa.length-1?' disabled':'';
-        var counter = s.cpa.length>1 ? (idx+1)+' / '+s.cpa.length : '';
-        var html = '<img class="cpa-popup-img" src="'+item.img
-          +'" alt="" onclick="event.stopPropagation();cpaLbOpenItem(\''+cKey+'\','+idx+')">'
-          +(s.cpa.length>1
-            ? '<div class="cpa-popup-nav">'
-              +'<button id="cpanav-prev"'+prev+'>&#8592;</button>'
-              +'<span>'+counter+'</span>'
-              +'<button id="cpanav-next"'+next+'>&#8594;</button>'
-              +'</div>'
-            : '')
-          +'<div class="cpa-popup-body">'
-          +'<div class="cpa-popup-loc">&#128205; '+s.loc+'</div>'
-          +'<div class="cpa-popup-title">'+item.title+'</div>'
-          +'<div class="cpa-popup-desc">'+item.desc+'</div>'
-          +'</div>';
-        p.setHTML(html);
-        setTimeout(function(){
-          var prev2 = document.getElementById('cpanav-prev');
-          var next2 = document.getElementById('cpanav-next');
-          if (prev2) prev2.addEventListener('click',function(e){e.stopPropagation();idx--;renderPopup();});
-          if (next2) next2.addEventListener('click',function(e){e.stopPropagation();idx++;renderPopup();});
-        },0);
-      }
-      wrap.addEventListener('click',function(e){
-        e.stopPropagation(); idx=0; renderPopup();
-        p.setLngLat([s.lng,s.lat]).addTo(map);
+    /* Clic sur le marqueur 📷 → naviguer vers la vue-lieu-photo (FR-3.5) */
+    (function(s, cN) {
+      wrap.addEventListener('click', function(e) {
+        e.stopPropagation();
+        NAV.go(3, { cahier: cN, section: 'photos', cpaLoc: s.loc });
+        Panel.setExpanded(true);
       });
-    })(stop, popup, stopIdx, regKey);
+    })(stop, n);
 
     var m = new maplibregl.Marker({element:wrap,anchor:'center'})
-      .setLngLat([stop.lng,stop.lat])
-      .addTo(map);
+      .setLngLat([stop.lng,stop.lat]);
+    /* Naît détaché — setCahierVisibility l'ajoute quand le cahier devient actif */
     cpaMarkers[n].push(m);
   });
 }
@@ -1490,41 +1790,11 @@ function _cpaLbRender() {
   }
 }
 document.addEventListener('keydown', function(e) {
-  // Task 7.4: ne pas interférer avec les champs de saisie
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-  // Task 7.1: lightbox CPA ouverte → navigation CPA uniquement
   var lb = document.getElementById('cpa-lb');
-  if (lb && lb.classList.contains('open')) {
-    if (e.key === 'Escape')      lb.classList.remove('open');
-    if (e.key === 'ArrowRight')  { _cpaLbIdx = Math.min(_cpaLbList.length-1, _cpaLbIdx+1); _cpaLbRender(); }
-    if (e.key === 'ArrowLeft')   { _cpaLbIdx = Math.max(0, _cpaLbIdx-1); _cpaLbRender(); }
-    return;
-  }
-
-  // Task 7.2/7.3: navigation arborescente
-  if (!activeNode) return;
-  var siblings = activeNode.parent ? activeNode.parent.children : [];
-  var idx = siblings.indexOf(activeNode);
-
-  switch(e.key) {
-    case 'ArrowUp':
-      if (idx > 0) navigateTo(siblings[idx-1]);
-      e.preventDefault(); // Task 7.3
-      break;
-    case 'ArrowDown':
-      if (idx < siblings.length-1) navigateTo(siblings[idx+1]);
-      e.preventDefault(); // Task 7.3
-      break;
-    case 'ArrowLeft':
-      if (activeNode.parent) navigateTo(activeNode.parent);
-      e.preventDefault(); // Task 7.3
-      break;
-    case 'ArrowRight':
-      if (activeNode.children.length) navigateTo(activeNode.children[0]);
-      e.preventDefault(); // Task 7.3
-      break;
-  }
+  if (!lb.classList.contains('open')) return;
+  if (e.key==='Escape')     lb.classList.remove('open');
+  if (e.key==='ArrowRight') { _cpaLbIdx=Math.min(_cpaLbList.length-1,_cpaLbIdx+1); _cpaLbRender(); }
+  if (e.key==='ArrowLeft')  { _cpaLbIdx=Math.max(0,_cpaLbIdx-1); _cpaLbRender(); }
 });
 
 // =====================================================================
@@ -1543,52 +1813,7 @@ function fitAllLoaded() {
 }
 
 function updateVueEnsembleBtn() {
-  var btn = document.getElementById('btn-vue-ensemble');
-  if (!btn) return; // bouton supprimé du header
-  if (loadedCahiers.size >= 2) { btn.disabled = false; btn.classList.add('active'); }
-  else                         { btn.disabled = true;  btn.classList.remove('active'); }
-}
-
-// =====================================================================
-// updateHeader(n)
-// =====================================================================
-function updateHeader(n) {
-  var meta = CAHIER_META[n];
-  var fullTitles = {
-    1: 'Cahier 1\u00a0: La Guerre',
-    2: 'Cahier 2\u00a0: Journal non \u00e9crit d\u2019un fantassin en repli strat\u00e9gique',
-    3: 'Cahier 3\u00a0: L\u2019\u00c9vasion',
-    4: 'Cahier 4\u00a0: Captivit\u00e9, r\u00e9cits et r\u00e9flexions'
-  };
-  document.getElementById('header-title').textContent = fullTitles[n] || ('Cahier ' + n + '\u00a0: ' + meta.title);
-  // Icônes-liens dans l'entête "À propos"
-  var links = document.getElementById('legend-links');
-  if (links) {
-    links.innerHTML =
-      '<a href="'+meta.pdfTranscript+'" target="_blank" title="Lire la transcription (Google Docs)" style="color:#a0b4c8;opacity:.7;transition:opacity .15s;display:flex;align-items:center" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7" onclick="event.stopPropagation()">'
-      + '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>'
-      + '</a>'
-      + '<a href="'+meta.pdfOriginal+'" target="_blank" title="Manuscrit original (Google Drive)" style="color:#a0b4c8;opacity:.7;transition:opacity .15s;display:flex;align-items:center" onmouseover="this.style.opacity=1" onmouseout="this.style.opacity=.7" onclick="event.stopPropagation()">'
-      + '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19l7-7 3 3-7 7-3-3z"/><path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/><path d="M2 2l7.586 7.586"/><circle cx="11" cy="11" r="2"/></svg>'
-      + '</a>';
-  }
-  var sub = document.getElementById('legend-subtitle');
-  if (sub) {
-    sub.textContent = meta.subtitle;
-    var body = document.getElementById('legend-body');
-    if (body) {
-      body.style.display = 'none';
-      // Mettre à jour ou créer le paragraphe de résumé
-      var resumeP = document.getElementById('legend-resume');
-      if (!resumeP) {
-        resumeP = document.createElement('p');
-        resumeP.id = 'legend-resume';
-        resumeP.style.cssText = 'text-align:justify;margin-top:6px';
-        body.appendChild(resumeP);
-      }
-      resumeP.textContent = meta.resume || '';
-    }
-  }
+  /* bouton supprimé du header — no-op */
 }
 
 // =====================================================================
@@ -1596,10 +1821,12 @@ function updateHeader(n) {
 // =====================================================================
 function setCahierVisibility(n, visible) {
   // Marqueurs stops
-  htmlMarkers[n].forEach(function(m) {
-    if (visible) { try { m.addTo(map); } catch(e){} }
-    else         { try { m.remove();   } catch(e){} }
-  });
+  if (visible) {
+    htmlMarkers[n].slice().reverse()
+      .forEach(function(m){ try { m.addTo(map); } catch(e){} });
+  } else {
+    htmlMarkers[n].forEach(function(m){ try { m.remove(); } catch(e){} });
+  }
   // Marqueurs CPA (si visibles globalement)
   if (cpaGlobalVisible) {
     cpaMarkers[n].forEach(function(m) {
@@ -1616,63 +1843,30 @@ function setCahierVisibility(n, visible) {
 
 // =====================================================================
 // setActiveCahier(n)
+// Maintient la compatibilité avec loadAllCahiers et loadCahier.
+// Sans sidebar ni header, seules les fonctions essentielles restent.
 // =====================================================================
-function setActiveCahier(n, noFit) {
-  // 1. Onglet actif
-  document.querySelectorAll('.ctab').forEach(function(btn) {
-    var match = parseInt(btn.getAttribute('data-n')) === n;
-    btn.classList.toggle('active', match);
-    btn.style.background = '';
-  });
-  // Séparateurs : masquer ceux adjacents à l'onglet actif
-  document.querySelectorAll('.ctab-sep').forEach(function(sep) {
-    sep.classList.remove('hidden');
-  });
-  var activeBtn = document.querySelector('.ctab[data-n="'+n+'"]');
-  if (activeBtn) {
-    var prev = activeBtn.previousElementSibling;
-    var next = activeBtn.nextElementSibling;
-    if (prev && prev.classList.contains('ctab-sep')) prev.classList.add('hidden');
-    if (next && next.classList.contains('ctab-sep')) next.classList.add('hidden');
-  }
-  // Barre de couleur sous les onglets
-  var border = document.getElementById('header-border');
-  if (border) border.style.background = '';
-  // Visibilité : afficher uniquement le cahier actif
-  if (n === 4) {
-    [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, false); });
-    if (loadedCahiers.has(4)) setCahierVisibility(4, true);
-  } else {
-    [1, 2, 3, 4].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, c === n); });
-  }
-  // Zoom sur l'étendue réelle des stops du cahier
-  var meta = CAHIER_META[n];
-  if (!noFit && meta) {
-    var data = getCahierData(n);
-    var stops = data.S || [];
-    if (stops.length >= 2) {
-      var lngs = stops.map(function(s){ return s.lng; });
-      var lats = stops.map(function(s){ return s.lat; });
-      var sw = [Math.min.apply(null,lngs), Math.min.apply(null,lats)];
-      var ne = [Math.max.apply(null,lngs), Math.max.apply(null,lats)];
-      map.fitBounds([sw, ne], {
-        padding: 80,
-        duration: 1200,
-        pitch:   meta.initialView && meta.initialView.pitch ? meta.initialView.pitch : 0,
-        bearing: 0
-      });
-    } else if (meta.bbox) {
-      map.fitBounds(meta.bbox, { padding:80, duration:1200, pitch:0, bearing:0 });
+function setActiveCahier(n, noFit, skipVisibility) {
+  if (!skipVisibility) {
+    // Repasser les tracés du cahier actif en couleur de phase
+    var solidId  = 'route-c'+n+'-solid';
+    var dashedId = 'route-c'+n+'-dashed';
+    if (map.getLayer(solidId)) {
+      map.setPaintProperty(solidId,  'line-color', ['get','color']);
+      map.setPaintProperty(solidId,  'line-width', 4);
+      map.setPaintProperty(solidId,  'line-opacity', 0.85);
     }
+    if (map.getLayer(dashedId)) {
+      map.setPaintProperty(dashedId, 'line-color', ['get','color']);
+    }
+    // Afficher marqueurs + tracés du cahier actif
+    setCahierVisibility(n, true);
   }
-  // 2. Header only (panel is managed by renderPanel via navigateTo)
-  // 3. En-tête
-  updateHeader(n);
-  // 4. Profil altitude
+  // Profil altitude
   renderElevation(n);
-  // 5. Hash URL
+  // Hash URL
   updateHash(n);
-  // 6. État
+  // État
   activeCahier = n;
 }
 
@@ -1685,7 +1879,7 @@ function loadCahier(n) {
     return;
   }
   if (loadedCahiers.has(n)) {
-    setActiveCahier(n);
+    setActiveCahier(n, true);
     return;
   }
   var data = getCahierData(n);
@@ -1695,7 +1889,7 @@ function loadCahier(n) {
   loadedCahiers.add(n);
   updateVueEnsembleBtn();
 
-  setActiveCahier(n);
+  setActiveCahier(n, true);
 }
 
 // =====================================================================
@@ -1710,8 +1904,14 @@ var _elevHighlightId  = null;
 var _elevPC           = {};
 var _elevResizeOff    = null;
 var _elevPanelVisible = false;
+/* Référence vers drawElev() — mise à jour par renderElevation() pour
+   permettre à ElevPanel.setHighlight() de déclencher un redessin */
+var _elevDrawFn       = null;
+/* Cahier actuellement chargé dans le profil */
+var _elevCurrentCahierN = null;
 
 function renderElevation(n) {
+  _elevCurrentCahierN = n;
   var data        = getCahierData(n);
   var elevPanel   = document.getElementById('elevpanel');
   var elevToggle  = document.getElementById('elevtoggle');
@@ -1727,9 +1927,7 @@ function renderElevation(n) {
 
   if (data.noElevation || !data.elevProfile || !data.elevProfile.length) {
     elevPanel.classList.add('hidden');
-    elevToggle.style.opacity = '0.35';
-    elevToggle.style.cursor  = 'default';
-    elevToggle.disabled = true;
+    elevToggle.style.display = 'none';
     elevInfo.textContent = '';
     var ctx2 = canvas.getContext('2d');
     ctx2.clearRect(0, 0, canvas.width, canvas.height);
@@ -1737,8 +1935,7 @@ function renderElevation(n) {
     return;
   }
 
-  elevToggle.style.opacity = '';
-  elevToggle.style.cursor  = 'pointer';
+  elevToggle.style.display = '';
   elevToggle.disabled = false;
 
   // Flatten elevation points
@@ -1749,7 +1946,7 @@ function renderElevation(n) {
     });
   });
 
-  if (!_elevPts.length) { elevPanel.classList.add('hidden'); _elevPanelVisible = false; return; }
+  if (!_elevPts.length) { elevPanel.classList.add('hidden'); elevToggle.style.display = 'none'; _elevPanelVisible = false; return; }
 
   var maxD = _elevPts[_elevPts.length-1].d;
   var minA = Infinity, maxA = -Infinity;
@@ -1760,11 +1957,13 @@ function renderElevation(n) {
   // --- Step marks ---
   function ha15(a,b){ var dx=a[0]-b[0],dy=a[1]-b[1]; return dx*dx+dy*dy; }
   var stepN2=0;
+  var stepN2=0;
   var SYM={depart:'\u2605',capture:'\u25a0',frontiere:'\u2691',retour:'\u21ba',bivouac:'\u26fa',kommando:'\u2302',ferme:'\u2691'};
   var sortedPhases = Object.keys(data.PC).sort(function(a,b){return+a-+b;});
   sortedPhases.forEach(function(p){
     data.S.filter(function(x){return x.p==p;}).forEach(function(st){
       stepN2++;
+      if(st.id==20||st.id==21||st.id==22)return;
       var bi=-1,bd=Infinity;
       for(var k=0;k<_elevPts.length;k++){var dd=ha15([st.lat,st.lng],[_elevPts[k].lat,_elevPts[k].lng]);if(dd<bd){bd=dd;bi=k;}}
       if(bi<0||bd>0.0025)return;
@@ -1774,29 +1973,54 @@ function renderElevation(n) {
   _elevStepMarks.sort(function(a,b){return a.d-b.d;});
 
   // --- Time / weather engine (C3 only) ---
-  var STEP_TIME = n===3 ? {
-    32:{a:[1941,9,20,22,0]},1:{a:[1941,9,20,22,45]},2:{a:[1941,9,21,1,0]},
-    3:{a:[1941,9,21,1,20]},27:{a:[1941,9,21,2,30]},
-    25:{a:[1941,9,21,3,0],d:[1941,9,21,7,30]},4:{a:[1941,9,21,9,0]},
-    5:{a:[1941,9,21,20,0],d:[1941,9,22,6,30]},23:{a:[1941,9,22,10,0]},
-    28:{a:[1941,9,22,13,0]},29:{a:[1941,9,22,15,0],d:[1941,9,22,16,0]},
-    6:{a:[1941,9,22,17,0]},26:{a:[1941,9,22,19,30],d:[1941,9,23,6,30]},
-    7:{a:[1941,9,24,13,0]},30:{a:[1941,9,25,19,0],d:[1941,9,26,5,30]},
-    31:{a:[1941,9,26,6,0]},8:{a:[1941,9,26,8,0]},9:{a:[1941,9,26,16,0]},
-    10:{a:[1941,9,26,21,0]},43:{a:[1941,9,26,23,30],d:[1941,9,27,7,0]},
-    35:{a:[1941,9,27,18,0]},34:{a:[1941,9,27,20,0],d:[1941,9,28,17,0]},
-    11:{a:[1941,9,28,22,30]},12:{a:[1941,9,29,2,30]},13:{a:[1941,9,30,14,0]},
-    14:{a:[1941,10,1,18,0],d:[1941,10,2,6,30]},15:{a:[1941,10,2,11,0]},
-    16:{a:[1941,10,2,19,30],d:[1941,10,3,6,30]},17:{a:[1941,10,3,15,30]},
-    33:{a:[1941,10,3,15,35]},18:{a:[1941,10,3,19,0],d:[1941,10,4,20,0]},
-    19:{a:[1941,10,5,8,0]}
-  } : {};
+  // Toutes les ancres temporelles sont dans NIGHT_STOPS_C3 par distance.
+  // STEP_TIME est vide : on n'ancre plus par id de stop.
+  var STEP_TIME = {};
 
   var NIGHT_STOPS_C3 = n===3 ? [
-    {dist:61.0, a:[1941,9,23,18,30],d:[1941,9,24,6,30]},
-    {dist:73.0, a:[1941,9,24,18,30],d:[1941,9,25,6,30]},
-    {dist:173.0,a:[1941,9,29,3,0],  d:[1941,9,30,7,30]},
-    {dist:205.0,a:[1941,9,30,19,0], d:[1941,10,1,6,30]}
+    {dist:0.0,   a:[1941,9,20,22,0]},                              // 32 Ferme Grabner
+    {dist:1.2,   a:[1941,9,20,22,45]},                             // 1  Kommando départ
+    {dist:6.7,   a:[1941,9,21,1,0]},                               // 2  Weiz traversée
+    {dist:8.0,   a:[1941,9,21,1,20]},                              // 3  Forêt NO Weiz
+    {dist:12.6,  a:[1941,9,21,2,30]},                              // 27 Pancarte Arbeits
+    {dist:13.1,  a:[1941,9,21,3,0],   d:[1941,9,21,7,30]},        // 25 Bivouac nuit 1
+    {dist:16.3,  a:[1941,9,21,9,0]},                               // 4  Raabklamm
+    {dist:28.3,  a:[1941,9,21,20,0],  d:[1941,9,22,6,30]},        // 5  Bivouac nuit 2
+    {dist:32.9,  a:[1941,9,22,10,0]},                              // 23 Cascade
+    {dist:36.7,  a:[1941,9,22,13,0]},                              // 28 Village traversé
+    {dist:42.2,  a:[1941,9,22,15,0]},                              // 29 Pentes abruptes
+    {dist:45.8,  a:[1941,9,22,17,0]},                              // 6  Pont Frohnleiten
+    {dist:49.0,  a:[1941,9,22,19,30], d:[1941,9,23,6,30]},        // 26 Bivouac nuit 3
+    {dist:58.0,  a:[1941,9,23,14,0]},                              // phase 4 — milieu journée 23/9
+    {dist:61.0,  a:[1941,9,23,19,30], d:[1941,9,24,7,0]},         // bivouac nuit J3->J4 (après crépuscule)
+    {dist:67.4,  a:[1941,9,24,13,0]},                              // 7  Montagnes abreuvoirs
+    {dist:74.0,  a:[1941,9,24,19,0],  d:[1941,9,25,7,0]},         // bivouac nuit — abreuvoirs J4
+    {dist:81.0,  a:[1941,9,25,13,0]},                              // abreuvoirs J5 — mi-journée
+    {dist:88.8,  a:[1941,9,25,19,0],  d:[1941,9,26,5,30]},        // 30 Grange à foin
+    {dist:94.2,  a:[1941,9,26,6,0]},                               // 31 Village carrefour
+    {dist:96.4,  a:[1941,9,26,8,0]},                               // 8  Bords de la Mur
+    {dist:110.3, a:[1941,9,26,16,0]},                              // 9  Forêt le long Mur
+    {dist:114.8, a:[1941,9,26,21,0],  d:[1941,9,26,22,0]},        // 10 Gare Judenburg
+    {dist:116.3, a:[1941,9,26,23,30], d:[1941,9,27,7,0]},         // 43 Grange
+    {dist:119.4, a:[1941,9,27,8,0],   d:[1941,9,27,11,0]},        // 44 Feu de camp
+    {dist:139.0, a:[1941,9,27,19,0],  d:[1941,9,28,7,0]},         // 35 Baraque à foin
+    {dist:140.3, a:[1941,9,28,8,0],   d:[1941,9,28,20,0]},        // 34 Dimanche pêcheurs — repos, départ dim. soir
+    {dist:149.4, a:[1941,9,28,22,30]},                             // 11 Accident vélo — nuit du 28 au 29
+    {dist:162.4, a:[1941,9,29,2,30]},                              // 12 Tunnel gardé
+    {dist:163.5, a:[1941,9,29,3,30],  d:[1941,9,29,7,30]},        // repos taillis après tunnel
+    {dist:178.0, a:[1941,9,29,19,0],  d:[1941,9,30,8,0]},         // bivouac nuit J9->J10
+    {dist:194.9, a:[1941,9,30,14,0]},                              // 13 St. Veit — 30/9 à 14h (texte: "à deux heures")
+    {dist:198.5, a:[1941,9,30,20,30], d:[1941,10,1,8,0]},         // bivouac nuit J10->J11
+    {dist:221.5, a:[1941,10,1,15,0]},                              // orage + grange avant lac
+    {dist:231.3, a:[1941,10,1,18,0],  d:[1941,10,2,6,30]},        // 14 Lac d'Ossiach
+    {dist:245.8, a:[1941,10,2,11,0]},                              // 15 Villach
+    {dist:256.4, a:[1941,10,2,19,30], d:[1941,10,3,6,30]},        // 16 Dernier bivouac
+    {dist:265.7, a:[1941,10,3,15,30]},                             // 17 Frontière — 3/10 vendredi ✓
+    {dist:266.1, a:[1941,10,3,15,35]},                             // 33 Baraque lisière
+    {dist:273.7, a:[1941,10,3,19,0]},                              // 18 Versant italien — vendredi soir
+    {dist:278.5, a:[1941,10,4,12,0]},                              // Versant — samedi repos au soleil
+    {dist:283.0, a:[1941,10,4,19,30], d:[1941,10,5,4,0]},         // nuit de marche italienne — sam. crépuscule→dim.
+    {dist:309.9, a:[1941,10,5,8,0]}                                // 19 Arrestation — dimanche 5/10 ✓
   ] : [];
 
   var WEATHER = n===3 ? {
@@ -1924,17 +2148,9 @@ function renderElevation(n) {
   // Build timed array for C3 (empty for other cahiers)
   var timed = [];
   if (n===3) {
-    data.S.forEach(function(st) {
-      var tt = STEP_TIME[st.id]; if(!tt) return;
-      var bi=-1,bd=Infinity;
-      for(var k=0;k<_elevPts.length;k++){var dd=ha15([st.lat,st.lng],[_elevPts[k].lat,_elevPts[k].lng]);if(dd<bd){bd=dd;bi=k;}}
-      if(bi<0||bd>0.0025)return;
-      function toDate(arr){return new Date(arr[0],arr[1]-1,arr[2],arr[3],arr[4]);}
-      timed.push({d:_elevPts[bi].d,arr:toDate(tt.a),dep:tt.d?toDate(tt.d):toDate(tt.a)});
-    });
     NIGHT_STOPS_C3.forEach(function(ns){
       function toDateArr(arr){return new Date(arr[0],arr[1]-1,arr[2],arr[3],arr[4]);}
-      timed.push({d:ns.dist,arr:toDateArr(ns.a),dep:toDateArr(ns.d)});
+      timed.push({d:ns.dist,arr:toDateArr(ns.a),dep:ns.d?toDateArr(ns.d):toDateArr(ns.a)});
     });
     timed.sort(function(a,b){return a.d-b.d;});
   }
@@ -2070,6 +2286,8 @@ function renderElevation(n) {
       g.strokeStyle=_elevPC[q2.p]||'#888';g.lineWidth=2;g.stroke();
     }
   }
+  /* Exposer drawElev pour ElevPanel.setHighlight() */
+  _elevDrawFn = drawElev;
 
   function nearestByX(clientX){
     var rect=canvas.getBoundingClientRect(),px=clientX-rect.left,W=canvas.clientWidth;
@@ -2132,8 +2350,14 @@ function renderElevation(n) {
       if(dx3*dx3+dy3*dy3<=(sm3._r+3)*(sm3._r+3)){
         var stFound=null;
         data.S.forEach(function(x){if(x.id===sm3.id)stFound=x;});
-        if(stFound)map.flyTo({center:[stFound.lng,stFound.lat],zoom:Math.max(map.getZoom(),12),duration:600});
-        _elevHighlightId=sm3.id;drawElev();return;
+        if(stFound) {
+          /* FR-6.2 — clic profil → NAV.go → synchronisation bidirectionnelle */
+          NAV.go(3, { cahier: n, chapitre: stFound.p, stopId: stFound.id }, 'forward');
+        } else {
+          /* point sans stop associé : juste highlight local */
+          _elevHighlightId=sm3.id; drawElev();
+        }
+        return;
       }
     }
     var ii=nearestByX(e.clientX);
@@ -2152,9 +2376,15 @@ function renderElevation(n) {
   elevToggle.onclick=function(){
     _elevPanelVisible=!_elevPanelVisible;
     elevPanel.classList.toggle('hidden',!_elevPanelVisible);
-    elevToggle.innerHTML=(_elevPanelVisible?'\u25bc':'\u25b2')+' Profil altitude';
-    if(_elevPanelVisible){setTimeout(function(){drawElev();map.resize();},50);}
-    else{map.resize();}
+    elevToggle.innerHTML=(_elevPanelVisible?'\u25bc':'\u25b2');
+    elevToggle.classList.toggle('active', _elevPanelVisible);
+    elevToggle.style.display = _elevPanelVisible ? 'none' : '';
+    _syncBottombarForElev(_elevPanelVisible);
+    if(_elevPanelVisible){
+      var sd=document.getElementById('settings-drawer');
+      if(sd) sd.classList.remove('open');
+      setTimeout(function(){drawElev();map.resize();},50);
+    } else{map.resize();}
   };
 
   if(_elevPanelVisible&&!elevPanel.classList.contains('hidden')){setTimeout(drawElev,50);}
@@ -2165,6 +2395,1105 @@ function renderElevation(n) {
 }
 
 var _mapClickForElev = null;
+
+/* No-op — comportement du profil altitude géré par le flux normal du layout */
+function _syncBottombarForElev(elevVisible) {}
+
+/* ========== ElevPanel — profil altitude ========== */
+/* Design : § Decision Point 3 / § Profil altitude          */
+/* Spec   : carte-responsive-nav / task 2.2                  */
+var ElevPanel = (function() {
+
+  /* Cahier actuellement affiché dans ElevPanel (null si caché) */
+  var _currentCahierData = null;
+
+  /* show(cahierData | cahierN) — charge et affiche le profil altitude
+   * Accepte soit un entier (numéro de cahier) soit un objet data déjà
+   * extrait par getCahierData().  Délègue à renderElevation() existant. */
+  function show(cahierOrData) {
+    var cahierN;
+    if (typeof cahierOrData === 'number') {
+      cahierN = cahierOrData;
+    } else if (cahierOrData && typeof cahierOrData._cahierN === 'number') {
+      cahierN = cahierOrData._cahierN;
+    } else {
+      /* Essai de déduction depuis _elevCurrentCahierN */
+      cahierN = _elevCurrentCahierN || 1;
+    }
+
+    /* Éviter un rendu inutile si on est déjà sur ce cahier */
+    var alreadyVisible = _elevPanelVisible && _elevCurrentCahierN === cahierN;
+
+    /* Charger (ou recharger) le profil pour ce cahier */
+    renderElevation(cahierN);
+
+    var elevPanel = document.getElementById('elevpanel');
+    var elevToggle = document.getElementById('elevtoggle');
+
+    /* Si renderElevation a déterminé qu'il n'y a pas de données d'altitude
+       (cahiers 1, 2, 4 = noElevation), on n'affiche rien */
+    if (!_elevPts.length) {
+      _currentCahierData = null;
+      return;
+    }
+
+    /* Afficher le panneau */
+    _elevPanelVisible = true;
+    elevPanel.classList.remove('hidden');
+    _syncBottombarForElev(true);
+    if (elevToggle) {
+      elevToggle.innerHTML = '\u25bc';
+      elevToggle.classList.add('active');
+      elevToggle.style.display = 'none';
+    }
+
+    /* Forcer le redessin si le panneau vient de s'ouvrir */
+    if (!alreadyVisible) {
+      setTimeout(function() {
+        if (_elevDrawFn) _elevDrawFn();
+        map.resize();
+      }, 50);
+    }
+
+    _currentCahierData = cahierN;
+  }
+
+  /* hide() — masque le profil sans détruire les données */
+  function hide() {
+    var elevPanel = document.getElementById('elevpanel');
+    var elevToggle = document.getElementById('elevtoggle');
+
+    _elevPanelVisible = false;
+    if (elevPanel) elevPanel.classList.add('hidden');
+    _syncBottombarForElev(false);
+    if (elevToggle) {
+      elevToggle.innerHTML = '\u25b2';
+      elevToggle.classList.remove('active');
+      elevToggle.style.display = '';
+    }
+    map.resize();
+
+    _currentCahierData = null;
+  }
+
+  /* setHighlight(stopId | null) — met en surbrillance le point correspondant.
+   * Contrat identique à MapAdapter.setActiveMarker :
+   *   - le point précédemment surligné revient à la normale
+   *   - null = aucun highlight
+   * N'a d'effet visible que si le panneau est ouvert (_elevPanelVisible) */
+  function setHighlight(stopId) {
+    if (_elevHighlightId === stopId) return;   /* idempotent */
+    _elevHighlightId = (stopId != null) ? stopId : null;
+    if (_elevPanelVisible && _elevDrawFn) {
+      _elevDrawFn();
+    }
+  }
+
+  return {
+    show:         show,
+    hide:         hide,
+    setHighlight: setHighlight,
+    /* Lecture seule — utile pour débogage */
+    get currentCahier() { return _currentCahierData; }
+  };
+})();
+/* ========== /ElevPanel ========== */
+
+/* ========== Panel ========== */
+/* Design : Decision Point 2 — Vue unique + navigateTo()             */
+/* Spec   : carte-responsive-nav / task 3.1                          */
+var Panel = (function() {
+
+  /* État interne */
+  var _expanded     = true;
+  var _transitioning = false; /* guard anti-appels concurrents */
+  var _pendingNav    = null;  /* last-write-wins : nav en attente pendant une transition */
+
+  /* --- _queueNav(renderFn, direction) ---
+   * Si une transition est en cours, mémorise {renderFn, direction} dans _pendingNav.
+   * Sinon, appelle navigateTo directement.
+   * Utilisé par le dispatcher NAV.on('change') pour éviter la perte de navigations
+   * pendant une transition (F-1).
+   */
+  function _queueNav(info, direction) {
+    if (!info) return;
+    if (_transitioning) {
+      _pendingNav = { renderFn: info.renderFn, direction: info.direction || direction };
+      return;
+    }
+    navigateTo(info.renderFn, info.direction || direction);
+  }
+
+  /* --- navigateTo(renderFn, direction) ---
+   * renderFn : function() → HTML string
+   * direction : 'forward' | 'back'
+   * Crée une nouvelle vue, l'anime en entrée, supprime l'ancienne.
+   */
+  function navigateTo(renderFn, direction) {
+    var viewport = document.getElementById('panel-viewport');
+    if (!viewport) return;
+
+    /* Si une transition est en cours, mémoriser le dernier appel
+       et l'exécuter dès que la transition se termine (last-write-wins). */
+    if (_transitioning) {
+      _pendingNav = { renderFn: renderFn, direction: direction };
+      return;
+    }
+
+    _pendingNav    = null;
+    _transitioning = true;
+
+    var outgoing = viewport.firstChild;
+    var incoming = document.createElement('div');
+    incoming.className = 'panel-view';
+    incoming.innerHTML = renderFn();
+
+    /* Figer la hauteur du viewport pendant l'animation */
+    var viewH = viewport.offsetHeight || 400;
+    viewport.style.height = viewH + 'px';
+    viewport.style.overflowX = 'hidden';
+    if (isBackLevel) viewport.style.overflowY = 'hidden';
+
+    /* Rendre la vue sortante absolue pour l'animer */
+    if (outgoing) {
+      outgoing.style.position = 'absolute';
+      outgoing.style.top = '0';
+      outgoing.style.left = '0';
+      outgoing.style.width = '100%';
+    }
+
+    /* Position initiale de la vue entrante hors écran
+       forward     : slide horizontal droite→gauche
+       back-level  : slide vertical bas→haut (retour hiérarchique)
+       back        : slide horizontal gauche→droite (précédent même niveau) */
+    var isBack      = direction === 'back';
+    var isBackLevel = direction === 'back-level';
+    incoming.style.transform = isBackLevel ? 'translateY(100%)' : (isBack ? 'translateX(-100%)' : 'translateX(100%)');
+    viewport.appendChild(incoming);
+
+    /* Double rAF pour garantir le reflow avant l'animation */
+    requestAnimationFrame(function() {
+      requestAnimationFrame(function() {
+        incoming.style.transition = 'transform 200ms ease-in-out';
+        incoming.style.transform = 'translate(0,0)';
+        if (outgoing) {
+          outgoing.style.transition = 'transform 200ms ease-in-out';
+          outgoing.style.transform = isBackLevel ? 'translateY(-100%)' : (isBack ? 'translateX(100%)' : 'translateX(-100%)');
+        }
+        setTimeout(function() {
+          if (outgoing && outgoing.parentNode) {
+            outgoing.parentNode.removeChild(outgoing);
+          }
+          if (incoming.parentNode) {
+            incoming.style.transition = '';
+            incoming.style.transform = '';
+            incoming.style.position = 'relative';
+          }
+          viewport.style.height = '';
+          viewport.style.overflowX = '';
+          viewport.style.overflowY = '';
+          viewport.scrollTop = 0;
+          /* FR-1.4 */
+          var activeEl = viewport.querySelector('.pv-item.active, .va-card.active');
+          if (activeEl) {
+            activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+          /* Libérer et exécuter la nav en attente si présente */
+          _transitioning = false;
+          if (_pendingNav) {
+            var pending = _pendingNav;
+            _pendingNav = null;
+            navigateTo(pending.renderFn, pending.direction);
+          }
+        }, 210);
+      });
+    });
+  }
+
+  /* --- Manipulation DOM pure du panel (sans re-émettre vers NAV) --- */
+  function _applyExpandedDOM(expanded) {
+    var panel = document.getElementById('panel');
+    if (!panel) return;
+    if (expanded) {
+      panel.classList.add('expanded');
+      panel.classList.remove('compact');
+    } else {
+      panel.classList.add('compact');
+      panel.classList.remove('expanded');
+    }
+  }
+
+  /* Expand depuis l'intérieur d'un handler NAV.on('change') — PAS de re-émission */
+  function _expandDirect() {
+    _expanded = true;
+    _applyExpandedDOM(true);
+    /* PAS d'appel à NAV.setExpanded ici — on est déjà dans un handler change */
+  }
+
+  /* --- setExpanded(bool) --- */
+  function setExpanded(expanded) {
+    _expanded = !!expanded;
+    _applyExpandedDOM(_expanded);
+    /* Synchroniser l'état NAV — seulement depuis un appel utilisateur (breadcrumb, swipe) */
+    NAV.setExpanded(_expanded);
+  }
+
+  /* --- toggleExpanded() --- */
+  function toggleExpanded() {
+    setExpanded(!_expanded);
+  }
+
+  /* --- init() --- appel unique au Bootstrap --- */
+  function init() {
+  }
+
+  return {
+    navigateTo:       navigateTo,
+    setExpanded:      setExpanded,
+    toggleExpanded:   toggleExpanded,
+    _expandDirect:    _expandDirect,
+    init:             init,
+    get expanded()        { return _expanded; },
+    get _transitioning()  { return _transitioning; },
+    set _transitioning(v) { _transitioning = v; },
+    get _pendingNav()     { return _pendingNav; },
+    set _pendingNav(v)    { _pendingNav = v; },
+    _queueNav: _queueNav
+  };
+})();
+/* ========== /Panel ========== */
+
+/* ========== Views ========== */
+/* Fonctions de rendu : data → HTML string                           */
+/* Spec   : carte-responsive-nav / tâches 3.2–3.6                    */
+
+/* --- Styles partagés entre les vues (injectés une seule fois) ---  */
+(function() {
+  var styleId = 'panel-views-css';
+  if (document.getElementById(styleId)) return;
+  var s = document.createElement('style');
+  s.id = styleId;
+  s.textContent = [
+    /* Bouton retour */
+    '.pv-back{display:inline-flex;align-items:center;gap:6px;background:none;border:none;'
+    + 'color:#7a9ec8;font-size:.85em;cursor:pointer;padding:4px 0 10px;transition:color .15s}',
+    '.pv-back:hover{color:#fff}',
+    /* Barre de navigation haut : ◀ titre ▶ */
+    '.pv-nav-bar{display:flex;align-items:center;gap:4px;margin-bottom:10px;'
+    + 'border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:8px}',
+    '.pv-nav-btn{flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;'
+    + 'justify-content:center;background:#0f3460;border:1px solid #1a4a7a;border-radius:4px;'
+    + 'color:#a0b4c8;font-size:.85em;cursor:pointer;transition:background .15s,color .15s;'
+    + 'padding:0}',
+    '.pv-nav-btn:hover:not(:disabled){background:#1a5a9a;color:#fff}',
+    '.pv-nav-btn:disabled{opacity:.25;cursor:default}',
+    '.pv-nav-title{flex:1;min-width:0;text-align:center;font-size:.88em;font-weight:600;'
+    + 'color:#a0c4e0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'
+    + 'cursor:pointer;padding:2px 4px;border-radius:3px;transition:color .15s}',
+    '.pv-nav-title:hover{color:#fff}',
+    /* Titre de vue */
+    '.pv-title{font-size:1.1em;font-weight:700;color:#e0e0e0;margin-bottom:2px;line-height:1.3}',
+    '.pv-period{font-size:.82em;color:#8899aa;margin-bottom:14px}',
+    /* Liste générique d'items cliquables */
+    '.pv-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}',
+    '.pv-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:6px;'
+    + 'border-left:3px solid transparent;cursor:pointer;transition:background .15s;'
+    + 'background:rgba(255,255,255,.03)}',
+    '.pv-item:hover{background:rgba(255,255,255,.09)}',
+    '.pv-item-dot{width:10px;height:10px;border-radius:50%;flex-shrink:0}',
+    '.pv-item-body{flex:1;min-width:0}',
+    '.pv-item-name{font-size:.93em;font-weight:600;color:#e0e0e0;'
+    + 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.pv-item-meta{font-size:.78em;color:#667788;margin-top:2px;margin-left:auto;padding-left:8px;flex-shrink:0}',
+    '.pv-item-arrow{display:none}',
+    /* Section photos */
+    '.pv-photos-item{border-left-color:#c8a96e!important}',
+    '.pv-photos-icon{font-size:1.2em;flex-shrink:0}',
+    /* Vue-chapitre — liste d'étapes (task 3.4) */
+    '.pv-stop-num{font-size:.75em;font-weight:700;min-width:22px;text-align:right;flex-shrink:0;opacity:.7}',
+    '.pv-stop-date{font-size:.75em;color:#8899aa;margin-top:1px}',
+    '.pv-item.active{background:rgba(255,255,255,.12)!important;border-left-width:4px}',
+    /* Vue-étape (task 3.4) */
+    '.pv-etape-phase{font-size:.8em;font-weight:600;letter-spacing:.04em;margin-bottom:10px;opacity:.85}',
+    '.pv-etape-date{font-size:.85em;color:#e94560;margin-bottom:10px;display:flex;align-items:center;gap:5px}',
+    '.pv-etape-desc{font-size:.9em;color:#a0b4c8;line-height:1.65;margin-bottom:12px;text-align:justify;hyphens:auto}',
+    '.pv-etape-citation{border-left:3px solid #e94560;margin:10px 0;padding:8px 12px;'
+    + 'font-style:italic;color:#8899aa;font-size:.9em;line-height:1.55;background:rgba(233,69,96,.07);border-radius:0 4px 4px 0}',
+    '.pv-etape-ref{font-size:.8em;color:#667788;font-style:italic;margin-top:8px;'
+    + 'padding:6px 10px;background:rgba(255,255,255,.03);border-radius:4px;border:1px solid rgba(255,255,255,.06)}',
+
+    /* Vue-photos (task 3.5) */
+    '.pv-photos-grid{display:flex;flex-direction:column;gap:8px;margin-top:4px}',
+    '.pv-lieu-item{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:6px;'
+    + 'cursor:pointer;transition:background .15s;background:rgba(255,255,255,.03);'
+    + 'border:1px solid rgba(255,255,255,.05)}',
+    '.pv-lieu-item:hover{background:rgba(255,255,255,.09)}',
+    '.pv-lieu-thumb{width:52px;height:40px;object-fit:cover;border-radius:4px;'
+    + 'flex-shrink:0;border:1px solid rgba(255,255,255,.1)}',
+    '.pv-lieu-thumb-empty{width:52px;height:40px;border-radius:4px;flex-shrink:0;'
+    + 'background:#1a3055;border:1px solid rgba(255,255,255,.08);display:flex;'
+    + 'align-items:center;justify-content:center;font-size:1.2em;color:#4a6a8a}',
+    '.pv-lieu-body{flex:1;min-width:0}',
+    '.pv-lieu-name{font-size:.9em;font-weight:600;color:#e0e0e0;'
+    + 'white-space:nowrap;overflow:hidden;text-overflow:ellipsis}',
+    '.pv-lieu-count{font-size:.75em;color:#c8a96e;margin-top:2px}',
+
+    /* Vue-lieu-photo (task 3.5) */
+    '.pv-lieu-header{margin-bottom:12px}',
+    '.pv-lieu-title{font-size:1.05em;font-weight:700;color:#c8a96e;margin-bottom:4px}',
+    '.pv-lieu-locname{font-size:.8em;color:#667788}',
+    '.pv-photo-wrap{position:relative;margin-bottom:10px;border-radius:6px;overflow:hidden;'
+    + 'background:#0a1020;cursor:zoom-in;text-align:center}',
+    '.pv-photo-img{max-width:100%;max-height:240px;object-fit:contain;display:block;'
+    + 'margin:0 auto;border-radius:4px}',
+    '.pv-photo-nav{display:flex;align-items:center;justify-content:space-between;'
+    + 'padding:4px 0 8px;gap:6px}',
+    '.pv-photo-nav-btn{background:#0f3460;border:1px solid #1a4a7a;color:#a0b4c8;'
+    + 'width:30px;height:30px;border-radius:5px;font-size:.9em;cursor:pointer;flex-shrink:0;'
+    + 'display:flex;align-items:center;justify-content:center;transition:background .15s}',
+    '.pv-photo-nav-btn:hover{background:#1a5a9a;color:#fff}',
+    '.pv-photo-nav-btn:disabled{opacity:.3;cursor:default}',
+    '.pv-photo-counter{flex:1;text-align:center;font-size:.75em;color:#667788}',
+    '.pv-photo-title{font-size:.95em;font-weight:600;color:#e0e0e0;margin-bottom:4px}',
+    '.pv-photo-desc{font-size:.85em;color:#8899aa;line-height:1.55}',
+
+    /* Navigation contextuelle ◀/▶ (D-3) */
+    '.pv-ctx-nav{display:flex;gap:6px;margin-top:12px;padding-top:8px;border-top:1px solid rgba(255,255,255,.07)}',
+    '.nav-ctx-prev,.nav-ctx-next,.chap-ctx-prev,.chap-ctx-next{flex:1;padding:7px 10px;'
+    + 'background:#0f3460;border:1px solid #1a4a7a;border-radius:5px;'
+    + 'color:#a0b4c8;font-size:.82em;cursor:pointer;text-align:center;'
+    + 'transition:background .15s,color .15s}',
+    '.nav-ctx-prev:hover:not(:disabled),.nav-ctx-next:hover:not(:disabled),'
+    + '.chap-ctx-prev:hover:not(:disabled),.chap-ctx-next:hover:not(:disabled)'
+    + '{background:#1a5a9a;color:#fff}',
+    '.nav-ctx-prev:disabled,.nav-ctx-next:disabled,.chap-ctx-prev:disabled,.chap-ctx-next:disabled'
+    + '{opacity:.3;cursor:default}'
+  ].join('\n');
+  document.head.appendChild(s);
+})();
+
+/* --- renderCahier(cahierN) ---
+ * Vue-cahier (niveau 1) :
+ *   - Bouton ← → accueil (niveau 0)
+ *   - Titre + période du cahier
+ *   - Liste des chapitres (phases) avec numéro, titre, nb d'étapes
+ *   - Section "Photos" avec nb de lieux-CPA
+ * Référence : FR-3.2
+ */
+function renderCahier(cahierN) {
+  var meta = CAHIER_META[cahierN] || {};
+  var cd   = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var PC   = cd.PC    || {};
+  var PN   = cd.PN    || {};
+  var stops = cd.stops || [];
+  var cpa   = cd.cpa   || [];
+
+  /* Compter les stops par phase */
+  var stopsPerPhase = {};
+  stops.forEach(function(s) {
+    if (s.p != null) {
+      stopsPerPhase[s.p] = (stopsPerPhase[s.p] || 0) + 1;
+    }
+  });
+
+  /* Phases triées dans l'ordre */
+  var phaseNums = Object.keys(PN).map(Number).sort(function(a,b){return a-b;});
+  /* Ajouter les phases présentes dans les stops mais absentes de PN */
+  stops.forEach(function(s) {
+    if (s.p != null && phaseNums.indexOf(s.p) === -1) phaseNums.push(s.p);
+  });
+  phaseNums.sort(function(a,b){return a-b;});
+
+  /* FR-1.4 — État actif pour la surbrillance au retour */
+  var navState       = NAV.state;
+  /* D-2 : pendingHighlightChapitre si présent, sinon chapitre actif */
+  var activePhase    = NAV.pendingHighlightChapitre || navState.chapitre;
+  var activeSection  = navState.section;
+
+  /* HTML — chapitres */
+  var chapitresHTML = phaseNums.map(function(p, idx) {
+    var color     = PC[p] || meta.color || '#888';
+    var phaseName = PN[p] || ('Chapitre\u00a0' + (idx + 1));
+    var nbStops   = stopsPerPhase[p] || 0;
+    var metaStr   = nbStops + '\u00a0étape' + (nbStops > 1 ? 's' : '');
+    /* Marquer le chapitre actif pour le scroll-to-active au retour (FR-1.4) */
+    var isActive  = (activePhase === p && activeSection !== 'photos');
+    return '<li class="pv-item' + (isActive ? ' active' : '') + '" style="border-left-color:' + color + '"'
+      + ' onclick="NAV.go(2,{cahier:' + cahierN + ',chapitre:' + p + '})"'
+      + ' title="Voir les étapes — ' + phaseName.replace(/"/g, '&quot;') + '">'
+      + '<span class="pv-item-dot" style="background:' + color + '"></span>'
+      + '<span class="pv-item-body">'
+      + '<span class="pv-item-name">' + phaseName + '</span>'
+      + '<span class="pv-item-meta">' + metaStr + '</span>'
+      + '</span>'
+      + '<span class="pv-item-arrow">&#9658;</span>'
+      + '</li>';
+  }).join('');
+
+  /* HTML — section Photos */
+  var nbLieux   = cpa.length;
+  /* Marquer la section Photos active si on revient de la vue-photos (FR-1.4) */
+  var photosActive = (activeSection === 'photos');
+  var photosHTML = nbLieux > 0
+    ? '<li class="pv-item pv-photos-item' + (photosActive ? ' active' : '') + '" style="margin-top:10px"'
+      + ' onclick="NAV.go(2,{cahier:' + cahierN + ',section:\'photos\'})"'
+      + ' title="Voir les photos anciennes">'
+      + '<span class="pv-photos-icon">&#128247;</span>'
+      + '<span class="pv-item-body">'
+      + '<span class="pv-item-name">Photos</span>'
+      + '<span class="pv-item-meta">' + nbLieux + '\u00a0lieu' + (nbLieux > 1 ? 'x' : '') + '</span>'
+      + '</span>'
+      + '<span class="pv-item-arrow">&#9658;</span>'
+      + '</li>'
+    : '';
+
+  var prevCahier = cahierN > 1 ? cahierN - 1 : null;
+  var nextCahier = cahierN < 4 ? cahierN + 1 : null;
+
+  return _renderNavBar(
+      'Cahier\u00a0' + cahierN + '\u00a0\u2014 ' + (meta.title || ''),
+      'NAV.go(0,null,\'back\')',
+      prevCahier ? 'NAV.go(1,{cahier:' + prevCahier + '},\'back\')' : null,
+      nextCahier ? 'NAV.go(1,{cahier:' + nextCahier + '})' : null,
+      !prevCahier, !nextCahier
+    )
+    + '<div class="pv-period">' + (meta.subtitle || '') + '</div>'
+    + '<ul class="pv-list">'
+    + chapitresHTML
+    + photosHTML
+    + '</ul>';
+}
+
+/* --- findStop(cahierData, stopId) ---
+ * Retourne l'objet stop dont id === stopId, ou null.
+ * Spec : carte-responsive-nav / task 3.4
+ */
+function findStop(cahierData, stopId) {
+  var stops = (cahierData && (cahierData.S || cahierData.stops)) || [];
+  for (var i = 0; i < stops.length; i++) {
+    if (stops[i].id === stopId) return stops[i];
+  }
+  return null;
+}
+
+/* --- getStopSeqNum(cahierN, stopId) ---
+ * Retourne le numéro séquentiel (1-based) d'un stop dans le cahier.
+ * Même ordre que renderMarkersForCahier (parcours linéaire de data.S).
+ */
+function getStopSeqNum(cahierN, stopId) {
+  var cd = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var stops = cd.stops || [];
+  for (var i = 0; i < stops.length; i++) {
+    if (stops[i].id === stopId) return i + 1;
+  }
+  return null;
+}
+
+/* --- renderChapitre(cahierN, phaseN) ---
+ * Vue-chapitre (niveau 2) :
+ *   - Bouton ← → vue-cahier (niveau 1)
+ *   - Titre du chapitre avec couleur de phase
+ *   - Liste des étapes : numéro séquentiel, nom, date
+ *   - L'étape active (NAV.state.stopId) est mise en surbrillance
+ * Référence : FR-3.3, FR-1.4
+ */
+function renderChapitre(cahierN, phaseN) {
+  var cd   = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var PC   = cd.PC    || {};
+  var PN   = cd.PN    || {};
+  var stops = cd.stops || [];
+  var color = PC[phaseN] || CAHIER_META[cahierN].color || '#888';
+  var phaseName = PN[phaseN] || ('Chapitre\u00a0' + phaseN);
+
+  /* Stops de cette phase dans l'ordre */
+  var phaseStops = stops.filter(function(s) { return s.p === phaseN; });
+
+  /* FR-1.4 — highlight au retour : utiliser previousStopId s'il est défini (F-2) */
+  var activeStopId = (NAV.previousStopId !== null && NAV.previousStopId !== undefined)
+    ? NAV.previousStopId : NAV.state.stopId;
+
+  var itemsHTML = phaseStops.map(function(s) {
+    var seqNum = getStopSeqNum(cahierN, s.id);
+    var numStr = seqNum !== null ? String(seqNum) : '';
+    /* eslint-disable eqeqeq */
+    var isActive = activeStopId !== null && activeStopId !== undefined && s.id == activeStopId;
+    return '<li class="pv-item' + (isActive ? ' active' : '') + '"'
+      + ' style="border-left-color:' + color + '"'
+      + ' onclick="NAV.go(3,{cahier:' + cahierN + ',chapitre:' + phaseN + ',stopId:' + s.id + '})">'
+      + '<span class="pv-stop-num" style="color:' + color + '">' + numStr + '</span>'
+      + '<span class="pv-item-body">'
+      + '<span class="pv-item-name">' + s.n + '</span>'
+      + (s.date ? '<div class="pv-stop-date">' + s.date + '</div>' : '')
+      + '</span>'
+      + '<span class="pv-item-arrow">&#9658;</span>'
+      + '</li>';
+  }).join('');
+
+  /* D-3 — Boutons contextuels chapitre précédent/suivant */
+  var allPhases = Object.keys(PN).map(Number).sort(function(a,b){return a-b;});
+  stops.forEach(function(s) { if (s.p != null && allPhases.indexOf(s.p) === -1) allPhases.push(s.p); });
+  allPhases.sort(function(a,b){return a-b;});
+  var phaseIdx  = allPhases.indexOf(phaseN);
+  var prevPhase = phaseIdx > 0 ? allPhases[phaseIdx - 1] : null;
+  var nextPhase = phaseIdx < allPhases.length - 1 ? allPhases[phaseIdx + 1] : null;
+
+  /* Si dernier chapitre, ▶ = premier chapitre du cahier suivant (sans passer par photos) */
+  var prevFn, nextFn;
+  if (prevPhase) {
+    prevFn = 'NAV.go(2,{cahier:' + cahierN + ',chapitre:' + prevPhase + '},\'back\')';
+  } else if (cahierN > 1) {
+    /* Premier chapitre du cahier : ◀ = dernier chapitre du cahier précédent */
+    var prevCd = (cahierN-1===1?CAHIER_1_DATA:cahierN-1===2?CAHIER_2_DATA:cahierN-1===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
+    var prevAllPhases = Object.keys(prevCd.PN||{}).map(Number).sort(function(a,b){return a-b;});
+    prevCd.stops && prevCd.stops.forEach(function(s){if(s.p!=null&&prevAllPhases.indexOf(s.p)===-1)prevAllPhases.push(s.p);});
+    prevAllPhases.sort(function(a,b){return a-b;});
+    var prevLastPhase = prevAllPhases[prevAllPhases.length-1];
+    if (prevLastPhase != null) prevFn = 'NAV.go(2,{cahier:' + (cahierN-1) + ',chapitre:' + prevLastPhase + '},\'back\')';
+  }
+  if (nextPhase) {
+    nextFn = 'NAV.go(2,{cahier:' + cahierN + ',chapitre:' + nextPhase + '})';
+  } else if (cahierN < 4) {
+    /* Dernier chapitre du cahier : ▶ = premier chapitre du cahier suivant */
+    var nextCd = (cahierN+1===1?CAHIER_1_DATA:cahierN+1===2?CAHIER_2_DATA:cahierN+1===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
+    var nextAllPhases = Object.keys(nextCd.PN||{}).map(Number).sort(function(a,b){return a-b;});
+    nextCd.stops && nextCd.stops.forEach(function(s){if(s.p!=null&&nextAllPhases.indexOf(s.p)===-1)nextAllPhases.push(s.p);});
+    nextAllPhases.sort(function(a,b){return a-b;});
+    var nextFirstPhase = nextAllPhases[0];
+    if (nextFirstPhase != null) nextFn = 'NAV.go(2,{cahier:' + (cahierN+1) + ',chapitre:' + nextFirstPhase + '})';
+  }
+
+  return _renderNavBar(
+      phaseName,
+      'NAV.go(1,{cahier:' + cahierN + '},\'back\')',
+      prevFn || null, nextFn || null,
+      !prevFn, !nextFn
+    )
+    + '<div class="pv-period">' + phaseStops.length + '\u00a0étape' + (phaseStops.length > 1 ? 's' : '') + '</div>'
+    + '<ul class="pv-list">' + itemsHTML + '</ul>';
+}
+
+/* --- renderEtape(stop, PC, PN, cahierN) ---
+ * Vue-étape (niveau 3) :
+ *   - Bouton ← → vue-chapitre (niveau 2)
+ *   - Nom complet de l'étape (h2)
+ *   - Titre du chapitre avec couleur de phase
+ *   - Date narrative
+ *   - Description complète
+ *   - Citation (blockquote si présente)
+ *   - Référence/note historique (si présente)
+ * Référence : FR-3.4, FR-1.4
+ */
+function renderEtape(stop, PC, PN, cahierN) {
+  if (!stop) return '<div class="pv-period">Étape introuvable.</div>';
+  var color     = PC[stop.p] || CAHIER_META[cahierN].color || '#888';
+  var phaseName = PN[stop.p] || ('Chapitre\u00a0' + stop.p);
+
+  /* Typographie française : espaces insécables avant ! ? ; : » et après « */
+  function typofr(s) {
+    if (!s) return s;
+    return s
+      .replace(/ ([?!;:])/g, '\u00a0$1')
+      .replace(/ »/g, '\u00a0»')
+      .replace(/« /g, '«\u00a0');
+  }
+
+  var citationHTML = stop.q
+    ? '<blockquote class="pv-etape-citation">\u00ab\u00a0' + typofr(stop.q) + '\u00a0\u00bb</blockquote>'
+    : '';
+
+  var refHTML = stop.r
+    ? '<aside class="pv-etape-ref">&#9432;\u00a0' + stop.r + '</aside>'
+    : '';
+
+  var descHTML = stop.d
+    ? '<div class="pv-etape-desc">' + typofr(stop.d) + '</div>'
+    : '';
+
+  var dateHTML = stop.date
+    ? '<div class="pv-etape-date">&#128197;\u00a0' + stop.date + '</div>'
+    : '';
+
+  /* D-3 — Boutons contextuels ◀/▶ */
+  var seqNum = getStopSeqNum(cahierN, stop.id);
+  var cd = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var phaseStops = (cd.stops || []).filter(function(s){ return s.p === stop.p; });
+  var isFirstInChapter = (seqNum === getStopSeqNum(cahierN, phaseStops[0] && phaseStops[0].id));
+  var isLastInChapter  = (seqNum === getStopSeqNum(cahierN, phaseStops[phaseStops.length - 1] && phaseStops[phaseStops.length - 1].id));
+  /* Utiliser _seqIndex global pour prev/next */
+  var isFirstGlobal = NAV.isFirst();
+  var isLastGlobal  = NAV.isLast();
+
+  return _renderNavBar(
+      stop.n,
+      'NAV.go(2,{cahier:' + cahierN + ',chapitre:' + stop.p + '},\'back\')',
+      'NAV.prev()', 'NAV.next()',
+      isFirstGlobal, isLastGlobal
+    )
+    + '<div class="pv-etape-phase" style="color:' + color + '">' + phaseName + '</div>'
+    + dateHTML
+    + descHTML
+    + citationHTML
+    + refHTML;
+}
+
+/* --- renderPhotos(cahierN) — FR-3.5 (task 3.5) ---
+ * Vue-photos (niveau 2, section='photos') :
+ *   - Bouton ← → vue-cahier (niveau 1)
+ *   - Titre "Photos — [Nom du cahier]"
+ *   - Liste des lieux-CPA avec vignette, nom, compteur de photos
+ * Retourne un HTML string.
+ */
+function renderPhotos(cahierN) {
+  var meta = CAHIER_META[cahierN] || {};
+  var cd   = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var lieux = cd.cpa || [];
+
+  var lieux_html = lieux.map(function(lieu) {
+    var nbPhotos = (lieu.cpa && lieu.cpa.length) ? lieu.cpa.length : 0;
+    var firstImg  = (nbPhotos > 0) ? lieu.cpa[0].img : '';
+    var thumbHTML = firstImg
+      ? '<img class="pv-lieu-thumb" src="' + firstImg + '" alt="" loading="lazy">'
+      : '<div class="pv-lieu-thumb-empty">&#128247;</div>';
+    var countLabel = nbPhotos + '\u00a0photo' + (nbPhotos > 1 ? 's' : '');
+    /* Échapper les guillemets dans loc pour usage inline onclick */
+    var locEsc = lieu.loc.replace(/'/g, '\\\'').replace(/"/g, '&quot;');
+    return '<div class="pv-lieu-item"'
+      + ' onclick="NAV.go(3,{cahier:' + cahierN + ',section:\'photos\',cpaLoc:\'' + locEsc + '\'})">'
+      + thumbHTML
+      + '<div class="pv-lieu-body">'
+      + '<div class="pv-lieu-name">' + lieu.loc + '</div>'
+      + '<div class="pv-lieu-count">&#128247; ' + countLabel + '</div>'
+      + '</div>'
+      + '</div>';
+  }).join('');
+
+  var emptyHTML = lieux.length === 0
+    ? '<p style="color:#667788;font-size:.88em;padding:8px 4px;">Aucune photo disponible pour ce cahier.</p>'
+    : '';
+
+  return _renderNavBar(
+      'Photos \u2014 ' + (meta.title || ('Cahier\u00a0' + cahierN)),
+      'NAV.go(1,{cahier:' + cahierN + '},\'back\')',
+      null, null
+    )
+    + '<div class="pv-photos-grid">'
+    + lieux_html
+    + emptyHTML
+    + '</div>';
+}
+
+/* --- _cpaLbOpenDirect(cpaList, idx) ---
+ * Ouvre la lightbox en chargeant directement la liste CPA sans passer par _CPA_REGISTRY.
+ * Exposé globalement pour les onclick inline de renderLieuPhoto.
+ */
+function _cpaLbOpenDirect(cpaList, idx) {
+  _cpaLbList = cpaList || [];
+  _cpaLbIdx  = idx || 0;
+  _cpaLbRender();
+  document.getElementById('cpa-lb').classList.add('open');
+}
+
+/* --- _updateLieuPhotoView(lieu, cahierN, idx) ---
+ * Met à jour le contenu de la vue-lieu-photo in situ (sans transition NAV) pour
+ * la navigation interne ◀/▶ entre les photos d'un lieu.
+ * Appelé par les boutons de navigation dans renderLieuPhoto.
+ */
+function _updateLieuPhotoView(lieu, cahierN, idx) {
+  var viewport = document.getElementById('panel-viewport');
+  if (!viewport || !viewport.firstChild) return;
+  viewport.firstChild.innerHTML = _renderLieuPhotoContent(lieu, cahierN, idx);
+}
+
+/* --- _renderLieuPhotoContent(lieu, cahierN, idx) ---
+ * Retourne le HTML interne de la vue-lieu-photo pour l'index idx.
+ * Utilisé à la fois par renderLieuPhoto et _updateLieuPhotoView.
+ */
+function _renderLieuPhotoContent(lieu, cahierN, idx) {
+  var meta     = CAHIER_META[cahierN] || {};
+  var cpaList  = lieu.cpa || [];
+  var nbPhotos = cpaList.length;
+  idx = Math.max(0, Math.min(nbPhotos - 1, idx || 0));
+  var photo    = cpaList[idx] || {};
+
+  /* Construire un objet sérialisable pour le onclick inline */
+  /* On passe par un identifiant dans un registre temporaire plutôt que
+     sérialiser le tableau complet en inline (problème d'échappement). */
+  var regKey = '_lieu_' + cahierN + '_' + idx;
+  if (!window._CPA_REGISTRY) window._CPA_REGISTRY = {};
+  window._CPA_REGISTRY[regKey] = cpaList;
+
+  var imgHTML = photo.img
+    ? '<img class="pv-photo-img" src="' + photo.img + '" alt="'
+        + (photo.title || '').replace(/"/g, '&quot;') + '"'
+        + ' onclick="event.stopPropagation();_cpaLbOpenDirect(window._CPA_REGISTRY[\'' + regKey + '\'],' + idx + ')">'
+    : '<div style="height:120px;background:#0a1020;display:flex;align-items:center;'
+        + 'justify-content:center;color:#4a6a8a;font-size:2em;">&#128247;</div>';
+
+  /* Boutons de navigation ◀/▶ internes */
+  var prevDisabled = idx === 0 ? ' disabled' : '';
+  var nextDisabled = idx === nbPhotos - 1 ? ' disabled' : '';
+
+  /* Construire une représentation sérialisée de lieu pour les boutons nav */
+  /* On passe par un registre global pour éviter l'échappement JSON inline */
+  var lieuRegKey = '_lieu_nav_' + cahierN + '_' + lieu.loc.replace(/[^a-zA-Z0-9]/g, '_');
+  window._LIEU_REGISTRY = window._LIEU_REGISTRY || {};
+  window._LIEU_REGISTRY[lieuRegKey] = lieu;
+
+  var navHTML = nbPhotos > 1
+    ? '<div class="pv-photo-nav">'
+        + '<button class="pv-photo-nav-btn"' + prevDisabled
+        + ' onclick="_updateLieuPhotoView(window._LIEU_REGISTRY[\'' + lieuRegKey + '\'],' + cahierN + ',' + (idx - 1) + ')">'
+        + '&#9664;</button>'
+        + '<span class="pv-photo-counter">' + (idx + 1) + '\u00a0/\u00a0' + nbPhotos + '</span>'
+        + '<button class="pv-photo-nav-btn"' + nextDisabled
+        + ' onclick="_updateLieuPhotoView(window._LIEU_REGISTRY[\'' + lieuRegKey + '\'],' + cahierN + ',' + (idx + 1) + ')">'
+        + '&#9654;</button>'
+        + '</div>'
+    : '';
+
+  /* Bouton retour : si on vient de la carte (previousContext), retourner au contexte précédent */
+  var backFn;
+  var ctx = NAV.previousContext;
+  if (ctx) {
+    if (ctx.level === 0) {
+      backFn = 'NAV.go(0,null,\'back-level\')';
+    } else if (ctx.level === 1) {
+      backFn = 'NAV.go(1,{cahier:' + ctx.cahier + '},\'back-level\')';
+    } else if (ctx.level === 2 && ctx.section === 'photos') {
+      backFn = 'NAV.go(2,{cahier:' + ctx.cahier + ',section:\'photos\'},\'back-level\')';
+    } else if (ctx.level === 2 && ctx.chapitre != null) {
+      backFn = 'NAV.go(2,{cahier:' + ctx.cahier + ',chapitre:' + ctx.chapitre + '},\'back-level\')';
+    } else if (ctx.level === 3 && ctx.stopId != null) {
+      backFn = 'NAV.go(3,{cahier:' + ctx.cahier + ',chapitre:' + ctx.chapitre + ',stopId:' + ctx.stopId + '},\'back-level\')';
+    } else {
+      backFn = 'NAV.go(2,{cahier:' + cahierN + ',section:\'photos\'},\'back-level\')';
+    }
+  } else {
+    backFn = 'NAV.go(2,{cahier:' + cahierN + ',section:\'photos\'},\'back-level\')';
+  }
+
+  return _renderNavBar(
+      lieu.loc,
+      backFn,
+      null, null
+    )
+    + '<div class="pv-photo-wrap">'
+    + imgHTML
+    + '</div>'
+    + navHTML
+    + (photo.title ? '<div class="pv-photo-title">' + photo.title + '</div>' : '')
+    + (photo.desc  ? '<div class="pv-photo-desc">'  + photo.desc  + '</div>' : '');
+}
+
+/* --- renderLieuPhoto(lieu, cahierN, initialIdx) — FR-3.6 (task 3.5) ---
+ * Vue-lieu-photo (niveau 3, cpaLoc) :
+ *   - Bouton ← → vue-photos (niveau 2, section='photos')
+ *   - Photo en grand format avec clic → lightbox
+ *   - Navigation interne ◀/▶ entre photos du lieu (état local, pas NAV.go)
+ *   - Titre et description de la photo active
+ * Retourne un HTML string.
+ */
+function renderLieuPhoto(lieu, cahierN, initialIdx) {
+  return _renderLieuPhotoContent(lieu, cahierN, initialIdx || 0);
+}
+
+/* --- findLieuByCpaLoc(cahierN, cpaLoc) ---
+ * Retourne l'objet lieu dans CAHIER_N_DATA.cpa dont loc === cpaLoc.
+ */
+function findLieuByCpaLoc(cahierN, cpaLoc) {
+  var cd   = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA) || {};
+  var lieux = cd.cpa || [];
+  for (var i = 0; i < lieux.length; i++) {
+    if (lieux[i].loc === cpaLoc) return lieux[i];
+  }
+  return null;
+}
+
+/* --- renderAccueil() — FR-3.1, FR-8 (task 3.2) ---
+ * Vue-accueil (niveau 0) : biographie + liste des 4 cahiers avec liens PDF.
+ * Retourne un HTML string.
+ */
+(function() {
+  /* Injecter les styles une seule fois */
+  if (document.getElementById('panel-va-css')) return;
+  var s = document.createElement('style');
+  s.id = 'panel-va-css';
+  s.textContent = [
+    '.va-title{font-size:1.05em;font-weight:700;color:#e0e0e0;margin:0 0 2px}',
+    '.va-subtitle{font-size:.75em;color:#e94560;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}',
+    '.va-bio{font-size:.82em;color:#a0b4c8;line-height:1.6;margin-bottom:14px;text-align:justify}',
+    '.va-cards{display:flex;flex-direction:column;gap:8px}',
+    '.va-card{background:rgba(15,52,96,.45);border:1px solid #1a4a7a;border-radius:8px;cursor:pointer;transition:background .15s,transform .1s;overflow:hidden}',
+    '.va-card:hover{background:rgba(26,74,122,.6);transform:translateY(-1px)}',
+    '.va-card.active{background:rgba(255,255,255,.12)!important;border-left:4px solid currentColor}',
+    '.va-card-top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 4px}',
+    '.va-card-num{font-size:.72em;font-weight:700;letter-spacing:.1em;opacity:.8}',
+    '.va-card-pdf{color:#a0b4c8;opacity:.6;display:flex;align-items:center;transition:opacity .15s;text-decoration:none;flex-shrink:0}',
+    '.va-card-pdf:hover{opacity:1}',
+    '.va-card-body{padding:0 12px 12px}',
+    '.va-card-title{font-size:.92em;font-weight:600;color:#fff;margin:0 0 2px}',
+    '.va-card-period{font-size:.75em;color:#8899aa;margin-bottom:4px}',
+    '.va-card-desc{font-size:.78em;color:#8899aa;line-height:1.45;text-align:justify;hyphens:auto}'
+  ].join('');
+  document.head.appendChild(s);
+})();
+
+var _svgCahier = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"'
+  + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+  + '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'
+  + '<polyline points="14 2 14 8 20 8"/>'
+  + '<line x1="16" y1="13" x2="8" y2="13"/>'
+  + '<line x1="16" y1="17" x2="8" y2="17"/>'
+  + '<polyline points="10 9 9 9 8 9"/>'
+  + '</svg>';
+
+var _svgManuscrit = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"'
+  + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
+  + '<path d="M12 19l7-7 3 3-7 7-3-3z"/>'
+  + '<path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>'
+  + '<path d="M2 2l7.586 7.586"/>'
+  + '<circle cx="11" cy="11" r="2"/>'
+  + '</svg>';
+
+function renderAccueil() {
+  var CAHIER_COLORS  = { 1:'#f5a623', 2:'#e94560', 3:'#2ecc71', 4:'#3498db' };
+  var CAHIER_TITLES  = { 1:'La Guerre', 2:'Journal non \u00e9crit d\u2019un fantassin en repli strat\u00e9gique', 3:'L\u2019\u00c9vasion', 4:'Captivit\u00e9, r\u00e9cits et r\u00e9flexions' };
+  var CAHIER_PERIODS = { 1:'Ao\u00fbt 1939 \u2013 Juin 1940', 2:'Mai \u2013 Juin 1940', 3:'Sept. \u2013 Oct. 1941', 4:'1940 \u2013 1945' };
+  var CAHIER_DESCS   = {
+    1: 'De la mobilisation dans les Pyr\u00e9n\u00e9es ari\u00e9geoises jusqu\u2019aux avant-postes face \u00e0 Pirmasens, puis la d\u00e9b\u00e2cle vers Verdun. La \u00ab\u00a0dr\u00f4le de guerre\u00a0\u00bb vue d\u2019en bas.',
+    2: 'Le repli \u00e0 travers la France en d\u00e9route, les routes embouteill\u00e9es, les ordres contradictoires, et finalement la capture.',
+    3: 'Alban et Andr\u00e9 sautent dans le noir depuis leur Kommando. Deux semaines \u00e0 pied dans les Alpes autrichiennes, boussole et carte copi\u00e9e \u00e0 la main.',
+    4: 'R\u00e9flexions d\u2019un prisonnier de guerre depuis le Stalag XVIII\u00a0D\u00a0: souvenirs, lectures, pens\u00e9es sur la guerre et la libert\u00e9.'
+  };
+
+  var activeCahier = NAV.previousCahier;
+
+  var cardsHtml = '';
+  for (var n = 1; n <= 4; n++) {
+    var meta = CAHIER_META[n];
+    var col  = CAHIER_COLORS[n];
+    var isActive = (activeCahier === n);
+    cardsHtml += '<div class="va-card' + (isActive ? ' active' : '') + '" style="border-top:3px solid ' + col + '"'
+      + ' onclick="NAV.go(1,{cahier:' + n + '})">'
+      + '<div class="va-card-top">'
+      + '<div class="va-card-num" style="color:' + col + '">CAHIER ' + n + '</div>'
+      + '<div style="display:flex;align-items:center;gap:6px">'
+      + '<a class="va-card-pdf" href="' + meta.pdfTranscript + '" target="_blank"'
+      + ' title="Transcription (Google Docs)"'
+      + ' onclick="event.stopPropagation()">' + _svgCahier + '</a>'
+      + '<a class="va-card-pdf" href="' + meta.pdfOriginal + '" target="_blank"'
+      + ' title="Manuscrit original (Google Drive)"'
+      + ' onclick="event.stopPropagation()">' + _svgManuscrit + '</a>'
+      + '</div>'
+      + '</div>'
+      + '<div class="va-card-body">'
+      + '<div class="va-card-title">' + CAHIER_TITLES[n] + '</div>'
+      + '<div class="va-card-period">' + CAHIER_PERIODS[n] + '</div>'
+      + '<div class="va-card-desc">' + CAHIER_DESCS[n] + '</div>'
+      + '</div>'
+      + '</div>';
+  }
+
+  return '<div style="padding:12px 12px 16px">'
+    + '<div class="va-title">Alban Rouzaud</div>'
+    + '<div class="va-subtitle">\u00c9crits de Guerre \u2014 1939\u20131945</div>'
+    + '<p class="va-bio">Employé à la Société Générale de Lavelanet (Ariège), Alban Rouzaud est mobilis\u00e9 en ao\u00fbt\u00a01939.'
+    + ' Il vit la \u00ab\u00a0dr\u00f4le de guerre\u00a0\u00bb en Alsace, la d\u00e9b\u00e2cle de juin\u00a01940,'
+    + ' une \u00e9vasion \u00e0 travers les Alpes autrichiennes en\u00a01941,'
+    + ' et la captivit\u00e9 au Stalag XVIII\u00a0D de Marburg jusqu\u2019en\u00a01945.'
+    + ' Ces quatre cahiers en sont le t\u00e9moignage.</p>'
+    + '<div class="va-cards">' + cardsHtml + '</div>'
+    + '</div>';
+}
+/* ========== /Views ========== */
+
+/* --- _renderCtxNav(prevLabel, nextLabel, prevDisabled, nextDisabled, prevFn, nextFn) ---
+ * Génère une barre de navigation contextuelle ◀/▶.
+ * prevFn / nextFn : chaîne JS inline pour onclick.
+ */
+/* --- _renderNavBar(title, backFn, prevFn, nextFn, prevDisabled, nextDisabled) ---
+ * Barre de navigation : ◀  titre (= retour)  ▶
+ * backFn   : chaîne JS pour le clic sur le titre (retour)
+ * prevFn/nextFn : chaîne JS pour ◀/▶ (null = bouton absent)
+ */
+function _renderNavBar(title, backFn, prevFn, nextFn, prevDisabled, nextDisabled) {
+  var prev = prevFn
+    ? '<button class="pv-nav-btn"' + (prevDisabled ? ' disabled' : '')
+      + ' onclick="' + prevFn + '">&#9664;</button>'
+    : '<span style="width:28px;flex-shrink:0"></span>';
+  var next = nextFn
+    ? '<button class="pv-nav-btn"' + (nextDisabled ? ' disabled' : '')
+      + ' onclick="' + nextFn + '">&#9654;</button>'
+    : '<span style="width:28px;flex-shrink:0"></span>';
+  var _svgBack = '<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24"'
+    + ' fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"'
+    + ' style="display:inline-block;vertical-align:middle;margin-right:4px;opacity:.7;flex-shrink:0">'
+    + '<line x1="12" y1="19" x2="12" y2="5"/>'
+    + '<polyline points="5 12 12 5 19 12"/>'
+    + '</svg>';
+  return '<div class="pv-nav-bar">'
+    + prev
+    + '<span class="pv-nav-title" onclick="' + backFn + '">' + _svgBack + title + '</span>'
+    + next
+    + '</div>';
+}
+
+function _renderCtxNav(prevLabel, nextLabel, prevDisabled, nextDisabled, prevFn, nextFn) {
+  return '<div class="pv-ctx-nav">'
+    + '<button class="nav-ctx-prev"' + (prevDisabled ? ' disabled' : '')
+    + ' onclick="' + prevFn + '">' + prevLabel + '</button>'
+    + '<button class="nav-ctx-next"' + (nextDisabled ? ' disabled' : '')
+    + ' onclick="' + nextFn + '">' + nextLabel + '</button>'
+    + '</div>';
+}
+
+/* --- _getRenderFn(state) ---
+ * Fonction pure qui détermine la renderFn et la direction à partir de l'état NAV.
+ * Retourne {renderFn, direction} ou null si aucune vue n'est applicable.
+ * Utilisé par le dispatcher et les tests.
+ */
+function _getRenderFn(state) {
+  var dir = state.direction || 'forward';
+  if (state.level === 0) {
+    return { renderFn: renderAccueil, direction: dir };
+  } else if (state.level === 1 && state.cahier != null && !state.section) {
+    var cN = state.cahier;
+    return { renderFn: function() { return renderCahier(cN); }, direction: dir };
+  } else if (state.level === 2 && state.cahier != null && state.section === 'photos') {
+    var cN2 = state.cahier;
+    return { renderFn: function() { return renderPhotos(cN2); }, direction: dir };
+  } else if (state.level === 2 && state.cahier != null && state.chapitre != null && !state.section) {
+    var cN3 = state.cahier, pN = state.chapitre;
+    return { renderFn: function() { return renderChapitre(cN3, pN); }, direction: dir };
+  } else if (state.level === 3 && state.cpaLoc != null) {
+    var cN4 = state.cahier, loc = state.cpaLoc;
+    var lieu = findLieuByCpaLoc(cN4, loc);
+    if (lieu) {
+      return { renderFn: function() { return renderLieuPhoto(lieu, cN4, 0); }, direction: dir };
+    }
+  } else if (state.level === 3 && state.stopId != null) {
+    var cN5 = state.cahier, sId = state.stopId;
+    var cd = getCahierData(cN5);
+    var stop = findStop(cd, sId);
+    return { renderFn: function() { return renderEtape(stop, cd.PC || {}, cd.PN || {}, cN5); }, direction: dir };
+  }
+  return null;
+}
+
+/* --- Abonnement NAV → Views : dispatch vers les fonctions de rendu ---
+ * Vagues 3+4 : niveaux 0–3 gérés (tâches 3.2, 3.3, 3.4, 3.5).
+ */
+NAV.on('change', function(state) {
+  var dir = state.direction || 'forward';
+  var info = _getRenderFn(state);
+  if (!info) return;
+
+  /* Effets de bord non-Panel : flyTo, expand */
+  if (state.level === 3 && state.cpaLoc != null) {
+    var lieuSide = findLieuByCpaLoc(state.cahier, state.cpaLoc);
+    if (lieuSide) {
+      MapAdapter.flyToCPA(lieuSide);
+      Panel._expandDirect();
+    }
+    if (!info) return;
+  } else if (state.level === 3 && state.stopId != null) {
+    Panel._expandDirect();
+  }
+
+  Panel._queueNav(info, dir);
+});
+/* ========== /NAV → Views ========== */
+
+/* ========== Interactions ========== */
+/* Design : § Détection swipe, requirements FR-2.1, FR-2.2            */
+/* Spec   : carte-responsive-nav / task 4.1                            */
+
+/* --- attachSwipe(el, onLeft, onRight, onUp, onDown) ---
+ * Seuil : déplacement horizontal ≥ 50px ET ratio h/v ≥ 2 (FR-2.2).
+ * Les callbacks absents sont ignorés silencieusement.
+ */
+function attachSwipe(el, onLeft, onRight, onUp, onDown) {
+  var startX, startY;
+  el.addEventListener('touchstart', function(e) {
+    startX = e.touches[0].clientX;
+    startY = e.touches[0].clientY;
+  }, { passive: true });
+  el.addEventListener('touchend', function(e) {
+    var dx = e.changedTouches[0].clientX - startX;
+    var dy = e.changedTouches[0].clientY - startY;
+    if (Math.abs(dx) >= 50 && Math.abs(dx) / Math.abs(dy) >= 2) {
+      /* Swipe horizontal */
+      if (dx < 0 && onLeft)  onLeft();
+      if (dx > 0 && onRight) onRight();
+    } else if (Math.abs(dy) >= 50 && Math.abs(dy) / Math.abs(dx) >= 2) {
+      /* Swipe vertical */
+      if (dy < 0 && onUp)   onUp();
+      if (dy > 0 && onDown) onDown();
+    }
+  }, { passive: true });
+}
+
+var Interactions = (function() {
+
+  function init() {
+    /* --- Swipe sur #panel-viewport (FR-2.2) ---
+     * gauche → NAV.next(), droite → NAV.prev()
+     * haut   → expand,    bas    → compact
+     */
+    var viewport = document.getElementById('panel-viewport');
+    if (viewport) {
+      attachSwipe(
+        viewport,
+        function() { NAV.next(); },              /* gauche */
+        function() { NAV.prev(); },              /* droite */
+        function() { Panel.setExpanded(true);  }, /* haut   */
+        function() { Panel.setExpanded(false); }  /* bas    */
+      );
+    }
+
+    /* --- Swipe sur #panel (FR-2.2) ---
+     * haut → expand, bas → compact (swipe vertical sur tout le panneau)
+     */
+    var panel = document.getElementById('panel');
+    if (panel) {
+      attachSwipe(
+        panel,
+        null,
+        null,
+        function() { Panel.setExpanded(true);  },
+        function() { Panel.setExpanded(false); }
+      );
+    }
+  }
+
+  return { init: init };
+})();
+/* ========== /Interactions ========== */
+
+/* --- Abonnement NAV → ElevPanel ---
+ * Synchronise le profil altitude avec l'état NAV :
+ *   panelMode === 'elev'  → ElevPanel.show(cahier actif)
+ *   autre mode            → ElevPanel.hide()
+ *   stopId change         → ElevPanel.setHighlight(stopId)
+ */
+NAV.on('change', function(state) {
+  if (state.panelMode === 'elev') {
+    ElevPanel.show(state.cahier || 1);
+  } else {
+    /* Ne masquer que si le profil était visible — évite des map.resize() inutiles */
+    /* Exception : si le profil est visible et qu'on navigue vers un stop du même cahier
+       (clic depuis le profil ou la carte), garder le profil ouvert */
+    var keepOpen = _elevPanelVisible
+      && (state.level === 2 || state.level === 3)
+      && state.cahier === _elevCurrentCahierN;
+    if (_elevPanelVisible && !keepOpen) {
+      ElevPanel.hide();
+    }
+  }
+  /* Synchronisation highlight (FR-5.1 / FR-6.2) */
+  ElevPanel.setHighlight(state.stopId);
+});
+/* ========== /NAV → ElevPanel ========== */
 
 // =====================================================================
 // GESTION DU STYLE.LOAD (changements de fond de carte)
@@ -2177,6 +3506,8 @@ map.on('style.load', function() {
   loadedCahiers.forEach(function(n) {
     try { renderLinesForCahier(n, getCahierData(n)); } catch(e){}
   });
+  // Re-synchroniser la visibilité des couches uniquement (sans flyTo ni sélection de marqueur)
+  try { MapAdapter.syncLayersOnly(NAV.state); } catch(e){}
   updatePitchInfo();
 });
 
@@ -2211,10 +3542,6 @@ function updatePitchInfo(){
     'pitch: '+Math.round(map.getPitch())+'° | bear: '+Math.round(map.getBearing())+'°';
 }
 
-// btn-reset-view, btn-tilt, btn-vue-ensemble, btn-apropos : boutons supprimés du header
-// le code ci-dessous peut être réactivé si besoin
-// document.getElementById('btn-reset-view')...
-// document.getElementById('btn-tilt')...
 document.getElementById('ck-hillshade').addEventListener('change',function(){
   hillshadeOn=this.checked; applyHillshade();
 });
@@ -2236,83 +3563,62 @@ document.getElementById('ck-cpa').addEventListener('change',function(){
   }
 });
 document.querySelectorAll('input[name="basemap"]').forEach(function(r){
+  /* Synchroniser le radio coché avec currentBasemap au chargement */
+  r.checked = (r.value === currentBasemap);
   r.addEventListener('change',function(){
     currentBasemap=this.value;
     map.setStyle(STYLES[currentBasemap]);
   });
 });
-// ---- Sidebar toggle : desktop (sbtoggle) + mobile (FAB drawer) ----
-function isMobile(){return window.innerWidth<=768;}
+// =====================================================================
+// SETTINGS DRAWER — ouverture/fermeture
+// =====================================================================
+(function() {
+  var btn      = document.getElementById('settings-btn');
+  var drawer   = document.getElementById('settings-drawer');
+  var closeBtn = document.getElementById('settings-close');
 
-function openDrawer(){
-  var sb=document.getElementById('sidebar');
-  var fab=document.getElementById('sb-fab');
-  var ov=document.getElementById('sb-overlay');
-  sb.classList.add('drawer-open');
-  if(fab){fab.classList.add('open');fab.setAttribute('aria-label','Fermer la liste des étapes');}
-  if(ov)ov.classList.add('visible');
-}
-function closeDrawer(){
-  var sb=document.getElementById('sidebar');
-  var fab=document.getElementById('sb-fab');
-  var ov=document.getElementById('sb-overlay');
-  sb.classList.remove('drawer-open');
-  if(fab){fab.classList.remove('open');fab.setAttribute('aria-label','Ouvrir la liste des étapes');}
-  if(ov)ov.classList.remove('visible');
-}
-
-document.getElementById('sbtoggle').addEventListener('click',function(){
-  if(isMobile()) return; // géré par FAB
-  var sb=document.getElementById('sidebar');
-  sb.classList.toggle('collapsed');
-  this.textContent=sb.classList.contains('collapsed')?'\u25ba':'\u25c4';
-  this.style.left=sb.classList.contains('collapsed')?'0':'315px';
-  var info=document.getElementById('header-info');
-  if(info) info.style.left=sb.classList.contains('collapsed')?'0':'315px';
-  setTimeout(function(){map.resize();},280);
-});
-
-var fab=document.getElementById('sb-fab');
-if(fab){
-  fab.addEventListener('click',function(){
-    var sb=document.getElementById('sidebar');
-    if(sb.classList.contains('drawer-open')){closeDrawer();}else{openDrawer();}
-    setTimeout(function(){map.resize();},320);
+  btn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    drawer.classList.toggle('open');
   });
-}
+  closeBtn.addEventListener('click', function() {
+    drawer.classList.remove('open');
+  });
 
-var sbOverlay=document.getElementById('sb-overlay');
-if(sbOverlay){sbOverlay.addEventListener('click',function(){closeDrawer();setTimeout(function(){map.resize();},320);});}
-
-// Fermer le tiroir en tapant sur la carte (mobile)
-document.getElementById('map').addEventListener('click',function(){
-  if(isMobile()&&document.getElementById('sidebar').classList.contains('drawer-open')){
-    closeDrawer();
-    setTimeout(function(){map.resize();},320);
+  /* Bouton ✕ sur la barre du profil altitude — fermer le profil directement */
+  var elevCloseBtn = document.getElementById('elev-close-btn');
+  if (elevCloseBtn) {
+    elevCloseBtn.addEventListener('click', function() {
+      ElevPanel.hide();
+    });
   }
-});
+  /* Fermer en cliquant ailleurs */
+  document.addEventListener('click', function(e) {
+    if (!drawer.contains(e.target) && e.target !== btn) {
+      drawer.classList.remove('open');
+    }
+  });
 
-// Afficher/masquer le FAB selon la largeur
-function syncMobileUI(){
-  var fab=document.getElementById('sb-fab');
-  var sbt=document.getElementById('sbtoggle');
-  if(!fab) return;
-  if(isMobile()){
-    fab.style.display='flex';
-    if(sbt) sbt.style.display='none';
-    // S'assurer que le drawer est fermé au resize vers mobile
-    var sb=document.getElementById('sidebar');
-    if(sb&&sb.classList.contains('drawer-open')===false){/*ok*/}
-  } else {
-    fab.style.display='none';
-    if(sbt) sbt.style.display='';
-    // Fermer le drawer si on passe en desktop
-    closeDrawer();
+  /* E-1 — Durée des transitions MapLibre */
+  var ckTransition = document.getElementById('ck-transition');
+  if (ckTransition) {
+    ckTransition.addEventListener('change', function() {
+      mapTransitionDuration = parseInt(this.value, 10);
+    });
   }
-}
-syncMobileUI();
-window.addEventListener('resize',syncMobileUI);
 
+  /* E-2 — Terrain 3D checkbox */
+  var ckTerrainEl = document.getElementById('ck-terrain');
+  if (ckTerrainEl) {
+    ckTerrainEl.addEventListener('change', function() {
+      terrainOn = this.checked;
+      applyTerrain();
+      updateExagBtn();
+      syncTerrainUI();
+    });
+  }
+})();
 // =====================================================================
 // CHARGEMENT DE TOUS LES CAHIERS + VUE D'ENSEMBLE
 // =====================================================================
@@ -2320,38 +3626,25 @@ function loadAllCahiers() {
   function doLoad() {
     // Charger les données de chaque cahier sans déclencher flyTo ni setActiveCahier
     var firstLoad = loadedCahiers.size === 0;
-    [1, 2, 3].forEach(function(n) {
+    [1, 2, 3, 4].forEach(function(n) {
       if (!loadedCahiers.has(n)) {
         var data = getCahierData(n);
         renderLinesForCahier(n, data);
         renderMarkersForCahier(n, data);
+        renderSummaryMarkers(n, data);
         addCpaMarkersForCahier(n, data.CPA);
         loadedCahiers.add(n);
       }
     });
-    // S'assurer que C1-3 sont visibles pour la vue d'ensemble
-    [1, 2, 3].forEach(function(c) { if (loadedCahiers.has(c)) setCahierVisibility(c, true); });
-    if (loadedCahiers.has(4)) setCahierVisibility(4, false);
+    // S'assurer que les 4 cahiers sont visibles pour la vue d'ensemble (géré par onNavChange)
     updateVueEnsembleBtn();
-    // Activer C1 dans la sidebar seulement au premier chargement
-    if (firstLoad) setActiveCahier(1, true);
-    // Vue d'ensemble : bbox englobant tous les cahiers (France → Italie)
-    map.fitBounds([[-1.0, 42.0], [16.5, 51.5]], { padding: 40, duration: 800 });
+    // Activer C1 au premier chargement (profil altitude et hash URL uniquement — pas de visibilité)
+    if (firstLoad) setActiveCahier(1, true, /*skipVisibility=*/true);
+    // Afficher directement les marqueurs résumé
+    showSummaryMarkers(true);
   }
   if (map.loaded()) { doLoad(); }
   else { map.once('load', doLoad); }
-}
-
-// =====================================================================
-// PAGE DE GARDE — showCover / closeCover
-// =====================================================================
-function showCover() {
-  document.getElementById('coverpage').classList.remove('hidden');
-}
-function closeCover() {
-  var cp = document.getElementById('coverpage');
-  cp.style.opacity = '0';
-  setTimeout(function(){ cp.classList.add('hidden'); cp.style.opacity=''; }, 300);
 }
 
 // =====================================================================
@@ -2362,12 +3655,6 @@ function updateHash(n) {
 }
 
 window.addEventListener('hashchange', function(){
-  if (!TREE_ROOT) return;
-  var h = location.hash.replace('#', '');
-  if (!h) return;
-  var node = findNodeById(TREE_ROOT, h);
-  if (node) { navigateTo(node); return; }
-  // Legacy: #c1 through #c4
   var m = location.hash.match(/^#c([1-4])$/);
   if (m) loadCahier(parseInt(m[1]));
 });
@@ -2376,13 +3663,54 @@ window.addEventListener('hashchange', function(){
 // INITIALISATION AU CHARGEMENT
 // =====================================================================
 (function init() {
-  // La page de garde est toujours affichée à l'ouverture.
   updateExagBtn();
-  TREE_ROOT  = buildTree();
-  activeNode = TREE_ROOT;
-  renderPanel(activeNode);
-  restoreFromHash();
+  // Initialiser la séquence plate ◀/▶ traversante (task 5.3 — FR-2.1)
+  // Les 4 data files sont chargés synchroniquement via <script src>, donc
+  // CAHIER_N_DATA sont disponibles immédiatement ici.
+  NAV.initSequence([CAHIER_1_DATA, CAHIER_2_DATA, CAHIER_3_DATA, CAHIER_4_DATA]);
+  // Brancher MapAdapter sur NAV
+  NAV.on('change', function(state) { MapAdapter.onNavChange(state); });
+  // Initialiser le Panneau (task 3.1) : breadcrumb click + NAV wiring
+  Panel.init();
+  // Initialiser les interactions ◀/▶ et swipe (task 4.1)
+  Interactions.init();
+  // Charger tous les cahiers sur la carte (marqueurs + tracés + CPA)
+  loadAllCahiers();
+
+  /* FR-3.1 / FR-8 — Afficher la vue-accueil au chargement, panneau expanded.
+   * NAV.go(0) retourne no-op si déjà au niveau 0 (état initial),
+   * donc on appelle navigateTo directement pour le rendu initial. */
+  Panel.setExpanded(true);
+  Panel.navigateTo(renderAccueil, 'forward');
+
+  /* FR-1.4 / NFR-5 — Semer l'entrée initiale dans l'historique.
+   * Sans cet appel, le premier popstate déclencherait une sortie de page. */
+  history.pushState({ level: 0 }, '');
 })();
+
+// =====================================================================
+// BOUTON RETOUR ANDROID — history.pushState + popstate (task 4.2)
+// FR-1.4 : le bouton retour OS remonte d'un niveau dans NAV.
+// NFR-5  : depuis le niveau 0, aucune sortie de page.
+// =====================================================================
+
+/* Pousser une entrée dans l'historique à chaque navigation forward > 0 */
+NAV.on('change', function(state) {
+  if (state.direction === 'forward' && state.level > 0) {
+    history.pushState({ level: state.level }, '');
+  }
+});
+
+/* Intercepter le bouton retour OS / Android */
+window.addEventListener('popstate', function(e) {
+  var targetLevel = Math.max(0, NAV.state.level - 1);
+  if (NAV.state.level === 0) {
+    /* Déjà au niveau 0 — ré-injecter une entrée pour empêcher la sortie */
+    history.pushState({ level: 0 }, '');
+    return;
+  }
+  NAV.go(targetLevel, null, 'back');
+});
 
 // =====================================================================
 // CONTRÔLE D'EXAGÉRATION DU RELIEF — drag vertical sur btn-exag
@@ -2476,6 +3804,128 @@ window.addEventListener('hashchange', function(){
     updateExagBtn();
   });
 })();
+
+// =====================================================================
+// PANEL RESIZE — module de redimensionnement par drag (A-1)
+// =====================================================================
+var PanelResize = (function() {
+  var _active    = false;
+  var _startPos  = 0;    // clientX (desktop) ou clientY (mobile)
+  var _startSize = 0;    // width (desktop) ou height (mobile) au début du drag
+  var _mobile    = false;
+
+  var MIN_WIDTH  = 220;
+  var MIN_HEIGHT = 48;
+
+  function _getPanel() { return document.getElementById('panel'); }
+  function _getMap()   { return typeof map !== 'undefined' ? map : null; }
+
+  function _clampDesktop(w) {
+    return Math.min(Math.round(window.innerWidth * 0.5), Math.max(MIN_WIDTH, w));
+  }
+  function _clampMobile(h) {
+    return Math.min(Math.round(window.innerHeight * 0.8), Math.max(MIN_HEIGHT, h));
+  }
+
+  function _onStart(e) {
+    var handle = document.getElementById('panel-resize-handle');
+    if (!handle) return;
+    _mobile = window.matchMedia('(max-width:480px) and (orientation:portrait)').matches;
+    var panel = _getPanel();
+    if (!panel) return;
+    _active    = true;
+    if (_mobile) {
+      _startPos  = (e.touches ? e.touches[0].clientY : e.clientY);
+      _startSize = panel.offsetHeight;
+    } else {
+      _startPos  = (e.touches ? e.touches[0].clientX : e.clientX);
+      _startSize = panel.offsetWidth;
+    }
+    e.preventDefault();
+  }
+
+  function _onMove(e) {
+    if (!_active) return;
+    var panel = _getPanel();
+    if (!panel) return;
+    var pos = e.touches ? e.touches[0].clientX : e.clientX;
+    if (_mobile) {
+      pos = e.touches ? e.touches[0].clientY : e.clientY;
+      var newH = _clampMobile(_startSize - (pos - _startPos));
+      panel.style.height = newH + 'px';
+    } else {
+      var newW = _clampDesktop(_startSize + (pos - _startPos));
+      panel.style.width    = newW + 'px';
+      panel.style.minWidth = newW + 'px';
+    }
+    requestAnimationFrame(function() {
+      var m = _getMap();
+      if (m) try { m.resize(); } catch(e2) {}
+    });
+  }
+
+  function _onEnd(e) {
+    if (!_active) return;
+    _active = false;
+    var panel = _getPanel();
+    if (!panel) return;
+    var val = _mobile ? parseInt(panel.style.height) : parseInt(panel.style.width);
+    if (!isNaN(val)) {
+      try { localStorage.setItem('panelWidth', String(val)); } catch(e2) {}
+    }
+  }
+
+  function init() {
+    var handle = document.getElementById('panel-resize-handle');
+    if (!handle) return;
+
+    handle.addEventListener('mousedown',  _onStart, { passive: false });
+    handle.addEventListener('touchstart', _onStart, { passive: false });
+    document.addEventListener('mousemove', _onMove);
+    document.addEventListener('touchmove', _onMove, { passive: false });
+    document.addEventListener('mouseup',   _onEnd);
+    document.addEventListener('touchend',  _onEnd);
+
+    /* Nettoyer le style inline au changement d'orientation :
+     * en quittant le portrait, height/width inline doivent être remis à zéro
+     * pour que le CSS desktop reprenne la main. */
+    var _mql = window.matchMedia('(max-width:480px) and (orientation:portrait)');
+    function _onOrientationChange() {
+      var panel = _getPanel();
+      if (!panel) return;
+      if (!_mql.matches) {
+        /* On vient de quitter le mode portrait → nettoyer height inline */
+        panel.style.height = '';
+      } else {
+        /* On vient d'entrer en portrait → nettoyer width inline */
+        panel.style.width    = '';
+        panel.style.minWidth = '';
+      }
+      var m = _getMap();
+      if (m) try { m.resize(); } catch(e2) {}
+    }
+    _mql.addEventListener('change', _onOrientationChange);
+
+    /* Restaurer depuis localStorage — uniquement en mode desktop */
+    var isPortraitMobile = window.matchMedia('(max-width:480px) and (orientation:portrait)').matches;
+    if (!isPortraitMobile) {
+      try {
+        var saved = localStorage.getItem('panelWidth');
+        if (saved) {
+          var v = parseInt(saved, 10);
+          var panel = _getPanel();
+          if (!isNaN(v) && panel) {
+            panel.style.width    = v + 'px';
+            panel.style.minWidth = v + 'px';
+          }
+        }
+      } catch(e3) {}
+    }
+  }
+
+  return { init: init, _onStart: _onStart, _onMove: _onMove, _onEnd: _onEnd };
+})();
+PanelResize.init();
 </script>
 </body>
 </html>

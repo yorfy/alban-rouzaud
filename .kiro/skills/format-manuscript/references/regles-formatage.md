@@ -13,6 +13,30 @@
 - Espacement entre paragraphes : 2pt. Pas de paragraphes vides.
 - **Titres collés au texte** : si `^\d+[re]+ [Jj]ournée\s*:?\s*(.+)` matche, séparer en deux paragraphes (titre en gras, texte en normal).
 
+## Retrait de première ligne (style roman)
+
+Le script `apply_indents.py` applique un retrait de première ligne (0,5 cm par défaut) aux paragraphes identifiés comme **débuts de paragraphe typographique** dans un DOCX existant, sans régénérer le document.
+
+**Heuristique « début de paragraphe »** — retrait appliqué si :
+- Premier paragraphe du corps (après la page de titre)
+- Paragraphe qui suit un saut de page
+- Paragraphe qui suit un titre de section
+- Paragraphe dont le précédent se termine par `.` `!` `?` `»` `"` `)` `…`
+
+**Exclusions** — jamais de retrait sur :
+- Lignes de dialogue (commençant par `—`, `–`, `- `)
+- Titres de section (gras, taille ≥ 15pt)
+- Page de titre (paragraphes avant le premier saut de page)
+- Paragraphes vides
+
+**Limitations connues** : l'heuristique peut produire des faux positifs sur les dialogues multi-lignes où la réplique précédente se termine par `»`, et des faux négatifs sur les paragraphes qui suivent une phrase incomplète. Une correction manuelle reste possible directement dans Word après génération.
+
+**Usage** :
+```
+python apply_indents.py <fichier.docx> [--indent 0.5] [--dry-run]
+```
+Le fichier résultant est sauvegardé avec le suffixe `_indent.docx` pour préserver l'original.
+
 ## Alignement
 
 - Texte narratif : justifié.

@@ -2,8 +2,6 @@
 
 **Livrable public** : [https://yorfy.github.io/alban-rouzaud/ECRITS_DE_GUERRE.html](https://yorfy.github.io/alban-rouzaud/ECRITS_DE_GUERRE.html)
 
-**Version 2 (nouvelle)** : [https://yorfy.github.io/alban-rouzaud/ECRITS_DE_GUERRE_v2.html](https://yorfy.github.io/alban-rouzaud/ECRITS_DE_GUERRE_v2.html)
-
 Transcription automatique de documents manuscrits (PDF ou images) via le skill Kiro `transcribe-manuscript`. Le modèle IA lit directement les images et produit un texte structuré en paragraphes.
 
 ## Manuscrits transcrits
@@ -21,8 +19,7 @@ Les transcriptions `.txt`, les rapports `.md`, les cartes `.html` et la config K
 ## Structure du repo
 
 ```
-ECRITS_DE_GUERRE.html            ← livrable v1 (carte interactive des 4 cahiers, 78 KB)
-ECRITS_DE_GUERRE_v2.html         ← livrable v2 (navigation hiérarchique responsive)
+ECRITS_DE_GUERRE.html            ← livrable public (carte interactive des 4 cahiers, navigation hiérarchique responsive)
 README.md
 extract_data.py                  ← script de maintenance (extraction données HTML → JS)
 │
@@ -66,9 +63,7 @@ extract_data.py                  ← script de maintenance (extraction données 
     └── ALBAN ROUZAUD_4_CAPTIVITE, RECITS ET REFLEXIONS.pdf
 ```
 
-**ECRITS_DE_GUERRE.html** — Carte interactive v1 (MapLibre GL JS 4.7.1). Page de garde narrative, onglets par cahier, modèle accumulatif, profil altitude C3, cartes postales, contrôle d'exagération du relief.
-
-**ECRITS_DE_GUERRE_v2.html** — Carte interactive v2. Navigation hiérarchique responsive (accueil → cahier → chapitre → étape), transitions animées, profil altitude, highlight retour, panneau mobile.
+**ECRITS_DE_GUERRE.html** — Carte interactive (MapLibre GL JS). Navigation hiérarchique responsive (accueil → cahier → chapitre → étape), transitions animées, profil altitude, highlight retour, panneau mobile.
 
 ## Prérequis
 
