@@ -1,0 +1,113 @@
+# Rapport scraping photos Ariège – domaine public
+
+**0 images téléchargées / déjà présentes**
+
+## Images récupérées
+
+| Fichier local | Taille | Source Commons |
+|---|---|---|
+
+## Ignorées / échecs
+
+- `Chalet de Trutat, Foix (8189483269).jpg` — format non image
+- `Retour de la foire, Foix, Ariège (en version anaglyphe) - Fonds Trutat - MHNT.PH` — format non image
+- `Tarascon-sur-Ariège (8189481199).jpg` — format non image
+- `Grotte fortifiée à Albiat sic (Ariège) - 51Fi64 - Fonds Trutat.jpg` — format non image
+- `Trutat, Eugene - Bibliotheque de Toulouse - Vallee du Saurat, rocher de Carlong ` — format non image
+- `Orlu, le village, Ariège 1900 (cropped).jpg` — format non image
+- `Bord de lAriège au Castelet, Ariège (2567339593).jpg` — format non image
+- `Cascade dOrlu, Ariège (6233996730).jpg` — format non image
+- `Dans les bois, Saurat, Ariège (6216922834).jpg` — format non image
+- `Balcon aux rosiers, chalet de E. Trutat, Foix.jpg` — format non image
+- `Dans les bois, Saurat, Ariège (6216912200).jpg` — format non image
+- `Château de Lordat, Ariège, 1901.jpg` — format non image
+- `Dans les bois, Saurat, Ariège (6216977012).jpg` — format non image
+- `Chalet de Trutat, Foix (8190565326).jpg` — format non image
+- `Tarascon sur Ariège, ruines (2869595877).jpg` — format non image
+- `Pont dAuzat, Vicdessos, septembre 1882 (8189480815).jpg` — format non image
+- `Bloc erratique (faux dolmen), Vicdessos, septembre 1882 - btv1b10574152x.jpg` — format non image
+- `Pont dAuzat, Vicdessos, septembre 1882 (8190562948).jpg` — format non image
+- `Bloc erratique (faux dolmen), Vicdessos, septembre 1882 (8268394029).jpg` — format non image
+- `Pont d'Auzat, Vicdessos, septembre 1882 - btv1b10574151g.jpg` — format non image
+- `Automobile Rochette, Vicdessos - btv1b10577080x.jpg` — format non image
+- `Auto, Vicdessos, 17 janvier 1906 - btv1b105768975.jpg` — format non image
+- `Pont d'Auzat, Vicdessos, septembre 1882 - btv1b105741501.jpg` — format non image
+- `Aux mines de Rancié, Vicdessos, septembre 1882 (8190563032).jpg` — format non image
+- `Auto Rochette, Vicdessos, 1906 - btv1b10576896q.jpg` — format non image
+- `Bloc erratique (faux dolmen), Vicdessos, septembre 1882 (8190562790).jpg` — format non image
+- `Bloc erratique (faux dolmen), Vicdessos, septembre 1882 - btv1b10574163s.jpg` — format non image
+- `Cabane de berger, col de Saleich (Saleix), Vicdessos (environs), 17 juillet 1882` — format non image
+- `Col du Saleich (Saleix), Vicdessos, 17 juillet 1882 (8269463092).jpg` — format non image
+- `Aux mines de Rancié, Vicdessos, septembre 1882 - btv1b10574149n.jpg` — format non image
+- `Madame Berger, Luchon, juillet 1895, TRU C 3 - Fonds Trutat.jpg` — format non image
+- `Mme Berger, Luchon, 25 juillet 1899, TRU C 5 - Fonds Trutat.jpg` — format non image
+- `Cabane de berger, Saleich (Saleix), 17 juillet 1882 (8190567528).jpg` — format non image
+- `Berger occupé à traire une vache (M. Cochet), col de Saleich (Saleix), 17 juille` — format non image
+- `Cabane de berger, Saleich (Saleix), 17 juillet 1882 (8268394419).jpg` — format non image
+- `Madame Berger, Luchon, juillet 1895 - btv1b10580038b.jpg` — format non image
+- `Mme Berger... (Luchon), 25 juillet 1899 - btv1b105800405.jpg` — format non image
+- `Col de Saleich (Saleix), cabane de berger, 17 juillet 1882 (8189480535).jpg` — format non image
+- `Berger occupé à traire une vache (M. Cochet), col de Saleich (Saleix), 17 juille` — format non image
+- `Cabane de berger, Saleich (Saleix), 17 juillet 1882 - btv1b105741592.jpg` — format non image
+- `Cabane de berger, Saleich (Saleix), 17 juillet 1882 - btv1b10574158m.jpg` — format non image
+- `Col de Saleich (Saleix), cabane de berger, 17 juillet 1882 - btv1b10574154t.jpg` — format non image
+- `Cabane de berger, col de Saleich (Saleix), Vicdessos (environs), 17 juillet 1882` — format non image
+- `Bulletin Societe D'Histoire Naturelle de Toulouse (et de Midi Pyrenees). (IA bul` — format non image
+- `Catalogue of additions to the library of the United States Patent office (IA cat` — non pertinent
+- `"Mongolfière "Le Neptune" - btv1b10577090b.jpg` — format non image
+- `"Portrait - un homme moustachu ; son buste. Costume turc ou maghrébin (fin XIXe ` — format non image
+- `(Femme jouant du piano) - Fonds Trutat - 51Fi311.jpg` — format non image
+- `(Parc avec personnages au fond) - Fonds Trutat - 51Fi319.jpg` — format non image
+- `(Paysage de forêt) - Fonds Trutat - 51Fi324.jpg` — format non image
+- `3° lac d'Oô (polis) - btv1b10577207h.jpg` — format non image
+- `A Benqué, Gourdon Maurice - btv1b10580325q.jpg` — format non image
+- `A bord de la Princesse Alice, explorations du Prince de Monaco, 1905 - btv1b1057` — format non image
+- `A Bos Gayral, Cornusson - btv1b105768439.jpg` — format non image
+- `A Bélesta, 9 août 1896 - btv1b10576590w.jpg` — format non image
+- `A l'annexe, cheval à l'abreuvoir, Cornusson, février 1903 - btv1b10577580t.jpg` — format non image
+- `A l'eau - auto Béraldi, Luchon, août 1906 - btv1b105800691.jpg` — format non image
+- `A l'hôtel Riviera Palace, Monte-Carlo, avril 1905 - btv1b10578335k.jpg` — format non image
+- `A l'intérieur des remparts, Carcassonne, 28 octobre 1899 - btv1b10578754g.jpg` — format non image
+- `A la cabane des Péchés, Gourdon, Azam, son cousin, Luchon (environs) - btv1b1057` — format non image
+- `A la ferme, bétail et bâtisse - btv1b10579415g.jpg` — format non image
+- `A la ferme, Cornusson, 7 juin 1906 - btv1b105776109.jpg` — format non image
+- `A la frontière, Menton, avril 1906 - btv1b10578696n.jpg` — format non image
+- `A la gare, Nice, avril 1899 - btv1b10578700m.jpg` — format non image
+- `A la métairie, Bélesta, octobre 1892 - btv1b105774953.jpg` — format non image
+- `A la métairie, Cornusson, 6 juin 1906 - btv1b105776143.jpg` — format non image
+- `Abbaye de Beaulieu, Ginals, octobre 1906 - btv1b105776556.jpg` — format non image
+- `Abbaye de Beaulieu, Ginals, octobre 1906 - btv1b10578739w.jpg` — format non image
+- `Abbaye Saint-Michel-de-Cuxa, Codalet - btv1b10578921n.jpg` — format non image
+- `Abbé Delmas, Verfeil - btv1b10577812z.jpg` — format non image
+- `Abbé Peyrusse, Cornusson - btv1b10577834p.jpg` — format non image
+- `Abri de Plantade, Bruniquel, septembre 1889 - btv1b10574284f.jpg` — format non image
+- `Abri de Tuquerouye (Eugène Trutat), Henri Passet, octobre 1892 - btv1b10574390f.` — format non image
+- `Abri de Tuquerouye (Félix) Regnault (Eugène Trutat), octobre 1892 - btv1b1057439` — format non image
+- `Abri de Tuquerouye (Félix) Regnault, Henri Passet, octobre 1892 - btv1b10574391w` — format non image
+- `Cornell University Library digitization (IA cu31924030211415).pdf` — non pertinent
+- `Bulletin (IA bulletin1916sociuoft).pdf` — non pertinent
+- `Bulletin (IA bulletin1919sociuoft).pdf` — non pertinent
+- `Grange au toit de chaume, Tarascon-sur-Ariège (6233338755).jpg` — format non image
+- `Vieux moulin à plâtre, Tarascon-sur-Ariège, (congrès géologique), septembre 1882` — format non image
+- `Aux plâtrières, Tarascon-sur-Ariège, (congrès géologique), septembre 1882 (81894` — format non image
+- `Buttes de Calames et de Soudou, près Tarascon-sur-Ariège (6233338751).jpg` — format non image
+- `Tarascon - les hauts fourneaux, avril 1909.jpg` — format non image
+- `Tarascon, usine, 1909 (2881906412).jpg` — format non image
+- `Montagne de Sedour, Tarascon (2881921604).jpg` — format non image
+- `Montagne de Sedour, Tarascon.jpg` — format non image
+- `Bedeilhac, rocher de Calames, Ariège (6233338763).jpg` — format non image
+- `Vallée du Saurat (Ariège) (2869509487).jpg` — format non image
+- `Martel - Notice sur les travaux scientifiques, 1911.djvu` — non pertinent
+- `Vallée de la Rabat (?), vue du rocher de Soudou (?) (2867978300).jpg` — non pertinent
+- `Petit étang Fourcat (Vicdessos Ariège).jpg` — format non image
+- `Petit étang Fourcat (Ariège).jpg` — format non image
+- `Étang Fourcat (Ariège).jpg` — format non image
+- `Refuge de l'étang Fourcat (Ariège).jpg` — format non image
+- `La vallée de Vicdessos - A26137.jpg` — format non image
+- `L'entrée de la vallée du Vicdessos - A29080S.jpg` — format non image
+- `La vallée de Vicdessos vers l'amont - A26136S.jpg` — format non image
+- `L'entrée de la vallée du Vicdessos - A29085S.jpg` — format non image
+- `La vallée de Vicdessos vers l'amont - A26135S.jpg` — format non image
+- `L'entrée de la vallée du Vicdessos - A29086S.jpg` — format non image
+- `Pic de Tristagne (Ariège).jpg` — format non image
+- `L'entrée de la vallée du Vicdessos - A29079S.jpg` — format non image

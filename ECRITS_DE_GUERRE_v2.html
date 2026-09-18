@@ -37,6 +37,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 .maplibregl-ctrl-attrib{background:rgba(10,14,26,0.55)!important;color:#c0c8d8!important;font-size:.68em!important;opacity:.6;transition:opacity .2s}
 .maplibregl-ctrl-attrib:hover{opacity:1}
 .maplibregl-ctrl-attrib a{color:#a0c4e0!important}
+.maplibregl-ctrl-attrib-button{outline:none!important}
 #pitch-info{display:none}
 #exag-pill{position:absolute;top:84px;right:42px;transform:translateX(50%);z-index:600;background:rgba(15,22,40,.78);border:1px solid rgba(80,120,180,.40);border-radius:5px;color:#c8d8f0;font-size:.75em;font-variant-numeric:tabular-nums;padding:3px 8px;cursor:pointer;user-select:none;letter-spacing:.02em;transition:background .2s,color .2s;white-space:nowrap}
 #exag-pill:hover{background:rgba(26,74,122,.85);color:#fff}
@@ -965,6 +966,8 @@ var MapAdapter = (function() {
         currEl.firstChild.style.transform = 'scale(1.35) translateY(-4px)';
         currEl.firstChild.style.filter    = 'drop-shadow(0 6px 14px rgba(0,0,0,0.75))';
       }
+      /* Remonter au premier plan dans le DOM */
+      if (currEl && currEl.parentNode) currEl.parentNode.appendChild(currEl);
     }
   }
 
@@ -1064,7 +1067,11 @@ var MapAdapter = (function() {
       map.setPaintProperty(dashedId, 'line-color', ['get','color']);
       map.setLayoutProperty(dashedId, 'visibility', 'visible');
     }
-    if (htmlMarkers[n]) htmlMarkers[n].forEach(function(m){ try{m.addTo(map);}catch(e){} });
+    if (htmlMarkers[n]) {
+      /* Ajouter en sens inverse : stop 1 ajouté en dernier → devant */
+      htmlMarkers[n].slice().reverse()
+        .forEach(function(m){ try{m.addTo(map);}catch(e){} });
+    }
     if (cpaGlobalVisible && cpaMarkers[n]) cpaMarkers[n].forEach(function(m){ try{m.addTo(map);}catch(e){} });
     /* Mettre à jour le profil altitude pour ce cahier */
     if (activeCahier !== n) renderElevation(n);
@@ -1078,6 +1085,9 @@ var MapAdapter = (function() {
 
     if (level === 0) {
       showOverview();
+      /* Masquer le bouton profil altitude — pas pertinent en vue d'ensemble */
+      var et = document.getElementById('elevtoggle');
+      if (et) et.style.display = 'none';
 
     } else if (level === 1) {
       if (state.cahier != null) {
@@ -1246,7 +1256,7 @@ var CAHIER_META = {
   4: {
     title:       'Captivit\u00e9',
     subtitle:    '1940\u20131945 \u2014 R\u00e9flexions depuis le Stalag XVIII D',
-    resume:      'Écrites depuis le Stalag XVIII\u00a0D de Marburg an der Drau (Slovénie) et les Kommandos de Styrie, les réflexions d\u2019un instituteur ariégeois prisonnier de guerre\u00a0: ses souvenirs, ses lectures, ses pensées sur la guerre, la liberté et le retour. Un témoignage intérieur sur cinq années de captivité.',
+    resume:      'Écrites depuis le Stalag XVIII\u00a0D de Marburg an der Drau (Slovénie) et les Kommandos de Styrie, les réflexions d\u2019un prisonnier de guerre\u00a0: ses souvenirs, ses lectures, ses pensées sur la guerre, la liberté et le retour. Un témoignage intérieur sur cinq années de captivité.',
     pdfTranscript: 'https://docs.google.com/document/d/12HeGY9vhKJKc71NK3ajLXALOVU3sg5kk/edit?usp=drive_link',
     pdfOriginal:   'https://drive.google.com/file/d/1ZW2hv8iLNkZE0e73iSyS1fN-bNBj3H_X/view?usp=sharing',
     color:       '#3498db',
@@ -1811,10 +1821,12 @@ function updateVueEnsembleBtn() {
 // =====================================================================
 function setCahierVisibility(n, visible) {
   // Marqueurs stops
-  htmlMarkers[n].forEach(function(m) {
-    if (visible) { try { m.addTo(map); } catch(e){} }
-    else         { try { m.remove();   } catch(e){} }
-  });
+  if (visible) {
+    htmlMarkers[n].slice().reverse()
+      .forEach(function(m){ try { m.addTo(map); } catch(e){} });
+  } else {
+    htmlMarkers[n].forEach(function(m){ try { m.remove(); } catch(e){} });
+  }
   // Marqueurs CPA (si visibles globalement)
   if (cpaGlobalVisible) {
     cpaMarkers[n].forEach(function(m) {
@@ -2704,7 +2716,7 @@ var Panel = (function() {
     /* Vue-étape (task 3.4) */
     '.pv-etape-phase{font-size:.8em;font-weight:600;letter-spacing:.04em;margin-bottom:10px;opacity:.85}',
     '.pv-etape-date{font-size:.85em;color:#e94560;margin-bottom:10px;display:flex;align-items:center;gap:5px}',
-    '.pv-etape-desc{font-size:.9em;color:#a0b4c8;line-height:1.65;margin-bottom:12px}',
+    '.pv-etape-desc{font-size:.9em;color:#a0b4c8;line-height:1.65;margin-bottom:12px;text-align:justify;hyphens:auto}',
     '.pv-etape-citation{border-left:3px solid #e94560;margin:10px 0;padding:8px 12px;'
     + 'font-style:italic;color:#8899aa;font-size:.9em;line-height:1.55;background:rgba(233,69,96,.07);border-radius:0 4px 4px 0}',
     '.pv-etape-ref{font-size:.8em;color:#667788;font-style:italic;margin-top:8px;'
@@ -2976,8 +2988,17 @@ function renderEtape(stop, PC, PN, cahierN) {
   var color     = PC[stop.p] || CAHIER_META[cahierN].color || '#888';
   var phaseName = PN[stop.p] || ('Chapitre\u00a0' + stop.p);
 
+  /* Typographie française : espaces insécables avant ! ? ; : » et après « */
+  function typofr(s) {
+    if (!s) return s;
+    return s
+      .replace(/ ([?!;:])/g, '\u00a0$1')
+      .replace(/ »/g, '\u00a0»')
+      .replace(/« /g, '«\u00a0');
+  }
+
   var citationHTML = stop.q
-    ? '<blockquote class="pv-etape-citation">\u00ab\u00a0' + stop.q + '\u00a0\u00bb</blockquote>'
+    ? '<blockquote class="pv-etape-citation">\u00ab\u00a0' + typofr(stop.q) + '\u00a0\u00bb</blockquote>'
     : '';
 
   var refHTML = stop.r
@@ -2985,7 +3006,7 @@ function renderEtape(stop, PC, PN, cahierN) {
     : '';
 
   var descHTML = stop.d
-    ? '<div class="pv-etape-desc">' + stop.d + '</div>'
+    ? '<div class="pv-etape-desc">' + typofr(stop.d) + '</div>'
     : '';
 
   var dateHTML = stop.date
@@ -3212,7 +3233,7 @@ function findLieuByCpaLoc(cahierN, cpaLoc) {
     '.va-card-body{padding:0 12px 12px}',
     '.va-card-title{font-size:.92em;font-weight:600;color:#fff;margin:0 0 2px}',
     '.va-card-period{font-size:.75em;color:#8899aa;margin-bottom:4px}',
-    '.va-card-desc{font-size:.78em;color:#8899aa;line-height:1.45}'
+    '.va-card-desc{font-size:.78em;color:#8899aa;line-height:1.45;text-align:justify;hyphens:auto}'
   ].join('');
   document.head.appendChild(s);
 })();
@@ -3242,7 +3263,7 @@ function renderAccueil() {
     1: 'De la mobilisation dans les Pyr\u00e9n\u00e9es ari\u00e9geoises jusqu\u2019aux avant-postes face \u00e0 Pirmasens, puis la d\u00e9b\u00e2cle vers Verdun. La \u00ab\u00a0dr\u00f4le de guerre\u00a0\u00bb vue d\u2019en bas.',
     2: 'Le repli \u00e0 travers la France en d\u00e9route, les routes embouteill\u00e9es, les ordres contradictoires, et finalement la capture.',
     3: 'Alban et Andr\u00e9 sautent dans le noir depuis leur Kommando. Deux semaines \u00e0 pied dans les Alpes autrichiennes, boussole et carte copi\u00e9e \u00e0 la main.',
-    4: 'R\u00e9flexions d\u2019un instituteur ari\u00e9geois prisonnier de guerre depuis le Stalag XVIII\u00a0D\u00a0: souvenirs, lectures, pens\u00e9es sur la guerre et la libert\u00e9.'
+    4: 'R\u00e9flexions d\u2019un prisonnier de guerre depuis le Stalag XVIII\u00a0D\u00a0: souvenirs, lectures, pens\u00e9es sur la guerre et la libert\u00e9.'
   };
 
   var activeCahier = NAV.previousCahier;
@@ -3276,7 +3297,7 @@ function renderAccueil() {
   return '<div style="padding:12px 12px 16px">'
     + '<div class="va-title">Alban Rouzaud</div>'
     + '<div class="va-subtitle">\u00c9crits de Guerre \u2014 1939\u20131945</div>'
-    + '<p class="va-bio">Instituteur \u00e0 Lavelanet (Ari\u00e8ge), Alban Rouzaud est mobilis\u00e9 en ao\u00fbt\u00a01939.'
+    + '<p class="va-bio">Employé à la Société Générale de Lavelanet (Ariège), Alban Rouzaud est mobilis\u00e9 en ao\u00fbt\u00a01939.'
     + ' Il vit la \u00ab\u00a0dr\u00f4le de guerre\u00a0\u00bb en Alsace, la d\u00e9b\u00e2cle de juin\u00a01940,'
     + ' une \u00e9vasion \u00e0 travers les Alpes autrichiennes en\u00a01941,'
     + ' et la captivit\u00e9 au Stalag XVIII\u00a0D de Marburg jusqu\u2019en\u00a01945.'
@@ -3864,6 +3885,26 @@ var PanelResize = (function() {
     document.addEventListener('touchmove', _onMove, { passive: false });
     document.addEventListener('mouseup',   _onEnd);
     document.addEventListener('touchend',  _onEnd);
+
+    /* Nettoyer le style inline au changement d'orientation :
+     * en quittant le portrait, height/width inline doivent être remis à zéro
+     * pour que le CSS desktop reprenne la main. */
+    var _mql = window.matchMedia('(max-width:480px) and (orientation:portrait)');
+    function _onOrientationChange() {
+      var panel = _getPanel();
+      if (!panel) return;
+      if (!_mql.matches) {
+        /* On vient de quitter le mode portrait → nettoyer height inline */
+        panel.style.height = '';
+      } else {
+        /* On vient d'entrer en portrait → nettoyer width inline */
+        panel.style.width    = '';
+        panel.style.minWidth = '';
+      }
+      var m = _getMap();
+      if (m) try { m.resize(); } catch(e2) {}
+    }
+    _mql.addEventListener('change', _onOrientationChange);
 
     /* Restaurer depuis localStorage — uniquement en mode desktop */
     var isPortraitMobile = window.matchMedia('(max-width:480px) and (orientation:portrait)').matches;

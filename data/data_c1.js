@@ -3,59 +3,65 @@
 
 var CAHIER_1_DATA = {
   PC: {
-    1: '#f5a623',   // ocre — avant la guerre (Ariège, virées)
-    2: '#e94560',   // rouge — mobilisation (sept. 1939)
-    3: '#3498db',   // bleu — drôle de guerre en Alsace
-    4: '#e74c3c'    // rouge sombre — débâcle vers Verdun
+    1: '#f5a623',   // ocre — Août 39
+    2: '#e94560',   // rouge — Septembre 39
+    3: '#3498db',   // bleu — Au repos
+    4: '#9b59b6',   // violet — Patrouille
+    5: '#2ecc71',   // vert — Avant-poste
+    6: '#e67e22',   // orange — Fin d'Etcætera
+    7: '#e74c3c'    // rouge sombre — En Bretelle
   },
   PN: {
-    1: 'Avant la guerre — Ariège',
-    2: 'Mobilisation — Toulouse',
-    3: 'Drôle de guerre — Alsace',
-    4: 'La débâcle — vers Verdun'
+    1: 'Août 39',
+    2: 'Septembre 39',
+    3: 'Au repos',
+    4: 'Patrouille',
+    5: 'Avant-poste',
+    6: 'Fin d\'Etcætera',
+    7: 'En Bretelle'
   },
   stops: [
   {id:3,p:1,n:"Vallée du Vicdessos",lat:42.77,lng:1.505,
-   d:"Virée en torpedo avec trois amis. Prétexte : reconnaître les sentiers vers l'Espagne. Arrêt « jambon du pays » au bord du torrent. Rencontre avec une femme mémorable.",
-   q:"L'auto dévidait sans effort la route qui chevauchait les collines, enjambait les rivières, trouait les bois.",
+   d:"Dernière virée insouciante avant la guerre. Quatre amis en torpedo sur les routes ariégeoises, sous prétexte de reconnaître les sentiers vers l'Espagne. Arrêt devant une pancarte « jambon du pays » au bord du Vicdessos. La patronne de l'auberge — belle, pas fière — laisse derrière elle une heure d'été à se souvenir.",
+   q:"Tout bas : Ah ! mille dieux ! — Tout haut : Apportez-nous de ce jambon. Et deux litres de rouge.",
    r:"Route de la vallée du Vicdessos (D8)"},
   {id:4,p:1,n:"Cols vers l'Espagne",lat:42.60648,lng:1.46732,
-   d:"But théorique de l'expédition, vite oublié. Le traité de Versailles, Dantzig, la liberté ? « Qu'est-ce que ça pouvait leur foutre ? »",
-   q:"Mais ils avaient un état civil, un livret militaire et un fascicule de mobilisation."},
-  {id:5,p:2,n:"Lavelanet (mobilisation)",lat:42.9372,lng:1.8478,
+   d:"Les cols vers l'Espagne — but officiel de la virée — sont oubliés avant même d'y arriver. On tête goulûment à la vie depuis le matin. Un paysan descend un pré en marge de la folie sociale. Tout est encore possible.",
+   q:"Le traité de Versailles ? Le couloir de Dantzig ? Le droit ? La liberté ? La Civilisation ? Qu'est-ce que ça pouvait leur foutre véritablement ?"},
+  {id:5,p:2,n:"Lavelanet (mobilisation)",lat:42.93011,lng:1.84225,
    date:"3 sept. 1939",
-   d:"3 septembre 1939. Annonce à la radio dans l'escalier de l'immeuble. Départ le mardi. Le père, ancien fantassin de 14-18, s'assied sur une gerbe sans un mot.",
-   q:"La mobilisation générale est décrétée."},
+   d:"3 septembre 1939, minuit. La voix du speaker radiophonique dans le couloir de l'immeuble : « La mobilisation générale est décrétée. » Il descend les escaliers poussé par la frousse et la curiosité mêlées. La querelle du soir avec sa femme tombe d'un coup.",
+   q:"Tu peux préparer ma valise, je pars mardi."},
   {id:2,p:2,n:"L'Alibert (maison natale, près de Fougax)",lat:42.8623,lng:1.9401,
-   d:"La maison de ses parents dans la forêt de sapins de Bélesta. Sentier en lacets, colonnades de sapins, cèpes, lumière dans les futaies. Le père moissonne au Rec Blanc, la mère lie des gerbes au Soula.",
+   d:"La maison natale dans la forêt de Bélesta, colonnades de sapins, cèpes, lumière dans les futaies. Le père au Rec Blanc, la mère qui lie des gerbes au Soula. Elle lâche la gerbe en apprenant la nouvelle. Le père s'assied sur une gerbe sans un mot et passe sa main calleuse sur son front.",
    q:"Ah ! les assassins ! dit la mère en lâchant la gerbe."},
   {id:6,p:2,n:"Toulouse (rassemblement)",lat:43.6047,lng:1.4442,
-   d:"Centre de rassemblement du « grand troupeau ». Trains, casernes, tramways. Costumes hétéroclites. La foule se teinte de kaki.",
+   d:"Toulouse, centre de rassemblement du « grand troupeau ». Les trains ont déversé des milliers de bipèdes à fascicule dans la ville. La foule bariolée se teinte progressivement de kaki. Casernes, tramways bondés, odeur de naphtaline. Et l'adjudant.",
    q:"Le plus dur n'est pas d'aller se faire casser la gueule ; c'est d'y aller avec des cons et des adjudants.",
    r:"Train depuis Lavelanet"},
   {id:7,p:3,n:"La Petite-Pierre (cantonnement)",lat:48.8564,lng:7.3192,
-   d:"Secteur du 11e R.I. en Alsace. Cantonnement entre les montées en ligne. Pernod, poker, bridge. Le printemps alsacien « vient tout d'un coup, comme un miracle ».",
+   d:"Cantonnement du 11e R.I. entre les montées en ligne. Les chefs enchaînent les marches de trente kilomètres et les revues de calots pour empêcher les cerveaux de penser. Riposte des hommes : se réfugier à cinq ou six dans l'arrière-salle du café du Soleil, rhumatismes et genoux à roulière comme prétextes. Pernod, poker, et l'attente de la prochaine permission.",
    q:"Il ne nous restait plus qu'à boire du pernod et jouer au poker.",
    r:"Train depuis Toulouse"},
-  {id:8,p:3,n:"Ringendorf (repos)",lat:48.80,lng:7.4833,
-   d:"Village alsacien. Le lieutenant y était « si pimpant dans son costume fantoche surmonté d'un képi flamboyant ». Relève de garde courtelinesque.",
+  {id:8,p:3,n:"Ringendorf (repos)",lat:48.80713,lng:7.55583,
+   d:"Village alsacien du secteur. La relève de la garde y donne lieu chaque matin à une séance grotesque digne de Courteline : crochets de cartouchière mal placés, maniement d'armes insuffisamment raide, tenue des exécutants qui laisse à désirer. Le commandant n'est pas content. Les hommes s'en foutent éperdument.",
    q:"Alors qu'il était si pimpant à Ringendorf…"},
-  {id:11,p:3,n:"Village de Sy (patrouille nocturne)",lat:49.516,lng:4.870,
-   d:"Village abandonné. Patrouille de nuit. Cadavres, vaches estropiées. G… abat un soldat allemand au revolver. Riberot et Redon blessés. Le lieutenant tué.",
+  {id:11,p:4,n:"Village de Sy (patrouille nocturne)",lat:49.516,lng:4.870,
+   d:"Patrouille nocturne dans le no man's land. Départ au crépuscule, en chantail, revolvers et grenades à la ceinture. Marche dans les bois sans lumière, accrochés au ceinturon de celui qui précède. Cadavres sur la route, vaches estropiées dans les fossés. Au retour, G… abat un soldat allemand d'une balle dans le front. Le groupe de protection est pris dans un cercle de feu. Riberot et Redon blessés. Le lieutenant ne donne plus signe de vie.",
    q:"G… a tiré en criant : « C'en est un ! »"},
-  {id:9,p:3,n:"Avant-postes (face à Pirmasens)",lat:49.07,lng:7.55,
-   d:"Colline boisée, tranchées, barbelés. No man's land. Cabanas bégaie, Daydé pose des collets à lièvre, G… raconte ses aventures espagnoles. Nuits de bombardement.",
+  {id:9,p:5,n:"Avant-postes (face à Pirmasens)",lat:49.07,lng:7.55,
+   d:"Huit hommes dans une tranchée face aux barbelés et au no man's land. Au loin, les faubourgs de Pirmasens derrière l'horizon. Cabanas bégaie de peur puis finit par s'y habituer, Daydé pose des collets à lièvre, G… raconte ses aventures espagnoles. Nuits de bombardement. Un matin, l'adjudant ivrogne déboule : « Les Allemands arrivent. Fermez les chicanes. » Ils ne viendront pas.",
    q:"Les faubourgs de Pirmasens se perdaient derrière l'horizon."},
-  {id:10,p:3,n:"Pirmasens (positions allemandes)",lat:49.2014,lng:7.6056,
+  {id:10,p:5,n:"Pirmasens (positions allemandes)",lat:49.2014,lng:7.6056,
    d:"Ville allemande visible depuis les avant-postes. « Les ceux d'en face. » De courtes rafales rappellent leur présence.",
    q:"Tant qu'ils emmerderont les autres… qu'on pensait.",
    type:"mention"},
-  {id:12,p:4,n:"Alsace (fin de la drôle de guerre)",lat:48.8564,lng:7.3192,
+  {id:12,p:6,n:"Alsace (fin de la drôle de guerre)",lat:48.80926,lng:7.55732,
    date:"10 mai 1940",
-   d:"10 mai 1940. « Les Allemands ont envahi la Hollande. » Les piqûres sont interrompues. Fin de neuf mois d'attente.",
+   d:"10 mai 1940. Le toubib lève la main pour faire la piqûre anti-para quand le téléphone sonne. Il raccroche et annonce la nouvelle. Fin de neuf mois d'attente. En quelques minutes elle fait le tour du village, corsée de détails : Paris bombardée, des aérodromes touchés. Les visages laissent choir le masque de la tranquillité.",
    q:"Vous pouvez vous r'habiller. Les Allemands ont envahi la Hollande."},
-  {id:13,p:4,n:"Verdun (position « en bretelle »)",lat:49.16,lng:5.3833,
-   d:"Destination finale du cahier 1. Le régiment doit prendre position « en bretelle » pour « colmater la poche ». La suite dans le cahier 2.",
+  {id:13,p:7,n:"Verdun (position « en bretelle »)",lat:49.16,lng:5.3833,
+   d:"Marche de nuit dans le fracas et les éclairs de l'artillerie. « Je m'enfonce dans cette nuit parce que je ne peux pas faire autrement. Celui qui est devant me tire, celui de derrière me pousse. » Le régiment doit prendre position « en bretelle » pour colmater la poche. La suite dans le Cahier 2.",
    q:"Ils devaient aboutir du côté de Verdun prendre une position dite « en bretelle ».",
    r:"Déplacement en train puis à pied",
    type:"capture"}
@@ -71,12 +77,12 @@ var CAHIER_1_DATA = {
       title:"Toulouse — Gare Matabiau, CPA",
       desc:"La gare de Toulouse d'où Alban et ses camarades partent rejoindre leurs régiments en septembre 1939. « Le grand troupeau »." }
   ]},
-  { lat:49.19371, lng:7.60941, loc:"Avant-postes (face à Pirmasens)", p:3, stopId:9, cpa:[
+  { lat:49.19371, lng:7.60941, loc:"Avant-postes (face à Pirmasens)", p:5, stopId:9, cpa:[
     { img:"cartes_postales/pirmasens_1905.jpg",
       title:"Pirmasens (Allemagne) — CPA 1905",
       desc:"Pirmasens, la ville allemande visible depuis les avant-postes d'Alban Rouzaud. « Les ceux d'en face. » La drôle de guerre vue depuis la ligne Maginot." }
   ]},
-  { lat:49.16, lng:5.3833, loc:"Verdun (Meuse)", p:4, stopId:13, cpa:[
+  { lat:49.16, lng:5.3833, loc:"Verdun (Meuse)", p:7, stopId:13, cpa:[
     { img:"cartes_postales/verdun_bombardé_1918.jpg",
       title:"Verdun bombardé — CPA 1918",
       desc:"Verdun, destination finale du Cahier 1. Le régiment doit y prendre position « en bretelle » pour colmater la poche allemande de juin 1940." },
