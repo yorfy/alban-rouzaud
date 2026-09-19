@@ -28,7 +28,10 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 /* Marqueurs HTML */
 .mlk-pin{display:block}
 /* Profil altitude */
-#elevpanel{height:220px;background:#0f1628;border-top:2px solid #0f3460;flex-shrink:0;box-shadow:0 -4px 16px rgba(0,0,0,.5);display:flex;flex-direction:column}
+#elevpanel{height:var(--elev-h,220px);background:#0f1628;border-top:2px solid #0f3460;flex-shrink:0;box-shadow:0 -4px 16px rgba(0,0,0,.5);display:flex;flex-direction:column}
+#elev-resize-handle{height:12px;flex-shrink:0;cursor:row-resize;display:flex;align-items:center;justify-content:center;background:transparent;touch-action:none}
+#elev-resize-handle::after{content:'';display:block;width:36px;height:3px;border-radius:2px;background:rgba(160,180,200,.5)}
+#elev-resize-handle:hover::after{background:rgba(120,170,240,.9)}
 #elevpanel.hidden{display:none}
 #elevbar{display:flex;align-items:center;justify-content:space-between;padding:3px 10px;font-size:.82em;color:#a0b4c8}
 #elevbar b{color:#e0e0e0}
@@ -39,7 +42,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 #elevtoggle:hover{background:#1a4a7a;color:#fff}
 #elevtoggle.active{color:#fff;border-color:rgba(100,160,240,.7);background:rgba(26,74,122,.9)}
 #elevtoggle:disabled{opacity:.35;cursor:default}
-#elevcanvas{display:block;width:100%;height:196px}
+#elevcanvas{display:block;width:100%;flex:1;min-height:0}
 #elevtip{position:fixed;pointer-events:none;background:rgba(22,33,62,.97);color:#e0e0e0;padding:4px 9px;border-radius:4px;font-size:.8em;line-height:1.5;display:none;z-index:900;border:1px solid #1a4a7a}
 #coords{display:none}
 .maplibregl-ctrl-bottom-right{left:auto!important;right:0!important;transform:none!important}
@@ -190,7 +193,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   #settings-btn { top: 12px; left: 12px; }
   #settings-drawer { top: 56px; left: 12px; width: min(88vw, 340px); }
 }
-@media (max-width: 900px) and (orientation: landscape) {
+@media (orientation: landscape) and (max-width: 1200px) and (max-height: 540px) {
   #settings-drawer { width: min(60vw, 320px); }
 }
 /* Marqueurs CPA */
@@ -305,8 +308,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
   }
 
   /* Profil altitude */
-  #elevpanel { height: 140px; }
-  #elevcanvas { height: 116px; }
+  #elevpanel { height: var(--elev-h, 140px); }
 
   /* État compact : juste la barre */
   #panel.compact {
@@ -327,11 +329,37 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 
 }
 
-/* Tablette (481px–900px) en paysage : largeur confortable (40% de l'écran) */
-@media (max-width: 900px) and (orientation: landscape) {
+/* Téléphone en paysage — ciblé par la HAUTEUR (un tél. paysage est court),
+   pour couvrir aussi les écrans très allongés (21:9) qui dépassent 900px de large. */
+@media (orientation: landscape) and (max-width: 1200px) and (max-height: 540px) {
   #panel { width: 40vw; min-width: 300px; max-width: 50vw; }
   /* Même agrandissement de police qu'en portrait */
   body { font-size: 1.5rem; }
+
+  /* Profil d'altitude : posé sur le BAS DE LA CARTE uniquement (option C).
+     Le panneau (gauche) reste intact ; le profil couvre la largeur de la carte. */
+  #elevpanel:not(.hidden) {
+    position: fixed !important;
+    left: var(--panel-w, clamp(300px, 40vw, 50vw)) !important;   /* bord droit réel du panneau */
+    right: 0 !important;
+    bottom: 0 !important;
+    height: var(--elev-h, 120px) !important;
+    z-index: 650;
+    box-shadow: 0 -4px 16px rgba(0,0,0,.6);
+  }
+  /* Bouton d'affichage du profil : le remonter au-dessus d'une éventuelle
+     barre système basse (env() peut valoir 0 → marge de secours). */
+  /* En paysage, la barre d'outils du navigateur mobile mange le bas de l'écran
+     (hauteur non mesurable). On ancre donc le bouton profil EN HAUT de la carte,
+     où aucune barre ne le recouvre. */
+  #elevtoggle {
+    top: 10px !important;
+    bottom: auto !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    border-radius: 6px !important;
+    border: 1px solid rgba(80,120,180,.4) !important;
+  }
 }
 
 /* =====================================================================
@@ -341,8 +369,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 /* --- Mobile (≤ 768px) : ajustements profil altitude --- */
 @media(max-width:768px){
   /* ---- Profil altitude réduit ---- */
-  #elevpanel{height:140px}
-  #elevcanvas{height:116px}
+  #elevpanel{height:var(--elev-h,140px)}
   #elevbar{font-size:.75em}
 
   /* ---- layerswitch / elevtoggle — géré par settings-drawer ---- */
@@ -432,6 +459,7 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
     </div>
   </div><!-- fin #top-row -->
   <div id="elevpanel" class="hidden">
+    <div id="elev-resize-handle"></div>
     <div id="elevbar"><span>Profil du parcours</span><span id="elevinfo"></span><button id="elev-close-btn" title="Masquer le profil" aria-label="Masquer le profil">&#10005;</button></div>
     <canvas id="elevcanvas"></canvas>
   </div>
@@ -2342,8 +2370,23 @@ function renderElevation(n) {
       +'<br><span style="color:#8899aa">'+(_elevPC[q.p]||'')+'</span>';
     var rect2=canvas.getBoundingClientRect();
     var tx=(clientX!=null)?clientX:(rect2.left+xForD(q.d,canvas.clientWidth));
-    tip.style.left=Math.min(window.innerWidth-240,Math.max(4,tx))+'px';
-    tip.style.top=(rect2.top+4)+'px';
+    var isMobile = window.matchMedia('(max-width: 900px)').matches;
+    if (isMobile) {
+      /* Option B : tooltip AU-DESSUS du profil, ne masque pas le tracé.
+         Le tooltip est mesuré après display:block, puis calé juste au-dessus
+         du haut de #elevpanel. Largeur limitée + centré horizontalement. */
+      var ep = document.getElementById('elevpanel');
+      var epTop = ep ? ep.getBoundingClientRect().top : rect2.top;
+      tip.style.maxWidth = 'min(92vw, 360px)';
+      var tw = tip.offsetWidth || 240;
+      var th = tip.offsetHeight || 60;
+      var lx = Math.min(window.innerWidth - tw - 6, Math.max(6, tx - tw/2));
+      tip.style.left = lx + 'px';
+      tip.style.top  = Math.max(6, epTop - th - 6) + 'px';
+    } else {
+      tip.style.left=Math.min(window.innerWidth-240,Math.max(4,tx))+'px';
+      tip.style.top=(rect2.top+4)+'px';
+    }
   }
 
   // Replace canvas to remove old listeners
@@ -2356,6 +2399,52 @@ function renderElevation(n) {
     tip.style.display='none';drawElev();
     if(_elevHoverVisible&&_elevHoverMarker){_elevHoverMarker.remove();_elevHoverVisible=false;}
   });
+  /* --- Tactile : glisser pour déplacer le point survolé, relâcher pour sélectionner --- */
+  var _lastTouchIdx = null;
+  function _hideHover(){
+    tip.style.display='none'; drawElev();
+    if(_elevHoverVisible&&_elevHoverMarker){_elevHoverMarker.remove();_elevHoverVisible=false;}
+  }
+  /* Sélectionne le point d'index i : active la DERNIÈRE ÉTAPE franchie avant ce point
+     dans le panneau, ZOOME sur le point exact, et LAISSE le tooltip + le point rouge visibles. */
+  function _selectElevIndex(i){
+    if(i==null||!_elevPts[i]) return;
+    var q=_elevPts[i];
+    var cur=null;
+    for(var m=0;m<_elevStepMarks.length;m++){
+      if(_elevStepMarks[m].d <= q.d + 1e-6) cur=_elevStepMarks[m];
+      else break;
+    }
+    if(cur){
+      var stFound=null;
+      data.S.forEach(function(x){if(x.id===cur.id)stFound=x;});
+      if(stFound){ NAV.go(3, { cahier: n, chapitre: stFound.p, stopId: stFound.id }, 'forward'); }
+    }
+    /* Zoom sur le point EXACT du profil (après la nav, pour ne pas être recentré sur l'étape) */
+    setTimeout(function(){
+      map.flyTo({center:[q.lng,q.lat],zoom:Math.max(map.getZoom(),12),duration:600});
+      /* Réafficher le survol pour garder le POINT ROUGE, puis masquer le tooltip */
+      showHover(i, null);
+      tip.style.display='none';
+    }, 0);
+  }
+  canvas.addEventListener('touchstart',function(e){
+    if(!e.touches.length) return;
+    _lastTouchIdx = nearestByX(e.touches[0].clientX);
+    showHover(_lastTouchIdx, e.touches[0].clientX);
+    e.preventDefault();
+  },{passive:false});
+  canvas.addEventListener('touchmove',function(e){
+    if(!e.touches.length) return;
+    _lastTouchIdx = nearestByX(e.touches[0].clientX);
+    showHover(_lastTouchIdx, e.touches[0].clientX);
+    e.preventDefault();   /* déplacer le point sans scroller la page */
+  },{passive:false});
+  canvas.addEventListener('touchend',function(){
+    _selectElevIndex(_lastTouchIdx);   /* sélectionne le point où on a relâché */
+    /* On NE masque PAS : tooltip + point rouge restent visibles après le relâcher */
+  });
+  canvas.addEventListener('touchcancel',_hideHover);
   canvas.addEventListener('click',function(e){
     var rect3=canvas.getBoundingClientRect(),px3=e.clientX-rect3.left,py3=e.clientY-rect3.top;
     for(var m3=0;m3<_elevStepMarks.length;m3++){
@@ -3983,6 +4072,92 @@ var PanelResize = (function() {
   return { init: init, _onStart: _onStart, _onMove: _onMove, _onEnd: _onEnd };
 })();
 PanelResize.init();
+
+// --- Exposer la largeur RÉELLE du panneau en variable CSS (--panel-w) ---
+// Utilisée en paysage pour caler le profil d'altitude PILE au bord droit du
+// panneau, même après un redimensionnement par drag (où offsetWidth != 40vw).
+(function(){
+  var root = document.documentElement;
+  function exportPanelW(){
+    var p = document.getElementById('panel');
+    if (p) root.style.setProperty('--panel-w', Math.round(p.getBoundingClientRect().width) + 'px');
+  }
+  exportPanelW();
+  window.addEventListener('resize', exportPanelW);
+  window.addEventListener('orientationchange', function(){ setTimeout(exportPanelW, 300); });
+  // Suivre le drag de redimensionnement du panneau
+  document.addEventListener('mousemove', exportPanelW);
+  document.addEventListener('touchmove', exportPanelW, { passive: true });
+})();
+
+// --- Profil d'altitude redimensionnable en hauteur (poignée), avec persistance ---
+(function(){
+  var root = document.documentElement;
+  var handle = document.getElementById('elev-resize-handle');
+  var panel  = document.getElementById('elevpanel');
+  if (!handle || !panel) return;
+
+  var MIN = 90;
+  function MAX(){ return Math.round(window.innerHeight * 0.6); }
+  function clamp(h){ return Math.min(MAX(), Math.max(MIN, h)); }
+
+  var active=false, startY=0, startH=0;
+
+  function apply(h){
+    h = clamp(h);
+    root.style.setProperty('--elev-h', h + 'px');
+    /* Le handler resize existant redessine le canvas (drawElev) si le profil
+       est visible, et recale la carte. On le déclenche via un event resize. */
+    window.dispatchEvent(new Event('resize'));
+    return h;
+  }
+
+  function onStart(e){
+    active = true;
+    startY = e.touches ? e.touches[0].clientY : e.clientY;
+    startH = panel.getBoundingClientRect().height;
+    if (e.cancelable) e.preventDefault();
+  }
+  function onMove(e){
+    if(!active) return;
+    var y = e.touches ? e.touches[0].clientY : e.clientY;
+    apply(startH + (startY - y));   /* tirer vers le haut = agrandir */
+    if (e.cancelable) e.preventDefault();
+  }
+  function onEnd(){
+    if(!active) return;
+    active = false;
+    var h = panel.getBoundingClientRect().height;
+    try { localStorage.setItem('elevH', String(Math.round(h))); } catch(e){}
+  }
+
+  handle.addEventListener('mousedown',  onStart);
+  handle.addEventListener('touchstart', onStart, { passive:false });
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, { passive:false });
+  document.addEventListener('mouseup',   onEnd);
+  document.addEventListener('touchend',  onEnd);
+
+  /* Restaurer la hauteur mémorisée */
+  try {
+    var saved = parseInt(localStorage.getItem('elevH'), 10);
+    if (!isNaN(saved)) root.style.setProperty('--elev-h', clamp(saved) + 'px');
+  } catch(e){}
+
+  /* À la rotation : le canvas garde son ancienne taille tant qu'on n'a pas
+     redessiné. On force un recalcul APRÈS que le layout paysage/portrait
+     soit appliqué (double délai), sans attendre un drag. */
+  function _reflow(){ window.dispatchEvent(new Event('resize')); }
+  window.addEventListener('orientationchange', function(){
+    setTimeout(_reflow, 250);
+    setTimeout(_reflow, 550);
+  });
+  var _mqOrient = window.matchMedia('(orientation: landscape)');
+  _mqOrient.addEventListener('change', function(){
+    setTimeout(_reflow, 250);
+    setTimeout(_reflow, 550);
+  });
+})();
 </script>
 </body>
 </html>
