@@ -2858,8 +2858,13 @@ var Panel = (function() {
     + 'color:#7a9ec8;font-size:.85em;cursor:pointer;padding:4px 0 10px;transition:color .15s}',
     '.pv-back:hover{color:#fff}',
     /* Barre de navigation haut : ◀ titre ▶ */
-    '.pv-nav-bar{display:flex;align-items:center;gap:4px;margin-bottom:10px;'
-    + 'border-bottom:1px solid rgba(255,255,255,.07);padding-bottom:8px}',
+    /* Barre de titre : reste collée en haut du viewport pendant le scroll.
+       margin négatif = absorbe le padding de .panel-view (8px top, 12px lat.)
+       pour que le fond opaque couvre toute la largeur et démarre à top:0. */
+    '.pv-nav-bar{display:flex;align-items:center;gap:4px;'
+    + 'position:sticky;top:0;z-index:5;background:#16213e;'
+    + 'margin:-8px -12px 10px;padding:8px 12px;'
+    + 'border-bottom:1px solid rgba(255,255,255,.12)}',
     '.pv-nav-btn{flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;'
     + 'justify-content:center;background:#0f3460;border:1px solid #1a4a7a;border-radius:4px;'
     + 'color:#a0b4c8;font-size:.85em;cursor:pointer;transition:background .15s,color .15s;'
