@@ -332,9 +332,11 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 /* Téléphone en paysage — ciblé par la HAUTEUR (un tél. paysage est court),
    pour couvrir aussi les écrans très allongés (21:9) qui dépassent 900px de large. */
 @media (orientation: landscape) and (max-width: 1200px) and (max-height: 540px) {
-  #panel { width: 40vw; min-width: 300px; max-width: 50vw; }
+  #panel { width: 40vw; min-width: 300px; max-width: 50vw; height: 100%; }
+  /* height:100% (pas 100vh) : le panneau remplit #top-row, lui-même borné par
+     body en 100dvh — évite que la barre d'adresse mobile masque son haut. */
   /* Même agrandissement de police qu'en portrait */
-  body { font-size: 1.5rem; }
+  body { font-size: 1.5rem; height: 100dvh; }
 
   /* Profil d'altitude : posé sur le BAS DE LA CARTE uniquement (option C).
      Le panneau (gauche) reste intact ; le profil couvre la largeur de la carte. */
@@ -820,6 +822,21 @@ var NAV = (function() {
     if (!_seq || _seq.length === 0) return;
     var skipCpa = (_state.cpaLoc == null); /* sauter les CPA sauf si déjà sur une CPA */
     var idx = _seqIndex;
+    /* Aucune étape active (niveau cahier) : démarrer à la 1re étape du cahier COURANT,
+       pas à l'index 0 global (qui renverrait au cahier 1). */
+    if (idx === -1 && _state.cahier != null) {
+      var startedHere = false;
+      for (var s = 0; s < _seq.length; s++) {
+        if (_seq[s].cahier === _state.cahier && (!skipCpa || _seq[s].type === 'stop')) {
+          _seqIndex = s;
+          var a0 = _itemToGoArgs(_seq[s]);
+          go(a0.level, a0.ids, 'forward', true);
+          startedHere = true;
+          break;
+        }
+      }
+      if (startedHere) return;
+    }
     /* Trouver le prochain item valide */
     var target = -1;
     for (var i = idx + 1; i < _seq.length; i++) {
@@ -844,9 +861,22 @@ var NAV = (function() {
   /* --- Navigation ◀ --- */
   function prev() {
     if (!_seq || _seq.length === 0) return;
-    if (_seqIndex === -1) return;
     var skipCpa = (_state.cpaLoc == null);
     var idx = _seqIndex;
+    /* Aucune étape active (niveau cahier) : démarrer à la DERNIÈRE étape du cahier
+       courant plutôt que de repartir de la séquence globale. */
+    if (idx === -1 && _state.cahier != null) {
+      for (var s = _seq.length - 1; s >= 0; s--) {
+        if (_seq[s].cahier === _state.cahier && (!skipCpa || _seq[s].type === 'stop')) {
+          _seqIndex = s;
+          var a0 = _itemToGoArgs(_seq[s]);
+          go(a0.level, a0.ids, 'back', true);
+          return;
+        }
+      }
+      return;
+    }
+    if (_seqIndex === -1) return;
     /* Trouver le précédent item valide */
     var target = -1;
     for (var i = idx - 1; i >= 0; i--) {
@@ -3331,8 +3361,9 @@ function findLieuByCpaLoc(cahierN, cpaLoc) {
     '.va-card.active{background:rgba(255,255,255,.12)!important;border-left:4px solid currentColor}',
     '.va-card-top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px 4px}',
     '.va-card-num{font-size:.72em;font-weight:700;letter-spacing:.1em;opacity:.8}',
-    '.va-card-pdf{color:#a0b4c8;opacity:.6;display:flex;align-items:center;transition:opacity .15s;text-decoration:none;flex-shrink:0}',
-    '.va-card-pdf:hover{opacity:1}',
+    '.va-card-pdf{color:#a0b4c8;opacity:.6;display:flex;align-items:center;justify-content:center;transition:opacity .15s;text-decoration:none;flex-shrink:0;padding:6px;border-radius:6px}',
+    '.va-card-pdf:hover{opacity:1;background:rgba(255,255,255,.08)}',
+    '@media(max-width:900px){.va-card-pdf{padding:9px}}',
     '.va-card-body{padding:0 12px 12px}',
     '.va-card-title{font-size:.92em;font-weight:600;color:#fff;margin:0 0 2px}',
     '.va-card-period{font-size:.75em;color:#8899aa;margin-bottom:4px}',
@@ -3341,7 +3372,7 @@ function findLieuByCpaLoc(cahierN, cpaLoc) {
   document.head.appendChild(s);
 })();
 
-var _svgCahier = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"'
+var _svgCahier = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"'
   + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
   + '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>'
   + '<polyline points="14 2 14 8 20 8"/>'
@@ -3350,7 +3381,7 @@ var _svgCahier = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
   + '<polyline points="10 9 9 9 8 9"/>'
   + '</svg>';
 
-var _svgManuscrit = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" viewBox="0 0 24 24"'
+var _svgManuscrit = '<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24"'
   + ' fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">'
   + '<path d="M12 19l7-7 3 3-7 7-3-3z"/>'
   + '<path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>'
@@ -3359,6 +3390,9 @@ var _svgManuscrit = '<svg xmlns="http://www.w3.org/2000/svg" width="15" height="
   + '</svg>';
 
 function renderAccueil() {
+  /* Niveau accueil : le swipe fait défiler entre bio (cahier 0) et les cahiers.
+     Le sens (droite=avancer) est géré au niveau du geste ; ici next=avancer. */
+  window._swipeFns = { prev: '_accueilScrollCard(-1)', next: '_accueilScrollCard(1)' };
   var CAHIER_COLORS  = { 1:'#f5a623', 2:'#e94560', 3:'#2ecc71', 4:'#3498db' };
   var CAHIER_TITLES  = { 1:'La Guerre', 2:'Journal non \u00e9crit d\u2019un fantassin en repli strat\u00e9gique', 3:'L\u2019\u00c9vasion', 4:'Captivit\u00e9, r\u00e9cits et r\u00e9flexions' };
   var CAHIER_PERIODS = { 1:'Ao\u00fbt 1939 \u2013 Juin 1940', 2:'Mai \u2013 Juin 1940', 3:'Sept. \u2013 Oct. 1941', 4:'1940 \u2013 1945' };
@@ -3398,6 +3432,7 @@ function renderAccueil() {
   }
 
   return '<div style="padding:12px 12px 16px">'
+    + '<div class="va-intro">'
     + '<div class="va-title">Alban Rouzaud</div>'
     + '<div class="va-subtitle">\u00c9crits de Guerre \u2014 1939\u20131945</div>'
     + '<p class="va-bio">Employé à la Société Générale de Lavelanet (Ariège), Alban Rouzaud est mobilis\u00e9 en ao\u00fbt\u00a01939.'
@@ -3405,8 +3440,34 @@ function renderAccueil() {
     + ' une \u00e9vasion \u00e0 travers les Alpes autrichiennes en\u00a01941,'
     + ' et la captivit\u00e9 au Stalag XVIII\u00a0D de Marburg jusqu\u2019en\u00a01945.'
     + ' Ces quatre cahiers en sont le t\u00e9moignage.</p>'
+    + '</div>'
     + '<div class="va-cards">' + cardsHtml + '</div>'
     + '</div>';
+}
+
+/* --- _accueilScrollCard(dir) ---
+ * À l'accueil : fait défiler #panel-viewport entre la bio (.va-intro, "cahier 0")
+ * et les cartes de cahiers. dir=1 = avancer (bio→c1→c2…), dir=-1 = reculer.
+ * Repère l'élément actuellement le plus proche du haut de la zone visible. */
+function _accueilScrollCard(dir) {
+  var vp = document.getElementById('panel-viewport');
+  if (!vp) return;
+  /* Cibles : la bio d'abord, puis chaque carte de cahier */
+  var targets = [];
+  var intro = vp.querySelector('.va-intro');
+  if (intro) targets.push(intro);
+  var cards = vp.querySelectorAll('.va-card');
+  for (var c = 0; c < cards.length; c++) targets.push(cards[c]);
+  if (!targets.length) return;
+  var vpTop = vp.getBoundingClientRect().top;
+  var current = 0, best = Infinity;
+  for (var i = 0; i < targets.length; i++) {
+    var d = Math.abs(targets[i].getBoundingClientRect().top - vpTop);
+    if (d < best) { best = d; current = i; }
+  }
+  var target = Math.min(targets.length - 1, Math.max(0, current + dir));
+  if (target === current) return;
+  targets[target].scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 /* ========== /Views ========== */
 
@@ -3420,6 +3481,13 @@ function renderAccueil() {
  * prevFn/nextFn : chaîne JS pour ◀/▶ (null = bouton absent)
  */
 function _renderNavBar(title, backFn, prevFn, nextFn, prevDisabled, nextDisabled) {
+  /* Mémoriser les actions ◀/▶ DU NIVEAU COURANT pour que le swipe fasse
+     exactement la même chose que les boutons (cahier↔cahier, chapitre↔chapitre,
+     étape↔étape). Les chaînes sont générées par nous, pas par l'utilisateur. */
+  window._swipeFns = {
+    prev: (prevFn && !prevDisabled) ? prevFn : null,
+    next: (nextFn && !nextDisabled) ? nextFn : null
+  };
   var prev = prevFn
     ? '<button class="pv-nav-btn"' + (prevDisabled ? ' disabled' : '')
       + ' onclick="' + prevFn + '">&#9664;</button>'
@@ -3538,17 +3606,27 @@ function attachSwipe(el, onLeft, onRight, onUp, onDown) {
 
 var Interactions = (function() {
 
+  /* Exécute l'action ◀/▶ DU NIVEAU COURANT (capturée par _renderNavBar),
+     pour que le swipe fasse exactement la même chose que les boutons :
+     niveau cahier → change de cahier, chapitre → change de chapitre, étape → étape. */
+  function _runSwipe(dir) {
+    var fns = window._swipeFns || {};
+    var code = (dir === 'next') ? fns.next : fns.prev;
+    if (!code) return;                 /* rien à ce niveau (ex. accueil, ou bord de plage) */
+    try { (0, eval)(code); } catch (e) {}
+  }
+
   function init() {
     /* --- Swipe sur #panel-viewport (FR-2.2) ---
-     * gauche → NAV.next(), droite → NAV.prev()
-     * haut   → expand,    bas    → compact
+     * gauche → action ▶ du niveau courant, droite → action ◀
+     * haut/bas désactivés (conflit scroll de lecture)
      */
     var viewport = document.getElementById('panel-viewport');
     if (viewport) {
       attachSwipe(
         viewport,
-        function() { NAV.next(); },              /* gauche */
-        function() { NAV.prev(); },              /* droite */
+        function() { _runSwipe('next'); },       /* gauche → avancer */
+        function() { _runSwipe('prev'); },       /* droite → reculer */
         null,                                    /* haut  — désactivé : conflit avec le scroll de lecture */
         null                                     /* bas   — désactivé : conflit avec le scroll de lecture */
       );
