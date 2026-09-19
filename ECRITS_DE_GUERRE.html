@@ -50,8 +50,49 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
 .maplibregl-ctrl-attrib:hover{opacity:1}
 .maplibregl-ctrl-attrib a{color:#a0c4e0!important}
 .maplibregl-ctrl-attrib-button{outline:none!important}
+/* Mobile : bouton ⓘ plus grand et texte d'attribution lisible une fois déplié */
+@media (max-width: 900px){
+  .maplibregl-ctrl-attrib-button{
+    width:40px!important;height:40px!important;
+    background-size:32px 32px!important;
+    background-repeat:no-repeat!important;
+    background-position:center!important;
+    box-shadow:none!important;
+    -webkit-tap-highlight-color:transparent!important;
+  }
+  .maplibregl-ctrl-attrib-button:focus,
+  .maplibregl-ctrl-attrib-button:focus-visible,
+  .maplibregl-ctrl-attrib-button:active{
+    outline:none!important;box-shadow:none!important;
+  }
+  /* Replié : pas de fond de container, seul le bouton ⓘ est visible et dimensionné */
+  .maplibregl-ctrl-attrib.maplibregl-compact:not(.maplibregl-compact-show){
+    background:transparent!important;
+    width:40px!important;height:40px!important;
+    min-height:40px!important;border-radius:50%!important;
+    opacity:1!important;
+  }
+  .maplibregl-ctrl-attrib.maplibregl-compact:not(.maplibregl-compact-show) .maplibregl-ctrl-attrib-button{
+    position:absolute!important;top:0!important;right:0!important;
+  }
+  .maplibregl-ctrl-attrib.maplibregl-compact-show{
+    font-size:13px!important;line-height:1.35!important;
+    padding:8px 34px 8px 10px!important;
+    max-width:min(90vw,420px)!important;
+    border-radius:8px!important;
+  }
+  .maplibregl-ctrl-attrib.maplibregl-compact-show .maplibregl-ctrl-attrib-button{
+    top:2px!important;right:2px!important;
+  }
+  /* Échelle (ScaleControl) plus lisible sur mobile */
+  .maplibregl-ctrl-scale{
+    font-size:13px!important;line-height:1.3!important;
+    padding:2px 6px!important;border-width:2px!important;
+  }
+}
 #pitch-info{display:none}
-#exag-pill{position:absolute;top:84px;right:42px;transform:translateX(50%);z-index:600;background:rgba(15,22,40,.78);border:1px solid rgba(80,120,180,.40);border-radius:5px;color:#c8d8f0;font-size:.75em;font-variant-numeric:tabular-nums;padding:3px 8px;cursor:pointer;user-select:none;letter-spacing:.02em;transition:background .2s,color .2s;white-space:nowrap}
+#exag-pill{position:absolute;top:84px;right:42px;transform:translateX(50%);z-index:600;background:rgba(15,22,40,.78);border:1px solid rgba(80,120,180,.40);border-radius:5px;color:#c8d8f0;font-size:.75em;font-variant-numeric:tabular-nums;padding:3px 8px;cursor:pointer;user-select:none;letter-spacing:.02em;transition:background .2s,color .2s,top .2s;white-space:nowrap}
+#exag-pill.no-compass{top:12px}
 #exag-pill:hover{background:rgba(26,74,122,.85);color:#fff}
 #exag-pill.active{color:#fff;border-color:rgba(100,160,240,.6)}
 
@@ -449,6 +490,11 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
             <label><input type="checkbox" id="ck-hillshade" checked> Ombrage terrain</label>
             <label><input type="checkbox" id="ck-cpa" checked> 📷 Cartes postales</label>
             <label><input type="checkbox" id="ck-terrain" checked> 🏔 Terrain 3D</label>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Contrôles carte</div>
+            <label><input type="checkbox" id="ck-compass" checked> 🧭 Boussole</label>
+            <label><input type="checkbox" id="ck-exag" checked> ⛰️ Bouton exagération terrain</label>
           </div>
         </div>
       </div>
@@ -3799,6 +3845,27 @@ document.querySelectorAll('input[name="basemap"]').forEach(function(r){
       applyTerrain();
       updateExagBtn();
       syncTerrainUI();
+    });
+  }
+
+  /* E-3 — Boussole */
+  var ckCompass = document.getElementById('ck-compass');
+  if (ckCompass) {
+    ckCompass.addEventListener('change', function() {
+      var cw = document.getElementById('compass-widget');
+      if (cw) cw.style.display = this.checked ? '' : 'none';
+      /* Quand la boussole est masquée, le bouton relief remonte à sa place */
+      var pill = document.getElementById('exag-pill');
+      if (pill) pill.classList.toggle('no-compass', !this.checked);
+    });
+  }
+
+  /* E-4 — Bouton exagération terrain */
+  var ckExag = document.getElementById('ck-exag');
+  if (ckExag) {
+    ckExag.addEventListener('change', function() {
+      var pill = document.getElementById('exag-pill');
+      if (pill) pill.style.display = this.checked ? '' : 'none';
     });
   }
 })();
