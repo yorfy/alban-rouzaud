@@ -148,7 +148,7 @@ var CAHIER_3_DATA = {
         n: "Montagnes entre Mur et M\u00fcrz",
         lat: 47.24166, lng: 15.15371,
         date: "~23-25 sept.",
-        d: "\u00ab\u00a0Une belle vie, une vraie vie qui \u00e9prouve les muscles en lutte constante contre l'espace et la pesanteur.\u00a0\u00bb Marche \u00e0 la boussole plein ouest, plusieurs jours. Andr\u00e9 d\u00e9rive nord-ouest, Alban tire sud-ouest \u2014 \u00ab\u00a0en moyenne ils ne doivent gu\u00e8re s'\u00e9carter de la direction ouest\u00a0\u00bb. Trois jours de suite un abreuvoir creus\u00e9 dans un tronc les accueille \u00e0 l'\u00e9tape. ~17\u00a0km par jour.",
+        d: "\u00ab\u00a0Une belle vie, une vraie vie qui \u00e9prouve les muscles en lutte constante contre l'espace et la pesanteur.\u00a0\u00bb Marche \u00e0 la boussole plein ouest, plusieurs jours durant. Mais ils maudissent souvent cet enchev\u00eatrement de vall\u00e9es et de collines : la boussole, indiff\u00e9rente au relief, les force \u00e0 encha\u00eener \u00ab\u00a0descentes sur ascensions et ascensions sur descentes\u00a0\u00bb, et chaque piton p\u00e9niblement gravi ne d\u00e9couvre qu'un panorama encore plus chaotique. Les dos s'incurvent, les pieds butent cailloux et racines, les reins r\u00e9clament un peu de d\u00e9tente. Andr\u00e9 d\u00e9rive nord-ouest, Alban tire sud-ouest \u2014 \u00ab\u00a0en moyenne ils ne doivent gu\u00e8re s'\u00e9carter de la direction ouest\u00a0\u00bb. Trois jours de suite, la chance leur offre \u00e0 l'\u00e9tape un abreuvoir creus\u00e9 dans un tronc.",
         q: "On n'en sortira jamais !"
     },
     {
@@ -174,7 +174,7 @@ var CAHIER_3_DATA = {
         n: "Bords de la Mur, vers Knittelfeld",
         lat: 47.2164, lng: 14.8483,
         date: "~26 sept.",
-        d: "Dans le brouillard matinal, le bruit d'une grande rivi\u00e8re. \u00ab\u00a0La voil\u00e0\u2026 Merde\u00a0! \u00c7a ne peut \u00eatre que la Mur\u00a0!\u00a0\u00bb Un gros bourg sur l'autre rive \u2014 Knittelfeld\u00a0? Judenburg\u00a0? Feu de camp au bord de l'eau, th\u00e9 au lait, rasage. Ils d\u00e9cident de remonter la rivi\u00e8re vers l'ouest, direction Klagenfurt.",
+        d: "Dans le brouillard matinal, le bruit d'une grande rivi\u00e8re : ce ne peut \u00eatre que la Mur. Un gros bourg sur l'autre rive \u2014 Knittelfeld\u00a0? Judenburg\u00a0? Feu de camp au bord de l'eau, th\u00e9 au lait, rasage. Ils d\u00e9cident de remonter la rivi\u00e8re vers l'ouest, direction Klagenfurt.",
         q: "La voil\u00e0... Merde ! \u00c7a ne peut \u00eatre que la Mur !",
         r: "Retrouvent la Mur apr\u00e8s avoir coup\u00e9 par les montagnes",
         type: "mention"
@@ -212,7 +212,7 @@ var CAHIER_3_DATA = {
         n: "Feu de camp \u2014 rencontre du prisonnier fran\u00e7ais",
         lat: 47.18200, lng: 14.61240,
         date: "~27 sept. \u2014 matin",
-        d: "Lendemain matin, ils quittent la grange et regagnent le bord de la Mur. Feu de camp au confluent d\u2019un ruisseau. Th\u00e9 au lait, cuisson de patates, rasage. Un prisonnier fran\u00e7ais arrachant des betteraves leur crie : \u00ab\u00a0Franzose\u00a0?\u00a0\u00bb \u2014 \u00ab\u00a0Nous aussi\u2026 On fait la malle.\u00a0\u00bb L\u2019homme les regarde s\u2019\u00e9loigner, bras ballants.",
+        d: "Lendemain matin, ils quittent la grange et regagnent le bord de la Mur. Feu de camp au confluent d\u2019un ruisseau. Th\u00e9 au lait, cuisson de patates, rasage. Un prisonnier fran\u00e7ais arrachant des betteraves les h\u00e8le \u2014 \u00ab\u00a0Franzose\u00a0?\u00a0\u00bb \u2014 et comprend aussit\u00f4t qu\u2019ils s\u2019\u00e9vadent. L\u2019homme les regarde s\u2019\u00e9loigner, bras ballants.",
         q: "Nous aussi, dis donc ! On fait la malle.",
         r: "Rive de la Mur, entre Judenburg et Zeltweg"
     },
@@ -221,7 +221,7 @@ var CAHIER_3_DATA = {
         n: "Baraque \u00e0 foin \u2014 nuit avant le Dimanche",
         lat: 47.17471, lng: 14.43052,
         date: "Samedi soir ~27 sept.",
-        d: "Au cr\u00e9puscule, ils gagnent les abords de la voie ferr\u00e9e. Les trains de marchandises s\u2019essoufflent sur un raidillon en lisi\u00e8re de for\u00eat \u2014 id\u00e9e d\u2019escalader un wagon cette nuit. Ils p\u00e9n\u00e8trent dans une baraque \u00e0 foin pour observer les trains et attendre l\u2019obscurit\u00e9. Leurs paupi\u00e8res s\u2019alourdissent. \u00ab\u00a0Si on roupillait ici\u00a0?\u00a0\u00bb \u2014 \u00ab\u00a0Demain c\u2019est dimanche, nous observerons la tr\u00eave hebdomadaire.\u00a0\u00bb",
+        d: "Au cr\u00e9puscule, ils gagnent les abords de la voie ferr\u00e9e. Les trains de marchandises s\u2019essoufflent sur un raidillon en lisi\u00e8re de for\u00eat \u2014 id\u00e9e d\u2019escalader un wagon cette nuit. Ils p\u00e9n\u00e8trent dans une baraque \u00e0 foin pour observer les trains et attendre l\u2019obscurit\u00e9. Mais les paupi\u00e8res s\u2019alourdissent : ils renoncent \u00e0 la tentative et d\u00e9cident de dormir l\u00e0, remettant tout au lendemain.",
         q: "Si on roupillait ici ? \u2014 Tant vaut-il. Demain c\u2019est dimanche.",
         r: "Baraque \u00e0 foin pr\u00e8s de la Rudolfsbahn, en amont d\u2019Unzmarkt",
         type: "bivouac"
@@ -242,7 +242,7 @@ var CAHIER_3_DATA = {
         n: "Auto-strade \u2014 accident de v\u00e9lo (borne Klagenfurt 76\u00a0km)",
         lat: 47.10460, lng: 14.45578,
         date: "Nuit du 27 au 28 sept.",
-        d: "Sur l'auto-strade Vienne-Klagenfurt. Bornes \u00ab\u00a0Klagenfurt 76\u00a0km\u2026 75\u2026 74\u2026\u00a0\u00bb Un cycliste sans lumi\u00e8re percute Andr\u00e9 de plein fouet. L'homme s'affale sur la route, le visage ensanglant\u00e9. Ils le rel\u00e8vent avec l'aide d'une femme puis s'enfuient \u00e0 travers champs. Point positionn\u00e9 \u00e0 ~18\u00a0km de Judenburg le long de la route, correspondant \u00e0 la borne \u00ab\u00a0Klagenfurt 76\u00a0km\u00a0\u00bb.",
+        d: "Il n'y a pas eu de prochaine gare : la tentative de wagon abandonn\u00e9e, ils basculent sur l'auto-strade Vienne-Klagenfurt. Bornes \u00ab\u00a0Klagenfurt 76\u00a0km\u2026 75\u2026 74\u2026\u00a0\u00bb Un cycliste sans lumi\u00e8re percute Andr\u00e9 de plein fouet. L'homme s'affale sur la route, le visage ensanglant\u00e9. Ils le rel\u00e8vent avec l'aide d'une femme puis s'enfuient \u00e0 travers champs.",
         q: "Ah ! putain de Dieu ! Quelle tuile ! Quelle poisse !",
         r: "Auto-strade direction Klagenfurt (borne 76\u00a0km)"
     },
@@ -279,8 +279,8 @@ var CAHIER_3_DATA = {
         n: "Villach (travers\u00e9e & pont sur la Drau)",
         lat: 46.60961, lng: 13.85230,
         date: "~2 oct.",
-        d: "Le pont sur la Drau n'est pas gard\u00e9. La sentinelle de la caserne ne devine rien \u2014 c'est elle qui reste prisonni\u00e8re. Un adolescent ent\u00eat\u00e9 veut les prendre sur sa charrette tir\u00e9e par un b\u0153uf. \u00c0 la sortie, une pancarte\u00a0: \u00ab\u00a0Italien. Grenze 21\u00a0Km.\u00a0\u00bb",
-        q: "Italien. Grenze 21 Km.",
+        d: "Le pont sur la Drau n'est pas gard\u00e9. Un adolescent ent\u00eat\u00e9 veut \u00e0 tout prix les prendre sur sa charrette tir\u00e9e par un b\u0153uf ; ils s'en d\u00e9barrassent par monosyllabes. Devant la gu\u00e9rite d'une caserne, une sentinelle monte la garde sans se douter que deux \u00e9vad\u00e9s la fr\u00f4lent.",
+        q: "C'est elle qui reste prisonni\u00e8re. Eux partent \u00e0 la montagne.",
         r: "Travers\u00e9e de Villach, pont sur la Drau"
     },
     // Phase 8 — Evvira
@@ -299,8 +299,8 @@ var CAHIER_3_DATA = {
         n: "Fronti\u00e8re italo-autrichienne (cr\u00eate au sud de Th\u00f6rl-Maglern)",
         lat: 46.52221, lng: 13.70255,
         date: "3 oct. — 15h30",
-        d: "Tranch\u00e9e dans la for\u00eat, une pancarte rong\u00e9e : \u00ab\u00a0Cassa\u00a0\u00bb. Une lettre en italien. \u00ab\u00a0Plus de doute\u00a0! On y est bien\u00a0!\u00a0\u00bb Ils s'embrassent. En patois occitan : \u00ab\u00a0\u00c9 aro euf f\u00e9 atension\u00a0!\u00a0\u00bb (Et maintenant il faut faire attention\u00a0!)",
-        q: "Cassa ! Cassa ! \u00c7a veut dire certainement \u00ab chasse \u00bb en italien !",
+        d: "Une tranch\u00e9e dans la for\u00eat, une pancarte rong\u00e9e portant \u00ab\u00a0Cassa\u00a0\u00bb \u2014 de l'italien pour \u00ab\u00a0chasse\u00a0\u00bb \u2014 et une lettre \u00e9gar\u00e9e dans la m\u00eame langue : plus de doute, ils ont franchi la fronti\u00e8re. Ils s'embrassent, puis se reprennent aussit\u00f4t.",
+        q: "\u00c9 aro euf f\u00e9 atension\u00a0! (patois occitan : Et maintenant il faut faire attention\u00a0!)",
         type: "frontiere"
     },
     {
@@ -346,7 +346,7 @@ var CAHIER_3_DATA = {
         n: "Udine (Prison Centrale)",
         lat: 46.0693, lng: 13.2357,
         date: "~6-7 oct.",
-        d: "Panier \u00e0 salade, caserne, puis Prison Centrale \u2014 \u00ab\u00a0une esp\u00e8ce de forteresse sans fen\u00eatres\u00a0\u00bb. Un gardien ouvre une grille, referme. \u00ab\u00a0Ils nous ont fait crever de faim en Italie.\u00a0\u00bb Ils sont gentils, toujours le sourire, mais \u00ab\u00a0on ne vit pas que d'esp\u00e9rance\u00a0\u00bb.",
+        d: "Panier \u00e0 salade, caserne, puis Prison Centrale \u2014 \u00ab\u00a0une esp\u00e8ce de forteresse sans fen\u00eatres\u00a0\u00bb. Un gardien ouvre une grille, referme. Les Italiens sont gentils, toujours le sourire, mais \u00ab\u00a0on ne vit pas que d'esp\u00e9rance\u00a0\u00bb \u2014 et la faim tenaille.",
         q: "Ils nous ont fait crever de faim en Italie.",
         r: "Train sous escorte, menottes aux mains"
     },
@@ -355,7 +355,7 @@ var CAHIER_3_DATA = {
         n: "Stalag XVIII\u00a0D \u2014 Marburg (Maribor)",
         lat: 46.5547, lng: 15.6467,
         date: "21 oct. 1941 (\u00e9pilogue)",
-        d: "Retour au Stalag XVIII\u00a0D, Marburg. 21 jours de cachot. Les copains passent des biscuits par le petit trou de la porte. \u00ab\u00a0Putain quelle fringale.\u00a0\u00bb",
+        d: "Retour au Stalag XVIII\u00a0D, Marburg. 21 jours de cachot pour les \u00ab\u00a0sept \u00e0 huit rep\u00each\u00e9s\u00a0\u00bb enferm\u00e9s dans la cellule. Des copains rest\u00e9s prisonniers dans le camp leur glissent des biscuits par le petit trou de la porte. \u00ab\u00a0Putain quelle fringale.\u00a0\u00bb",
         q: "Et d'o\u00f9 arrivez-vous ? \u2014 D'Italie. Vous avez des biscuits ?",
         type: "retour"
     }
