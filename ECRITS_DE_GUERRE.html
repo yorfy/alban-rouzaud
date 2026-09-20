@@ -1005,13 +1005,10 @@ var MapAdapter = (function() {
 
   /* --- _fitPadding(base) — padding asymétrique en portrait mobile pour compenser la bottombar --- */
   function _fitPadding(base) {
-    var isPortrait = window.matchMedia('(max-width:480px) and (orientation:portrait)').matches;
-    if (!isPortrait) return base;
-    var panel = document.getElementById('panel');
-    /* Utiliser offsetHeight si dispo et non nul, sinon fallback 60vh */
-    var panelH = panel ? panel.offsetHeight : 0;
-    if (panelH === 0) panelH = Math.round(window.innerHeight * 0.6);
-    return { top: base, bottom: panelH + 20, left: Math.round(base * 0.7), right: Math.round(base * 0.7) };
+    /* Padding symétrique simple. Un padding bas asymétrique (pour dégager le
+       panneau bottombar) faisait dézoomer à l'extrême sur mobile car le canvas est
+       déjà réduit par le panneau — MapLibre gère mieux un padding modeste et égal. */
+    return base;
   }
 
   /* --- fitCahier(n) — fitBounds sur tous les stops du cahier, padding 60 --- */
@@ -1449,8 +1446,10 @@ var STYLES = {
 var map = new maplibregl.Map({
   container: 'map',
   style:     STYLES.ofm,
-  center:    [8, 47.5],
-  zoom:      5,
+  /* Vue initiale centrée sur Lavelanet (Ariège), pays natal et lieu de mobilisation
+     d'Alban Rouzaud — point de départ du récit (coords du stop C1). */
+  center:    [1.84225, 42.93011],
+  zoom:      8,
   pitch:     0,
   bearing:   0,
   maxPitch:  85,
@@ -2865,6 +2864,10 @@ var Panel = (function() {
     + 'position:sticky;top:0;z-index:5;background:#16213e;'
     + 'margin:-8px -12px 10px;padding:8px 12px;'
     + 'border-bottom:1px solid rgba(255,255,255,.12)}',
+    /* Resize par swipe vertical sur la nav bar — portrait mobile uniquement.
+       touch-action:none pour que le geste vertical n'aille pas au scroll natif. */
+    '@media (orientation:portrait) and (max-width:820px){'
+    + '.pv-nav-bar{touch-action:none;cursor:row-resize}}',
     '.pv-nav-btn{flex-shrink:0;width:28px;height:28px;display:flex;align-items:center;'
     + 'justify-content:center;background:#0f3460;border:1px solid #1a4a7a;border-radius:4px;'
     + 'color:#a0b4c8;font-size:.85em;cursor:pointer;transition:background .15s,color .15s;'
@@ -3941,6 +3944,24 @@ window.addEventListener('hashchange', function(){
   /* FR-1.4 / NFR-5 — Semer l'entrée initiale dans l'historique.
    * Sans cet appel, le premier popstate déclencherait une sortie de page. */
   history.pushState({ level: 0 }, '');
+
+  /* Fit initial de la vue d'ensemble. Le rendu de l'accueil passe par
+     Panel.navigateTo (pas NAV.go), donc onNavChange(level 0) n'est JAMAIS déclenché
+     au démarrage : sans ceci la carte restait figée sur center:[8,47.5]/zoom:5.
+     On attend map idle + resize() pour que fitBounds calcule le zoom sur les
+     dimensions RÉELLES du canvas (panneau bottombar déjà posé sur mobile). */
+  function _fitInitialOverview() {
+    map.resize();                 // capter la taille finale du canvas
+    /* Fit d'accueil animé : la carte s'ouvre sur l'Ariège (center/zoom initial de
+       new Map) puis élargit vers l'ensemble des 4 cahiers avec la durée normale —
+       effet d'ouverture narratif (point de départ du récit -> parcours complet). */
+    MapAdapter.onNavChange({ level: 0 });
+  }
+  if (map.loaded()) {
+    map.once('idle', _fitInitialOverview);
+  } else {
+    map.once('load', function(){ map.once('idle', _fitInitialOverview); });
+  }
 })();
 
 // =====================================================================
@@ -4144,12 +4165,56 @@ var PanelResize = (function() {
   var _startPos  = 0;    // clientX (desktop) ou clientY (mobile)
   var _startSize = 0;    // width (desktop) ou height (mobile) au début du drag
   var _mobile    = false;
+  var _boundsBefore = null;  // bounds géographiques visibles capturés au début du geste
 
   var MIN_WIDTH  = 220;
   var MIN_HEIGHT = 48;
 
   function _getPanel() { return document.getElementById('panel'); }
   function _getMap()   { return typeof map !== 'undefined' ? map : null; }
+
+  /* Détection du régime portrait mobile par la FORME de l'écran (plus haut que
+     large et pas trop large), et non par max-width:480px qui ne matche pas les
+     téléphones dont la largeur CSS dépasse 480px. */
+  function _isPortrait() {
+    return (window.innerHeight > window.innerWidth) && (window.innerWidth <= 820);
+  }
+
+  /* Capturer l'état AVANT le resize : centre, zoom, et hauteur du canvas.
+     On préserve le CENTRE et on fait suivre le zoom à la hauteur (échelle log2)
+     — quand la carte grandit en hauteur, on zoome ; quand elle rétrécit, on
+     dézoome. fitBounds ne convient pas ici : en portrait la largeur (inchangée)
+     domine, donc agrandir la hauteur ne rezoomait pas. */
+  function _captureBounds() {
+    var m = _getMap();
+    if (m && m.getCenter) {
+      _boundsBefore = {
+        center: m.getCenter(),
+        zoom:   m.getZoom(),
+        h:      m.getContainer().offsetHeight
+      };
+    } else {
+      _boundsBefore = null;
+    }
+  }
+  /* Après resize : recentrer + ajuster le zoom au ratio de hauteur, instantanément. */
+  function _restoreBounds() {
+    var m = _getMap();
+    if (!m) return;
+    try { m.resize(); } catch(e) {}
+    if (_boundsBefore) {
+      var newH = m.getContainer().offsetHeight;
+      var oldH = _boundsBefore.h;
+      var newZoom = _boundsBefore.zoom;
+      if (oldH > 0 && newH > 0) {
+        newZoom = _boundsBefore.zoom + Math.log2(newH / oldH);
+      }
+      try {
+        m.jumpTo({ center: _boundsBefore.center, zoom: newZoom });
+      } catch(e2) {}
+    }
+    _boundsBefore = null;
+  }
 
   function _clampDesktop(w) {
     return Math.min(Math.round(window.innerWidth * 0.5), Math.max(MIN_WIDTH, w));
@@ -4161,10 +4226,11 @@ var PanelResize = (function() {
   function _onStart(e) {
     var handle = document.getElementById('panel-resize-handle');
     if (!handle) return;
-    _mobile = window.matchMedia('(max-width:480px) and (orientation:portrait)').matches;
+    _mobile = _isPortrait();
     var panel = _getPanel();
     if (!panel) return;
     _active    = true;
+    _captureBounds();
     if (_mobile) {
       _startPos  = (e.touches ? e.touches[0].clientY : e.clientY);
       _startSize = panel.offsetHeight;
@@ -4189,10 +4255,8 @@ var PanelResize = (function() {
       panel.style.width    = newW + 'px';
       panel.style.minWidth = newW + 'px';
     }
-    requestAnimationFrame(function() {
-      var m = _getMap();
-      if (m) try { m.resize(); } catch(e2) {}
-    });
+    /* Option B : pas de map.resize() pendant le geste (source de clignotement) —
+       le canvas est recalé une seule fois au relâchement, dans _onEnd. */
   }
 
   function _onEnd(e) {
@@ -4205,6 +4269,9 @@ var PanelResize = (function() {
       /* Clés séparées : hauteur en portrait mobile, largeur sinon (paysage/desktop) */
       try { localStorage.setItem(_mobile ? 'panelH' : 'panelW', String(val)); } catch(e2) {}
     }
+    /* Option B : recaler le canvas MapLibre une seule fois, au relâchement,
+       en réappliquant les bounds visibles d'avant le resize. */
+    _restoreBounds();
   }
 
   function init() {
@@ -4242,14 +4309,77 @@ var PanelResize = (function() {
     }
 
     /* Au changement d'orientation : réappliquer la taille du nouveau régime */
-    var _mql = window.matchMedia('(max-width:480px) and (orientation:portrait)');
     function _onOrientationChange() {
-      _applyStored(_mql.matches);
+      _applyStored(_isPortrait());
     }
-    _mql.addEventListener('change', _onOrientationChange);
+    window.matchMedia('(orientation:portrait)').addEventListener('change', _onOrientationChange);
+    window.addEventListener('resize', _onOrientationChange);
 
     /* Restauration initiale selon le régime courant */
-    _applyStored(_mql.matches);
+    _applyStored(_isPortrait());
+
+    /* ---- Resize par swipe vertical sur la barre de titre (.pv-nav-bar) ----
+       La nav bar est régénérée à chaque rendu de vue : on délègue depuis #panel
+       (stable) plutôt que d'attacher un listener qui serait perdu au re-render.
+       On distingue tap (clic bouton/titre) et drag (resize) par un seuil : sous le
+       seuil, on ne preventDefault pas, donc le onclick natif des boutons joue. */
+    var SWIPE_THRESHOLD = 8;   // px avant de considérer que c'est un resize
+    var _navActive = false, _navStartY = 0, _navStartH = 0, _navMoved = false;
+
+    function _navStart(e) {
+      if (!_isPortrait()) return;                 // resize par swipe = portrait seul
+      if (!e.target.closest || !e.target.closest('.pv-nav-bar')) return;
+      var panel = _getPanel();
+      if (!panel) return;
+      _navActive = true; _navMoved = false;
+      _navStartY = e.touches ? e.touches[0].clientY : e.clientY;
+      _navStartH = panel.offsetHeight;
+      _captureBounds();
+    }
+    function _navMove(e) {
+      if (!_navActive) return;
+      var panel = _getPanel();
+      if (!panel) return;
+      var y  = e.touches ? e.touches[0].clientY : e.clientY;
+      var dy = y - _navStartY;
+      if (!_navMoved && Math.abs(dy) < SWIPE_THRESHOLD) return;  // encore un tap potentiel
+      _navMoved = true;
+      e.preventDefault();                          // bloque le scroll pendant le resize
+      /* Panneau ancré en bas : glisser vers le HAUT agrandit (hauteur += -dy). */
+      var newH = _clampMobile(_navStartH - dy);
+      panel.style.height = newH + 'px';
+      /* Option B : pas de map.resize() pendant le geste — recalage au relâchement. */
+    }
+    function _navEnd() {
+      if (!_navActive) return;
+      _navActive = false;
+      if (!_navMoved) { _boundsBefore = null; return; }  // tap : rien à recadrer
+      var panel = _getPanel();
+      if (!panel) { _boundsBefore = null; return; }
+      var val = parseInt(panel.style.height, 10);
+      if (!isNaN(val)) { try { localStorage.setItem('panelH', String(val)); } catch(e2) {} }
+      /* Option B : recaler le canvas une seule fois, en réappliquant les bounds
+         visibles d'avant le resize. */
+      _restoreBounds();
+    }
+    /* Bloquer un click synthétique déclenché juste après un drag (évite d'activer
+       un bouton ◀/▶ ou le titre en relâchant après un resize). */
+    function _navClickGuard(e) {
+      if (_navMoved && e.target.closest && e.target.closest('.pv-nav-bar')) {
+        e.stopPropagation(); e.preventDefault(); _navMoved = false;
+      }
+    }
+
+    var panelEl = _getPanel();
+    if (panelEl) {
+      panelEl.addEventListener('touchstart', _navStart, { passive: true });
+      panelEl.addEventListener('touchmove',  _navMove,  { passive: false });
+      panelEl.addEventListener('touchend',   _navEnd);
+      panelEl.addEventListener('mousedown',  _navStart);
+      document.addEventListener('mousemove', _navMove);
+      document.addEventListener('mouseup',   _navEnd);
+      panelEl.addEventListener('click',      _navClickGuard, true);
+    }
   }
 
   return { init: init, _onStart: _onStart, _onMove: _onMove, _onEnd: _onEnd };
