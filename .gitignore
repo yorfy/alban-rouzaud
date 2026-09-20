@@ -46,11 +46,18 @@ _server.js
 extract_kml.py
 
 # Kiro (specs et skills internes — à exclure du repo public)
-.kiro/
+# Exclure tout le contenu de .kiro/ SAUF les skills projet ré-inclus plus bas.
+# NB: on exclut .kiro/* (le contenu) et non .kiro/ (le dossier) — git ne
+# redescend jamais dans un dossier exclu, donc les exceptions !.kiro/... ne
+# marchent que si chaque niveau parent reste ouvert.
+.kiro/*
 # Sauf les skills spécifiques au projet
 !.kiro/skills/
+.kiro/skills/*
 !.kiro/skills/docx-to-pdf/
 !.kiro/skills/docx-to-pdf/**
+!.kiro/skills/fetch-gdrive-docx/
+!.kiro/skills/fetch-gdrive-docx/**
 !.kiro/skills/format-manuscript/
 !.kiro/skills/format-manuscript/**
 !.kiro/skills/generate-map/
@@ -59,3 +66,6 @@ extract_kml.py
 !.kiro/skills/review-transcription/**
 !.kiro/skills/transcribe-manuscript/
 !.kiro/skills/transcribe-manuscript/**
+# Mais jamais les artefacts Python compilés des scripts de skills
+.kiro/skills/**/__pycache__/
+.kiro/skills/**/*.pyc
