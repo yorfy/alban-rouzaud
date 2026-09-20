@@ -91,5 +91,6 @@ Le skill demande la source (PDF ou dossier d'images), la langue et le contexte d
 | `review-transcription` | Revue et correction d'une transcription existante |
 | `format-manuscript` | Génération d'un DOCX mis en page depuis un `.txt` |
 | `docx-to-pdf` | Conversion de DOCX en PDF via l'API COM de Word (Windows) |
+| `fetch-gdrive-docx` | Récupération des cahiers DOCX depuis Google Drive vers `docs/` (écrase les versions locales) |
 | `generate-map` | Carte HTML interactive du parcours décrit |
 | `writing-for-agents` | Rédaction de skills, steering et docs agent-facing |
