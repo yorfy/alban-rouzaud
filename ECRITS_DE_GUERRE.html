@@ -1020,7 +1020,7 @@ var MapAdapter = (function() {
     map.fitBounds(
       [[Math.min.apply(null,lngs), Math.min.apply(null,lats)],
        [Math.max.apply(null,lngs), Math.max.apply(null,lats)]],
-      { padding:60, duration:mapTransitionDuration }
+      { padding:60, maxZoom:14, duration:mapTransitionDuration }
     );
   }
 
@@ -1033,15 +1033,15 @@ var MapAdapter = (function() {
     map.fitBounds(
       [[Math.min.apply(null,lngs), Math.min.apply(null,lats)],
        [Math.max.apply(null,lngs), Math.max.apply(null,lats)]],
-      { padding:80, duration:mapTransitionDuration }
+      { padding:80, maxZoom:14, duration:mapTransitionDuration }
     );
   }
 
-  /* --- flyToStop(stop) — zoom max(actuel, 13), durée mapTransitionDuration --- */
+  /* --- flyToStop(stop) — zoom cible 14, borné [13,15], durée mapTransitionDuration --- */
   function flyToStop(stop) {
     map.flyTo({
       center:   [stop.lng, stop.lat],
-      zoom:     Math.max(map.getZoom(), 13),
+      zoom:     Math.min(Math.max(map.getZoom(), 13), 15),
       duration: mapTransitionDuration
     });
   }
