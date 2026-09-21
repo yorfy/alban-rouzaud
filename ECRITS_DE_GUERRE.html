@@ -475,13 +475,28 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
             <label><input type="radio" name="basemap" value="terrain"> 🏔️ Basemap.at Terrain</label>
             <label><input type="radio" name="basemap" value="ortho"> 🎞️ Basemap.at Ortho</label>
             <label><input type="radio" name="basemap" value="satellite"> 🌐 Satellite Esri</label>
+          </div>
+          <div class="settings-section">
+            <div class="settings-section-title">Animations</div>
             <label style="display:flex;align-items:center;justify-content:space-between;gap:6px">Transitions carte
               <select id="ck-transition" style="background:#0f1628;border:1px solid #1a4a7a;color:#a0b4c8;border-radius:4px;padding:2px 4px;font-size:.8em">
                 <option value="0">Instantané</option>
                 <option value="400">Rapide</option>
-                <option value="1200" selected>Normal</option>
+                <option value="1200">Normal</option>
                 <option value="2000">Lent</option>
+                <option value="3500" selected>Très lent</option>
+                <option value="custom">Personnalisé…</option>
               </select>
+            </label>
+            <label id="ck-transition-custom-row" style="display:none;align-items:center;justify-content:space-between;gap:6px">Durée (ms)
+              <input type="number" id="ck-transition-custom" min="0" max="20000" step="100" value="1200"
+                     style="width:80px;background:#0f1628;border:1px solid #1a4a7a;color:#a0b4c8;border-radius:4px;padding:2px 4px;font-size:.8em;font-variant-numeric:tabular-nums">
+            </label>
+            <label><input type="checkbox" id="ck-anim-bearing" checked> 🧭 Orientation animée (cap du trajet)</label>
+            <label><input type="checkbox" id="ck-flyover"> 🛩️ Survol du parcours (points intermédiaires)</label>
+            <label id="ck-flyover-dist-row" style="display:none;align-items:center;justify-content:space-between;gap:6px">Distance entre survols (km)
+              <input type="number" id="ck-flyover-dist" min="0.5" max="50" step="0.5" value="3"
+                     style="width:70px;background:#0f1628;border:1px solid #1a4a7a;color:#a0b4c8;border-radius:4px;padding:2px 4px;font-size:.8em;font-variant-numeric:tabular-nums">
             </label>
           </div>
           <div class="settings-section">
@@ -1020,7 +1035,7 @@ var MapAdapter = (function() {
     map.fitBounds(
       [[Math.min.apply(null,lngs), Math.min.apply(null,lats)],
        [Math.max.apply(null,lngs), Math.max.apply(null,lats)]],
-      { padding:60, duration:mapTransitionDuration }
+      { padding:60, maxZoom:14, duration:mapTransitionDuration }
     );
   }
 
@@ -1033,26 +1048,39 @@ var MapAdapter = (function() {
     map.fitBounds(
       [[Math.min.apply(null,lngs), Math.min.apply(null,lats)],
        [Math.max.apply(null,lngs), Math.max.apply(null,lats)]],
-      { padding:80, duration:mapTransitionDuration }
+      { padding:80, maxZoom:14, duration:mapTransitionDuration }
     );
   }
 
-  /* --- flyToStop(stop) — zoom max(actuel, 13), durée mapTransitionDuration --- */
-  function flyToStop(stop) {
-    map.flyTo({
+  /* --- flyToStop(stop, flyoverFrom) — zoom cible 14, borné [13,15].
+   *  Si flyoverFrom = {lng,lat, cahier} est fourni ET que le survol est activé ET
+   *  qu'un tracé exploitable relie l'étape de départ à l'arrivée sur la polyligne
+   *  ordonnée du cahier, on survole le parcours en continu ; sinon flyTo direct. --- */
+  function flyToStop(stop, flyoverFrom) {
+    _cancelFlyover();
+    var finalZoom = Math.min(Math.max(map.getZoom(), 13), 15);
+    if (flyoverEnabled && flyoverFrom) {
+      var plan = _flyoverPlan(flyoverFrom.cahier,
+                              flyoverFrom.lng, flyoverFrom.lat, stop.lng, stop.lat);
+      if (plan) {
+        _startFlyover(plan, { lng: stop.lng, lat: stop.lat }, finalZoom);
+        return;
+      }
+    }
+    map.flyTo(Object.assign({
       center:   [stop.lng, stop.lat],
-      zoom:     Math.max(map.getZoom(), 13),
+      zoom:     finalZoom,
       duration: mapTransitionDuration
-    });
+    }, _bearingOpt(stop.lng, stop.lat)));
   }
 
   /* --- flyToCPA(lieu) — zoom max(actuel, 12) --- */
   function flyToCPA(lieu) {
-    map.flyTo({
+    map.flyTo(Object.assign({
       center:   [lieu.lng, lieu.lat],
       zoom:     Math.max(map.getZoom(), 12),
       duration: 900
-    });
+    }, _bearingOpt(lieu.lng, lieu.lat)));
   }
 
   /* --- setActiveMarker(stopId) — met à jour le visuel du marqueur actif ---
@@ -1220,9 +1248,30 @@ var MapAdapter = (function() {
       if (state.cahier != null) showCahier(state.cahier);
       if (state.stopId != null) {
         var entry = stopMarkerIndex['c' + state.cahier + '_' + state.stopId];
-        if (entry) flyToStop(entry.marker.getLngLat());
+        if (entry) {
+          /* Survol du parcours : seulement d'une étape vers l'étape suivante
+             contiguë (même cahier), toutes phases confondues. Sinon flyTo direct. */
+          var flyoverFrom = null;
+          if (flyoverEnabled && _activeStopId != null) {
+            var m = /^c(\d+)_(.+)$/.exec(_activeStopId);
+            if (m) {
+              var fromCahier = parseInt(m[1], 10);
+              var fromStopId = m[2];
+              if (fromCahier === state.cahier &&
+                  _areAdjacentStops(fromCahier, fromStopId, state.stopId)) {
+                var fromEntry = stopMarkerIndex[_activeStopId];
+                if (fromEntry) {
+                  var fll = fromEntry.marker.getLngLat();
+                  flyoverFrom = { lng: fll.lng, lat: fll.lat, cahier: fromCahier };
+                }
+              }
+            }
+          }
+          flyToStop(entry.marker.getLngLat(), flyoverFrom);
+        }
         setActiveMarker('c' + state.cahier + '_' + state.stopId);
       } else if (state.cpaLoc != null) {
+        _cancelFlyover();
         var cahierN = state.cahier;
         var cd = (cahierN===1?CAHIER_1_DATA:cahierN===2?CAHIER_2_DATA:cahierN===3?CAHIER_3_DATA:CAHIER_4_DATA)||{};
         var lieux = cd.cpa || cd.lieux || [];
@@ -1231,8 +1280,30 @@ var MapAdapter = (function() {
         }
         setActiveMarker(null);
       }
+    } else {
+      _cancelFlyover();
     }
   }
+
+  /* Les deux stops (ids, comparés en string) sont-ils deux items 'stop'
+     adjacents dans la séquence plate du même cahier (CPA intercalés ignorés) ? */
+  function _areAdjacentStops(cahier, idA, idB) {
+    var seq = NAV && NAV._seq;
+    if (!seq) return false;
+    var lastStopIdx = -1;
+    for (var i = 0; i < seq.length; i++) {
+      if (seq[i].type !== 'stop' || seq[i].cahier !== cahier) continue;
+      var id = String(seq[i].data.id);
+      if (lastStopIdx >= 0) {
+        var prevId = String(seq[lastStopIdx].data.id);
+        if ((prevId === String(idA) && id === String(idB)) ||
+            (prevId === String(idB) && id === String(idA))) return true;
+      }
+      lastStopIdx = i;
+    }
+    return false;
+  }
+
 
   /* --- syncLayersOnly(state) — ré-applique visibilité des couches après style.load
    *     sans aucun effet de bord : pas de flyTo, fitBounds, showOverview, showCahier --- */
@@ -1300,7 +1371,275 @@ var terrainExaggeration = 1.0;
 var hillshadeOn         = true;
 var currentBasemap = 'ofm';
 var cpaGlobalVisible = true;
-var mapTransitionDuration = 1200; // durée des transitions MapLibre en ms (E-1)
+var mapTransitionDuration = 3500; // durée des transitions MapLibre en ms (E-1) — défaut « Très lent »
+var animateBearing = true; // E-3 : orienter la carte selon le cap départ→arrivée pendant le vol (actif par défaut)
+var flyoverEnabled  = false;  // E-4 : survol fluide du tracé GPS entre deux étapes contiguës (désactivé par défaut)
+var flyoverSampleKm = 3;     // distance (km) entre points de survol échantillonnés; lisse le tracé (spline)
+
+/* Cap géographique (0-360°, 0=Nord) du point [lng1,lat1] vers [lng2,lat2].
+   Utilisé quand animateBearing est actif pour tourner la carte dans le sens du trajet. */
+function _bearingTo(lng1, lat1, lng2, lat2) {
+  var rad = Math.PI / 180;
+  var phi1 = lat1 * rad, phi2 = lat2 * rad;
+  var dLng = (lng2 - lng1) * rad;
+  var y = Math.sin(dLng) * Math.cos(phi2);
+  var x = Math.cos(phi1) * Math.sin(phi2) - Math.sin(phi1) * Math.cos(phi2) * Math.cos(dLng);
+  return (Math.atan2(y, x) / rad + 360) % 360;
+}
+
+/* Renvoie l'option bearing à passer à flyTo vers [lng,lat], si l'orientation animée
+   est active ET que la distance départ→arrivée est suffisante pour un cap fiable.
+   Sinon renvoie {} (MapLibre conserve le bearing courant). */
+function _bearingOpt(lng, lat) {
+  if (!animateBearing) return {};
+  var c = map.getCenter();
+  // Ignore un déplacement quasi nul (cap instable, évite une rotation parasite).
+  if (Math.abs(c.lng - lng) < 1e-4 && Math.abs(c.lat - lat) < 1e-4) return {};
+  return { bearing: _bearingTo(c.lng, c.lat, lng, lat) };
+}
+
+/* --- Survol du tracé (E-4) --------------------------------------------
+ * Le tracé de chaque phase est prédéfini (staticRoutes). On projette l'étape
+ * de départ et l'étape d'arrivée sur ce tracé pour obtenir leurs distances
+ * curvilignes, puis on suit le parcours en continu (rAF, vitesse constante,
+ * sans arrêt) entre les deux. N'agit QUE d'une étape vers la suivante.
+ */
+
+/* Distance haversine en km entre deux [lng,lat]. */
+function _haversineKm(lng1, lat1, lng2, lat2) {
+  var R = 6371, rad = Math.PI / 180;
+  var dLat = (lat2 - lat1) * rad, dLng = (lng2 - lng1) * rad;
+  var a = Math.sin(dLat/2)*Math.sin(dLat/2)
+        + Math.cos(lat1*rad)*Math.cos(lat2*rad)*Math.sin(dLng/2)*Math.sin(dLng/2);
+  return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+/* Polyligne maîtresse ORDONNÉE du cahier entier.
+   - Priorité à elevProfile (déjà trié le long du trajet, distance cumulée globale
+     et continue ; chaque point = [distCumKm, alt, lat, lng]).
+   - Fallback : staticRoutes concaténées dans l'ordre du tableau (variantes da≠0
+     ignorées), distance cumulée calculée par haversine. Suffisant quand les routes
+     du cahier s'enchaînent (cas des cahiers 1 et 2).
+   Renvoie { pts:[[lng,lat],...], cum:[km,...] }. Mis en cache par cahier. */
+var _cahierPolyCache = {};
+function _cahierPolyline(cahier) {
+  if (_cahierPolyCache[cahier]) return _cahierPolyCache[cahier];
+  var cd = getCahierData(cahier);
+  var pts = [], cum = [];
+
+  var ep = (cd && cd.elevProfile) || [];
+  var hasElev = false;
+  for (var e = 0; e < ep.length; e++) { if ((ep[e].pts||[]).length) { hasElev = true; break; } }
+
+  if (hasElev) {
+    for (var i = 0; i < ep.length; i++) {
+      var seg = ep[i].pts || [];
+      for (var j = 0; j < seg.length; j++) {
+        var d = seg[j][0], lat = seg[j][2], lng = seg[j][3];
+        // Évite un doublon exact à la jonction de deux segments (même dist + même point).
+        if (pts.length && Math.abs(cum[cum.length-1] - d) < 1e-6 &&
+            Math.abs(pts[pts.length-1][0] - lng) < 1e-9 &&
+            Math.abs(pts[pts.length-1][1] - lat) < 1e-9) continue;
+        pts.push([lng, lat]);
+        cum.push(d);
+      }
+    }
+  } else {
+    // Fallback staticRoutes (coords en [lat,lng]) — distance cumulée par haversine.
+    var routes = (cd && cd.routes) || [];
+    for (var r = 0; r < routes.length; r++) {
+      if (routes[r].da && routes[r].da !== 0) continue; // ignore les variantes
+      var cs = routes[r].coords || [];
+      for (var k = 0; k < cs.length; k++) {
+        var lng2 = cs[k][1], lat2 = cs[k][0];
+        if (pts.length &&
+            Math.abs(pts[pts.length-1][0] - lng2) < 1e-9 &&
+            Math.abs(pts[pts.length-1][1] - lat2) < 1e-9) continue; // saute le doublon de jonction
+        var dd = pts.length ? cum[cum.length-1] +
+          _haversineKm(pts[pts.length-1][0], pts[pts.length-1][1], lng2, lat2) : 0;
+        pts.push([lng2, lat2]);
+        cum.push(dd);
+      }
+    }
+  }
+
+  var poly = { pts: pts, cum: cum };
+  _cahierPolyCache[cahier] = poly;
+  return poly;
+}
+
+/* Projette [lng,lat] sur la polyligne (segments) et renvoie
+   { s: distance curviligne du point projeté (km), dist: écart au tracé (km) }.
+   Projection point→segment sur chaque arête, on garde la plus proche. */
+function _projectOnPolyline(poly, lng, lat) {
+  var pts = poly.pts, cum = poly.cum;
+  var best = { s: 0, dist: Infinity };
+  for (var i = 0; i < pts.length - 1; i++) {
+    var ax = pts[i][0],   ay = pts[i][1];
+    var bx = pts[i+1][0], by = pts[i+1][1];
+    var dx = bx - ax, dy = by - ay;
+    var len2 = dx*dx + dy*dy;
+    var t = len2 > 0 ? ((lng-ax)*dx + (lat-ay)*dy) / len2 : 0;
+    if (t < 0) t = 0; else if (t > 1) t = 1;
+    var px = ax + dx*t, py = ay + dy*t;
+    var d = _haversineKm(px, py, lng, lat);
+    if (d < best.dist) {
+      var segKm = cum[i+1] - cum[i];
+      best = { s: cum[i] + segKm * t, dist: d };
+    }
+  }
+  return best;
+}
+
+/* Renvoie le [lng,lat] situé à la distance curviligne s (km) le long de poly. */
+function _pointAtDistance(poly, s) {
+  var pts = poly.pts, cum = poly.cum;
+  if (s <= 0) return pts[0].slice();
+  var total = cum[cum.length - 1];
+  if (s >= total) return pts[pts.length - 1].slice();
+  var lo = 0, hi = cum.length - 1;
+  while (lo < hi - 1) { var mid = (lo+hi)>>1; if (cum[mid] <= s) lo = mid; else hi = mid; }
+  var segKm = cum[hi] - cum[lo];
+  var t = segKm > 0 ? (s - cum[lo]) / segKm : 0;
+  return [ pts[lo][0] + (pts[hi][0]-pts[lo][0])*t,
+           pts[lo][1] + (pts[hi][1]-pts[lo][1])*t ];
+}
+
+/* Plan de survol : projette départ et arrivée sur la polyligne maîtresse ORDONNÉE
+   du cahier (elevProfile), sans notion de phase. sFrom/sTo = km depuis le départ
+   du cahier. Renvoie { poly, sFrom, sTo } ou null si pas de survol pertinent. */
+var FLYOVER_MAX_SNAP_KM = 3;   // si une étape est plus loin que ça du tracé, on renonce
+var FLYOVER_MIN_KM      = 0.3; // en-deçà, un flyTo direct suffit
+var FLYOVER_MAX_DETOUR  = 3.0; // si tracé curviligne > facteur × vol d'oiseau, on renonce
+function _flyoverPlan(cahier, fromLng, fromLat, toLng, toLat) {
+  var poly = _cahierPolyline(cahier);
+  if (poly.pts.length < 2) return null;
+
+  var a = _projectOnPolyline(poly, fromLng, fromLat);
+  var b = _projectOnPolyline(poly, toLng, toLat);
+  if (a.dist > FLYOVER_MAX_SNAP_KM || b.dist > FLYOVER_MAX_SNAP_KM) return null;
+
+  var span = Math.abs(b.s - a.s);
+  if (span < FLYOVER_MIN_KM) return null; // trop court : flyTo direct
+
+  // Garde-fou anti-détour : si le tracé fait un long détour vs le vol d'oiseau
+  // entre les deux étapes (tronçon manquant, projection aberrante), flyTo direct.
+  var crow = _haversineKm(fromLng, fromLat, toLng, toLat);
+  if (crow > 0.2 && span > crow * FLYOVER_MAX_DETOUR) return null;
+
+  return { poly: poly, sFrom: a.s, sTo: b.s };
+}
+
+/* Survol fluide : le tracé est rééchantillonné en points réguliers (espacés de
+ * flyoverSampleKm) pour effacer le bruit haute-fréquence du GPS, puis lissé par
+ * une spline Catmull-Rom. La position avance à vitesse constante (u linéaire en
+ * temps) et le bearing suit la tangente de la spline → variation douce, sans
+ * rebond ni à-coup. Trois phases : descente (dézoom global) → suivi rAF → montée.
+ * Annulable : une nouvelle navigation incrémente _flyover.seq.
+ */
+
+/* Interpolation Catmull-Rom sur 4 points (p0..p3), paramètre t∈[0,1] entre p1 et p2. */
+function _catmull(p0, p1, p2, p3, t) {
+  var t2 = t*t, t3 = t2*t;
+  function c(a, b, cc, d) {
+    return 0.5 * ((2*b) + (-a + cc)*t + (2*a - 5*b + 4*cc - d)*t2 + (-a + 3*b - 3*cc + d)*t3);
+  }
+  return [ c(p0[0],p1[0],p2[0],p3[0]), c(p0[1],p1[1],p2[1],p3[1]) ];
+}
+
+var _flyover = { active: false, seq: 0, raf: 0 };
+function _startFlyover(plan, dest, finalZoom) {
+  _flyover.seq++;
+  var mySeq = _flyover.seq;
+  _flyover.active = true;
+  if (_flyover.raf) { cancelAnimationFrame(_flyover.raf); _flyover.raf = 0; }
+
+  var poly = plan.poly, sFrom = plan.sFrom, sTo = plan.sTo;
+  var distKm = Math.abs(sTo - sFrom);
+
+  // 1) Rééchantillonnage régulier du parcours en points espacés de flyoverSampleKm.
+  //    Ces points lissent le tracé : on ne suit plus les micro-zigzags GPS.
+  var nSeg = Math.max(1, Math.round(distKm / Math.max(0.2, flyoverSampleKm)));
+  var P = [];
+  for (var k = 0; k <= nSeg; k++) {
+    var s = sFrom + (sTo - sFrom) * (k / nSeg);
+    P.push(_pointAtDistance(poly, s));
+  }
+  // Points fantômes aux extrémités pour Catmull-Rom (miroir).
+  var first = P[0], last = P[P.length-1];
+  var pad0 = [2*first[0]-P[1][0], 2*first[1]-P[1][1]];
+  var padN = [2*last[0]-P[P.length-2][0], 2*last[1]-P[P.length-2][1]];
+  var CR = [pad0].concat(P, [padN]); // indices 1..P.length correspondent à P[0..]
+
+  // Position lissée le long de la spline pour g∈[0,1] (g = progression globale).
+  function splineAt(g) {
+    var f = g * nSeg;          // position en unités de segment
+    var i = Math.floor(f);
+    if (i >= nSeg) i = nSeg - 1;
+    var t = f - i;
+    // Catmull-Rom sur CR[i], CR[i+1], CR[i+2], CR[i+3] (décalage +1 pour le pad).
+    return _catmull(CR[i], CR[i+1], CR[i+2], CR[i+3], t);
+  }
+
+  // 2) Une SEULE animation continue : center + zoom + bearing varient ensemble.
+  //    Durée ∝ distance (rythme constant), bornée.
+  var MS_PER_KM = 320;
+  var travelDur = Math.min(30000, Math.max(1800, Math.round(distKm * MS_PER_KM)));
+  var EPS = 0.01;       // avance (en g) pour estimer la tangente du cap
+  var curBearing = animateBearing ? map.getBearing() : 0;
+
+  // Zoom : début = fin = finalZoom (même niveau des deux côtés). En-dessous de
+  // ZOOM_FREE_KM, aucun dézoom (survol au niveau étape). Au-delà, amplitude en
+  // RACINE de la distance excédentaire (sature sur les longs trajets).
+  // Profil en CLOCHE (sinus) : descente/remontée douces, creux au milieu.
+  var ZOOM_MIN        = 6.5;   // plancher : ne jamais dézoomer plus bas que ça
+  var ZOOM_FREE_KM    = 2;     // sous cette distance, on ne dézoome pas du tout
+  var ZOOM_FACTOR     = 0.35;  // amplitude = ZOOM_FACTOR × √(distKm − ZOOM_FREE_KM) (à ajuster)
+  var excess = Math.max(0, distKm - ZOOM_FREE_KM);
+  var zoomDrop = Math.min(ZOOM_FACTOR * Math.sqrt(excess), finalZoom - ZOOM_MIN); // creux au milieu
+  if (zoomDrop < 0) zoomDrop = 0;
+
+  function zoomAt(g) {
+    if (zoomDrop <= 0) return finalZoom; // petites distances : zoom constant
+    var w = Math.sin(Math.PI * g); // 0 aux extrémités, 1 au milieu, cloche douce
+    return finalZoom - zoomDrop * w;
+  }
+
+  var t0 = null;
+  function frame(ts) {
+    if (mySeq !== _flyover.seq) return; // annulé
+    if (t0 === null) t0 = ts;
+    var g = Math.min(1, (ts - t0) / travelDur); // 0→1 LINÉAIRE = vitesse constante
+    var p  = splineAt(g);
+    var opt = { center: p, zoom: zoomAt(g) }; // center + zoom + bearing, MÊME frame
+    if (animateBearing) {
+      var pn = splineAt(Math.min(1, g + EPS));
+      if (Math.abs(pn[0]-p[0]) > 1e-9 || Math.abs(pn[1]-p[1]) > 1e-9) {
+        var target = _bearingTo(p[0], p[1], pn[0], pn[1]);
+        var d = ((target - curBearing + 540) % 360) - 180; // plus court chemin, wrap 0/360
+        curBearing = (curBearing + d * 0.12 + 360) % 360;   // lissage exponentiel
+        opt.bearing = curBearing;
+      }
+    }
+    map.jumpTo(opt);
+    if (g < 1) {
+      _flyover.raf = requestAnimationFrame(frame);
+    } else {
+      // Fin : garantir l'arrivée exacte sur l'étape au zoom cible (jumpTo, pas de flyTo).
+      _flyover.active = false;
+      _flyover.raf = 0;
+      map.jumpTo({ center: [dest.lng, dest.lat], zoom: finalZoom });
+    }
+  }
+  _flyover.raf = requestAnimationFrame(frame);
+}
+function _cancelFlyover() {
+  if (_flyover.active || _flyover.raf) {
+    _flyover.seq++;
+    _flyover.active = false;
+    if (_flyover.raf) { cancelAnimationFrame(_flyover.raf); _flyover.raf = 0; }
+  }
+}
 
 // =====================================================================
 // CADASTRE FRANCISCAIN (~1820-1860) — overlay transparent
@@ -3837,11 +4176,58 @@ document.querySelectorAll('input[name="basemap"]').forEach(function(r){
     }
   });
 
-  /* E-1 — Durée des transitions MapLibre */
+  /* E-1 — Durée des transitions MapLibre (+ mode Personnalisé) */
   var ckTransition = document.getElementById('ck-transition');
+  var ckTransitionCustomRow = document.getElementById('ck-transition-custom-row');
+  var ckTransitionCustom = document.getElementById('ck-transition-custom');
   if (ckTransition) {
     ckTransition.addEventListener('change', function() {
-      mapTransitionDuration = parseInt(this.value, 10);
+      if (this.value === 'custom') {
+        if (ckTransitionCustomRow) ckTransitionCustomRow.style.display = 'flex';
+        if (ckTransitionCustom) {
+          ckTransitionCustom.value = mapTransitionDuration;
+          mapTransitionDuration = parseInt(ckTransitionCustom.value, 10) || 0;
+          ckTransitionCustom.focus();
+        }
+      } else {
+        if (ckTransitionCustomRow) ckTransitionCustomRow.style.display = 'none';
+        mapTransitionDuration = parseInt(this.value, 10);
+      }
+    });
+  }
+  if (ckTransitionCustom) {
+    ckTransitionCustom.addEventListener('input', function() {
+      var v = parseInt(this.value, 10);
+      if (!isNaN(v) && v >= 0) mapTransitionDuration = Math.min(v, 20000);
+    });
+  }
+
+  /* E-3 — Orientation animée (cap départ→arrivée) */
+  var ckAnimBearing = document.getElementById('ck-anim-bearing');
+  if (ckAnimBearing) {
+    ckAnimBearing.addEventListener('change', function() {
+      animateBearing = this.checked;
+      // En désactivant, remettre la carte au nord pour éviter de rester de travers.
+      if (!animateBearing && Math.abs(map.getBearing()) > 0.5) {
+        map.easeTo({ bearing: 0, duration: 500 });
+      }
+    });
+  }
+
+  /* E-4 — Survol du parcours (points intermédiaires) + distance max */
+  var ckFlyover     = document.getElementById('ck-flyover');
+  var ckFlyoverRow  = document.getElementById('ck-flyover-dist-row');
+  var ckFlyoverDist = document.getElementById('ck-flyover-dist');
+  if (ckFlyover) {
+    ckFlyover.addEventListener('change', function() {
+      flyoverEnabled = this.checked;
+      if (ckFlyoverRow) ckFlyoverRow.style.display = this.checked ? 'flex' : 'none';
+    });
+  }
+  if (ckFlyoverDist) {
+    ckFlyoverDist.addEventListener('input', function() {
+      var v = parseFloat(this.value);
+      if (!isNaN(v) && v > 0) flyoverSampleKm = Math.min(v, 50);
     });
   }
 
