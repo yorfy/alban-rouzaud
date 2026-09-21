@@ -493,8 +493,8 @@ body{font-family:'Segoe UI',Tahoma,sans-serif;background:#1a1a2e;color:#e0e0e0;h
                      style="width:80px;background:#0f1628;border:1px solid #1a4a7a;color:#a0b4c8;border-radius:4px;padding:2px 4px;font-size:.8em;font-variant-numeric:tabular-nums">
             </label>
             <label><input type="checkbox" id="ck-anim-bearing" checked> 🧭 Orientation animée (cap du trajet)</label>
-            <label><input type="checkbox" id="ck-flyover" checked> 🛩️ Survol du parcours (points intermédiaires)</label>
-            <label id="ck-flyover-dist-row" style="display:flex;align-items:center;justify-content:space-between;gap:6px">Distance entre survols (km)
+            <label><input type="checkbox" id="ck-flyover"> 🛩️ Survol du parcours (points intermédiaires)</label>
+            <label id="ck-flyover-dist-row" style="display:none;align-items:center;justify-content:space-between;gap:6px">Distance entre survols (km)
               <input type="number" id="ck-flyover-dist" min="0.5" max="50" step="0.5" value="3"
                      style="width:70px;background:#0f1628;border:1px solid #1a4a7a;color:#a0b4c8;border-radius:4px;padding:2px 4px;font-size:.8em;font-variant-numeric:tabular-nums">
             </label>
@@ -1373,7 +1373,7 @@ var currentBasemap = 'ofm';
 var cpaGlobalVisible = true;
 var mapTransitionDuration = 3500; // durée des transitions MapLibre en ms (E-1) — défaut « Très lent »
 var animateBearing = true; // E-3 : orienter la carte selon le cap départ→arrivée pendant le vol (actif par défaut)
-var flyoverEnabled  = true;  // E-4 : survol fluide du tracé GPS entre deux étapes contiguës (actif par défaut)
+var flyoverEnabled  = false;  // E-4 : survol fluide du tracé GPS entre deux étapes contiguës (désactivé par défaut)
 var flyoverSampleKm = 3;     // distance (km) entre points de survol échantillonnés; lisse le tracé (spline)
 
 /* Cap géographique (0-360°, 0=Nord) du point [lng1,lat1] vers [lng2,lat2].
