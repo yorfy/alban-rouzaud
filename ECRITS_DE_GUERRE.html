@@ -1603,6 +1603,7 @@ function _catmull(p0, p1, p2, p3, t) {
 
 var _flyover = { active: false, seq: 0, raf: 0, lastS: null, lastKey: null };
 function _startFlyover(plan, dest, finalZoom) {
+  _installFlyoverInterrupt();     // pose (une fois) les écouteurs d'interruption utilisateur
   _flyover.seq++;
   var mySeq = _flyover.seq;
   _flyover.active = true;
@@ -1751,6 +1752,30 @@ function _cancelFlyover() {
     _flyover.active = false;
     if (_flyover.raf) { cancelAnimationFrame(_flyover.raf); _flyover.raf = 0; }
   }
+}
+
+/* Interruption par l'utilisateur : si l'utilisateur touche/glisse/zoome la carte
+   PENDANT un survol, on l'annule pour lui rendre la main. On distingue une vraie
+   interaction (e.originalEvent présent : souris/tactile/molette) de nos propres
+   jumpTo programmatiques (qui n'ont pas d'originalEvent). Listeners posés une
+   seule fois (idempotent). */
+var _flyoverInterruptInstalled = false;
+function _installFlyoverInterrupt() {
+  if (_flyoverInterruptInstalled) return;
+  _flyoverInterruptInstalled = true;
+  function onUserGesture(e) {
+    if (_flyover.active && e && e.originalEvent) _cancelFlyover();
+  }
+  // dragstart/zoomstart/rotatestart/pitchstart portent originalEvent quand
+  // l'action vient de l'utilisateur ; nos jumpTo ne les déclenchent pas ainsi.
+  map.on('dragstart',   onUserGesture);
+  map.on('zoomstart',   onUserGesture);
+  map.on('rotatestart', onUserGesture);
+  map.on('pitchstart',  onUserGesture);
+  // Filet tactile/molette immédiat (avant même le seuil de drag).
+  map.on('mousedown',   onUserGesture);
+  map.on('touchstart',  onUserGesture);
+  map.on('wheel',       onUserGesture);
 }
 
 // =====================================================================
@@ -3177,11 +3202,10 @@ var Panel = (function() {
     incoming.className = 'panel-view';
     incoming.innerHTML = renderFn();
 
-    /* Figer la hauteur du viewport pendant l'animation */
-    var viewH = viewport.offsetHeight || 400;
-    viewport.style.height = viewH + 'px';
-    viewport.style.overflowX = 'hidden';
-    if (isBackLevel) viewport.style.overflowY = 'hidden';
+    var isBack      = direction === 'back';
+    var isBackLevel = direction === 'back-level';
+
+    var outH = viewport.offsetHeight || 400;
 
     /* Rendre la vue sortante absolue pour l'animer */
     if (outgoing) {
@@ -3195,10 +3219,22 @@ var Panel = (function() {
        forward     : slide horizontal droite→gauche
        back-level  : slide vertical bas→haut (retour hiérarchique)
        back        : slide horizontal gauche→droite (précédent même niveau) */
-    var isBack      = direction === 'back';
-    var isBackLevel = direction === 'back-level';
     incoming.style.transform = isBackLevel ? 'translateY(100%)' : (isBack ? 'translateX(-100%)' : 'translateX(100%)');
     viewport.appendChild(incoming);
+
+    /* Figer la hauteur du viewport pendant l'animation, au MAX des deux vues :
+       sinon une vue entrante plus haute (ex. date + description ajoutées)
+       apparaît clippée puis « pousse » la liste vers le bas à la fin. */
+    var inH   = incoming.offsetHeight || outH;
+    var viewH = Math.max(outH, inH);
+    viewport.style.height = viewH + 'px';
+    viewport.style.overflowX = 'hidden';
+    if (isBackLevel) viewport.style.overflowY = 'hidden';
+    /* Remettre le scroll en haut DÈS LE DÉBUT : l'accueil peut être scrollé
+       (bio ↔ cartes) et l'outgoing est en position:absolute;top:0, donc ce
+       reset ne le décale pas — mais il évite que la vue entrante apparaisse
+       décalée puis « saute » en haut à la fin de la transition. */
+    viewport.scrollTop = 0;
 
     /* Double rAF pour garantir le reflow avant l'animation */
     requestAnimationFrame(function() {
@@ -3353,6 +3389,11 @@ var Panel = (function() {
     '.pv-item.active{background:rgba(255,255,255,.12)!important;border-left-width:4px}',
     /* Vue-étape (task 3.4) */
     '.pv-etape-phase{font-size:.8em;font-weight:600;letter-spacing:.04em;margin-bottom:10px;opacity:.85}',
+    '.pv-etape-phase.clickable{cursor:pointer;display:inline-flex;align-items:center;gap:5px;'
+    + 'padding:3px 8px 3px 6px;border-radius:4px;transition:background .15s,opacity .15s}',
+    '.pv-etape-phase.clickable:hover{opacity:1;background:rgba(255,255,255,.08)}',
+    '.pv-etape-phase-arrow{display:block;flex-shrink:0;opacity:.75}',
+    '.pv-etape-phase.clickable:hover .pv-etape-phase-arrow{opacity:1}',
     '.pv-etape-date{font-size:.85em;color:#e94560;margin-bottom:10px;display:flex;align-items:center;gap:5px}',
     '.pv-etape-desc{font-size:.9em;color:#a0b4c8;line-height:1.65;margin-bottom:12px;text-align:justify;hyphens:auto}',
     '.pv-etape-citation{border-left:3px solid #e94560;margin:10px 0;padding:8px 12px;'
@@ -3487,19 +3528,51 @@ function renderCahier(cahierN) {
 
   var prevCahier = cahierN > 1 ? cahierN - 1 : null;
   var nextCahier = cahierN < 4 ? cahierN + 1 : null;
+  var backToAccueil = 'NAV.go(0,null,\'back\')';
+
+  /* Période et description du cahier, extraites du subtitle :
+     « <période> — <description> ». */
+  var sub  = meta.subtitle || '';
+  var dash = sub.indexOf('\u2014');
+  var cahierPeriod = dash >= 0 ? sub.slice(0, dash).trim() : sub.trim();
+  var cahierDesc   = dash >= 0 ? sub.slice(dash + 1).trim() : '';
+  var periodHTML = cahierPeriod
+    ? '<div class="pv-etape-date">&#128197;\u00a0' + cahierPeriod + '</div>'
+    : '';
+  var descHTML = cahierDesc
+    ? '<div class="pv-period">' + cahierDesc + '</div>'
+    : '';
 
   return _renderNavBar(
       'Cahier\u00a0' + cahierN + '\u00a0\u2014 ' + (meta.title || ''),
-      'NAV.go(0,null,\'back\')',
+      backToAccueil,
       prevCahier ? 'NAV.go(1,{cahier:' + prevCahier + '},\'back\')' : null,
       nextCahier ? 'NAV.go(1,{cahier:' + nextCahier + '})' : null,
-      !prevCahier, !nextCahier
+      !prevCahier, !nextCahier,
+      'fitCurrentCahier()'
     )
-    + '<div class="pv-period">' + (meta.subtitle || '') + '</div>'
+    + '<div class="pv-etape-phase clickable" style="color:' + (meta.color || '#888') + '"'
+    + ' title="Retour à l\'accueil" onclick="' + backToAccueil + '">'
+    + '<svg class="pv-etape-phase-arrow" xmlns="http://www.w3.org/2000/svg" width="13" height="13"'
+    + ' viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"'
+    + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>'
+    + '\u00c9crits de Guerre</div>'
+    + periodHTML
+    + descHTML
     + '<ul class="pv-list">'
     + chapitresHTML
     + photosHTML
     + '</ul>';
+}
+
+/* --- fitCurrentCahier() — recadre la carte sur le cahier affiché ---
+ * Appelé par le clic sur le titre en vue-cahier (niveau 1).
+ */
+function fitCurrentCahier() {
+  var st = NAV.state;
+  if (!st || st.level !== 1 || st.cahier == null) return;
+  MapAdapter.fitCahier(st.cahier);
 }
 
 /* --- findStop(cahierData, stopId) ---
@@ -3525,6 +3598,45 @@ function getStopSeqNum(cahierN, stopId) {
     if (stops[i].id === stopId) return i + 1;
   }
   return null;
+}
+
+/* --- _chapterPeriod(phaseName, datedStops) ---
+ * Détermine la période affichée d'un chapitre par analyse de cohérence.
+ * Priorité au TITRE du chapitre s'il porte un mois (ex. « Septembre 39 »),
+ * qui couvre alors tout le chapitre ; sinon plage des étapes datées ; sinon ''.
+ * Aucune date n'est fabriquée : on ne renvoie que ce que le titre ou les
+ * étapes affirment déjà.
+ */
+var _MOIS_FR = ['janvier','février','fevrier','mars','avril','mai','juin','juillet',
+  'août','aout','septembre','octobre','novembre','décembre','decembre',
+  'janv','févr','fevr','sept','oct','nov','déc','dec'];
+function _chapterPeriod(phaseName, datedStops) {
+  var title = phaseName || '';
+  var low = title.toLowerCase();
+  /* 1) Le titre porte-t-il un mois ? (mois entier ou abrégé) */
+  var monthMatch = null;
+  for (var i = 0; i < _MOIS_FR.length; i++) {
+    var re = new RegExp('\\b' + _MOIS_FR[i] + '\\b', 'i');
+    var m = re.exec(low);
+    if (m) { monthMatch = title.substr(m.index, _MOIS_FR[i].length); break; }
+  }
+  if (monthMatch) {
+    /* Normaliser l'année : « 39 » → « 1939 », « 40 » → « 1940 » */
+    var yr = /\b(\d{4})\b/.exec(title);
+    var yr2 = /\b(\d{2})\b/.exec(title);
+    var year = yr ? yr[1] : (yr2 ? (parseInt(yr2[1],10) >= 39 ? '19'+yr2[1] : '19'+yr2[1]) : '');
+    /* Capitaliser le mois tel qu'écrit dans le titre */
+    var mois = monthMatch.charAt(0).toUpperCase() + monthMatch.slice(1);
+    return year ? (mois + '\u00a0' + year) : mois;
+  }
+  /* 2) Plage des étapes datées */
+  if (datedStops.length) {
+    var dFirst = datedStops[0].date;
+    var dLast  = datedStops[datedStops.length - 1].date;
+    return (dFirst === dLast) ? dFirst : (dFirst + '\u00a0\u2013\u00a0' + dLast);
+  }
+  /* 3) Rien de fiable */
+  return '';
 }
 
 /* --- renderChapitre(cahierN, phaseN) ---
@@ -3600,14 +3712,47 @@ function renderChapitre(cahierN, phaseN) {
     if (nextFirstPhase != null) nextFn = 'NAV.go(2,{cahier:' + (cahierN+1) + ',chapitre:' + nextFirstPhase + '})';
   }
 
+  var backToCahier = 'NAV.go(1,{cahier:' + cahierN + '},\'back\')';
+  var cahierTitle  = (CAHIER_META[cahierN] && CAHIER_META[cahierN].title) || ('Cahier\u00a0' + cahierN);
+
+  /* Période du chapitre — analyse par cohérence, pas règle systématique :
+     1) si le TITRE du chapitre porte un mois (+ année), il donne la période
+        (ex. « Septembre 39 » couvre tout le chapitre même si une seule étape
+        est datée au 3 sept.) ;
+     2) sinon, plage dérivée de ses étapes datées (première → dernière) ;
+     3) sinon, rien (aucune date fabriquée). */
+  var datedStops = phaseStops.filter(function(s){ return s.date; });
+  var chapDate = _chapterPeriod(phaseName, datedStops);
+  var chapDateHTML = chapDate
+    ? '<div class="pv-etape-date">&#128197;\u00a0' + chapDate + '</div>'
+    : '';
+
   return _renderNavBar(
       phaseName,
-      'NAV.go(1,{cahier:' + cahierN + '},\'back\')',
+      backToCahier,
       prevFn || null, nextFn || null,
-      !prevFn, !nextFn
+      !prevFn, !nextFn,
+      'fitCurrentChapitre()'
     )
-    + '<div class="pv-period">' + phaseStops.length + '\u00a0étape' + (phaseStops.length > 1 ? 's' : '') + '</div>'
+    + '<div class="pv-etape-phase clickable" style="color:' + color + '"'
+    + ' title="Retour au cahier" onclick="' + backToCahier + '">'
+    + '<svg class="pv-etape-phase-arrow" xmlns="http://www.w3.org/2000/svg" width="13" height="13"'
+    + ' viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"'
+    + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>'
+    + cahierTitle + '</div>'
+    + chapDateHTML
     + '<ul class="pv-list">' + itemsHTML + '</ul>';
+}
+
+/* --- fitCurrentChapitre() — recadre la carte sur le chapitre affiché ---
+ * Appelé par le clic sur le titre en vue-chapitre. Relit l'état NAV et
+ * fitBounds sur les étapes de la phase (équivalent set_bound).
+ */
+function fitCurrentChapitre() {
+  var st = NAV.state;
+  if (!st || st.level !== 2 || st.chapitre == null || st.cahier == null) return;
+  MapAdapter.fitChapitre(st.cahier, st.chapitre);
 }
 
 /* --- renderEtape(stop, PC, PN, cahierN) ---
@@ -3661,17 +3806,39 @@ function renderEtape(stop, PC, PN, cahierN) {
   var isFirstGlobal = NAV.isFirst();
   var isLastGlobal  = NAV.isLast();
 
+  var backToChapter = 'NAV.go(2,{cahier:' + cahierN + ',chapitre:' + stop.p + '},\'back\')';
+
   return _renderNavBar(
       stop.n,
-      'NAV.go(2,{cahier:' + cahierN + ',chapitre:' + stop.p + '},\'back\')',
+      backToChapter,
       'NAV.prev()', 'NAV.next()',
-      isFirstGlobal, isLastGlobal
+      isFirstGlobal, isLastGlobal,
+      'flyToCurrentStop()'
     )
-    + '<div class="pv-etape-phase" style="color:' + color + '">' + phaseName + '</div>'
+    + '<div class="pv-etape-phase clickable" style="color:' + color + '"'
+    + ' title="Retour au chapitre" onclick="' + backToChapter + '">'
+    + '<svg class="pv-etape-phase-arrow" xmlns="http://www.w3.org/2000/svg" width="13" height="13"'
+    + ' viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"'
+    + ' stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'
+    + '<line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>'
+    + phaseName + '</div>'
     + dateHTML
     + descHTML
     + citationHTML
     + refHTML;
+}
+
+/* --- flyToCurrentStop() — recentre la carte sur l'étape affichée (FR-3.4bis) ---
+ * Appelé par le clic sur le titre en vue-étape. Geste isolé (pas de survol de
+ * parcours) : on relit l'état NAV, on retrouve le stop et on flyTo dessus.
+ */
+function flyToCurrentStop() {
+  var st = NAV.state;
+  if (!st || st.level !== 3 || st.stopId == null || st.cahier == null) return;
+  var cd = getCahierData(st.cahier);
+  var stop = findStop(cd, st.stopId);
+  if (!stop || stop.lng == null || stop.lat == null) return;
+  MapAdapter.flyToStop({ lng: stop.lng, lat: stop.lat });
 }
 
 /* --- renderPhotos(cahierN) — FR-3.5 (task 3.5) ---
@@ -3985,7 +4152,7 @@ function _accueilScrollCard(dir) {
  * backFn   : chaîne JS pour le clic sur le titre (retour)
  * prevFn/nextFn : chaîne JS pour ◀/▶ (null = bouton absent)
  */
-function _renderNavBar(title, backFn, prevFn, nextFn, prevDisabled, nextDisabled) {
+function _renderNavBar(title, backFn, prevFn, nextFn, prevDisabled, nextDisabled, titleFn) {
   /* Mémoriser les actions ◀/▶ DU NIVEAU COURANT pour que le swipe fasse
      exactement la même chose que les boutons (cahier↔cahier, chapitre↔chapitre,
      étape↔étape). Les chaînes sont générées par nous, pas par l'utilisateur. */
@@ -4007,9 +4174,14 @@ function _renderNavBar(title, backFn, prevFn, nextFn, prevDisabled, nextDisabled
     + '<line x1="12" y1="19" x2="12" y2="5"/>'
     + '<polyline points="5 12 12 5 19 12"/>'
     + '</svg>';
+  /* titleFn: si fourni, le titre déclenche cette action (ex. flyTo) au lieu du
+     retour au niveau supérieur, et n'affiche pas la flèche de retour. */
+  var titleHTML = titleFn
+    ? '<span class="pv-nav-title" title="Recentrer la carte sur l\'étape" onclick="' + titleFn + '">' + title + '</span>'
+    : '<span class="pv-nav-title" onclick="' + backFn + '">' + _svgBack + title + '</span>';
   return '<div class="pv-nav-bar">'
     + prev
-    + '<span class="pv-nav-title" onclick="' + backFn + '">' + _svgBack + title + '</span>'
+    + titleHTML
     + next
     + '</div>';
 }
